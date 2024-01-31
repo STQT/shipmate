@@ -3,8 +3,6 @@ version: '3'
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
-  production_traefik: {}
-  production_django_media: {}
 
 services:
   django: &django
@@ -14,10 +12,14 @@ services:
 
     image: shipmate_production_django
     volumes:
-      - production_django_media:/app/shipmate/media
+      - /var/www/api.shipmate.com/media:/app/shipmate/media
+      - /var/www/api.shipmate.com/static:/app/shipmate/static
+
     depends_on:
       - postgres
       - redis
+    ports:
+      - "7000:7000"
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
@@ -55,23 +57,17 @@ services:
     <<: *django
     image: shipmate_production_celeryworker
     command: /start-celeryworker
+    ports: [ ]
 
   celerybeat:
     <<: *django
     image: shipmate_production_celerybeat
     command: /start-celerybeat
+    ports: [ ]
 
   flower:
     <<: *django
     image: shipmate_production_flower
     command: /start-flower
+    ports: ["5555:5555"]
 
-  nginx:
-    build:
-      context: .
-      dockerfile: ./compose/production/nginx/Dockerfile
-    image: shipmate_local_nginx
-    depends_on:
-      - django
-    volumes:
-      - production_django_media:/usr/share/nginx/media:ro

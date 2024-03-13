@@ -86,7 +86,7 @@ COPY --chown=django:django . ${APP_HOME}
 # make django owner of the WORKDIR directory as well.
 RUN chown django:django ${APP_HOME}
 
-USER django
+# USER django
 
 RUN DATABASE_URL="" \
   CELERY_BROKER_URL="" \

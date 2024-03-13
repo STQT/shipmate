@@ -343,7 +343,7 @@ REST_FRAMEWORK = {
         'djangorestframework_camel_case.parser.CamelCaseJSONParser',
         # Any other parsers
     ),
-    'DEFAULT_PAGINATION_CLASS': 'contrib.pagination.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'shipmate.contrib.pagination.CustomPagination',
 
 }
 

@@ -19,7 +19,7 @@ services:
       - postgres
       - redis
     ports:
-      - "7000:7000"
+      - "7000:5000"
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres

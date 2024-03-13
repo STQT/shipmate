@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from shipmate.users.api.views import UserViewSet
@@ -10,6 +11,12 @@ else:
 
 router.register("users", UserViewSet)
 
-
 app_name = "api"
 urlpatterns = router.urls
+
+urlpatterns += [
+    path('address/', include('shipmate.addresses.urls'), name="addresses"),
+    path('quote/', include('shipmate.quotes.urls'), name="quotes"),
+    path('cars/', include('shipmate.cars.urls'), name="cars"),
+    path('customers/', include('shipmate.customers.urls'), name="customers")
+]

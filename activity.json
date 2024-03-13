@@ -1,0 +1,8 @@
+{
+  "title": "Text",
+  "attachments": null, // []
+  "type": "note, task, etc",
+  "description": null,
+  "from": "email@gmail.com",
+  "to": ["email@gmail.com"]
+}

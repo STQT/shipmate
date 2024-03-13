@@ -366,7 +366,7 @@ SPECTACULAR_SETTINGS = {
         'drf_spectacular.hooks.postprocess_schema_enums',
         'drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'contrib.pagination.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'shipmate.contrib.pagination.CustomPagination',
 }
 # Your stuff...
 # ------------------------------------------------------------------------------

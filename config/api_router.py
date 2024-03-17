@@ -17,6 +17,7 @@ urlpatterns = router.urls
 urlpatterns += [
     path('address/', include('shipmate.addresses.urls'), name="addresses"),
     path('quote/', include('shipmate.quotes.urls'), name="quotes"),
+    path('leads/', include('shipmate.leads.urls'), name="leades"),
     path('cars/', include('shipmate.cars.urls'), name="cars"),
     path('customers/', include('shipmate.customers.urls'), name="customers")
 ]

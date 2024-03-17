@@ -89,6 +89,7 @@ LOCAL_APPS = [
     "shipmate.cars",
     "shipmate.customers",
     "shipmate.quotes",
+    "shipmate.leads",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -344,6 +345,7 @@ REST_FRAMEWORK = {
         # Any other parsers
     ),
     'DEFAULT_PAGINATION_CLASS': 'shipmate.contrib.pagination.CustomPagination',
+    'DATETIME_FORMAT': '%m/%d/%Y %I:%M %p',
 
 }
 

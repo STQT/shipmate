@@ -4,7 +4,7 @@ from .serializers import *
 
 
 class ListQuoteAPIView(ListAPIView):
-    queryset = Quote.objects.all()
+    queryset = Quote.objects.filter(is_archive=False)
     serializer_class = ListQuoteSerializer
 
 
@@ -26,3 +26,8 @@ class DeleteQuoteAPIView(DestroyAPIView):
 class DetailQuoteAPIView(RetrieveAPIView):
     queryset = Quote.objects.all()
     serializer_class = RetrieveQuoteSerializer
+
+
+class ArchiveListQuoteAPIView(ListAPIView):
+    queryset = Quote.objects.filter(is_archive=True)
+    serializer_class = ListQuoteSerializer

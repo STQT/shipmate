@@ -162,7 +162,8 @@ sentry_sdk.init(
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
-    {"url": "https://api.shipmate.com", "description": "Production server"},
+    {"url": "https://crmapi01xz.matelogisticss.com", "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
+CSRF_TRUSTED_ORIGINS = ["https://crmapi01xz.matelogisticss.com"]

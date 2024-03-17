@@ -32,7 +32,7 @@ class LeadsAbstract(models.Model):
 
     reservation = models.PositiveIntegerField(default=200)
     trailer_type = models.CharField(choices=TrailerTypeChoices.choices, default=TrailerTypeChoices.OPEN, max_length=20)
-    date_est_ship = models.DateField(null=True, blank=True)
+    date_est_ship = models.DateField()
     is_archive = models.BooleanField(default=False, verbose_name='Is Archived')
 
     class Meta:

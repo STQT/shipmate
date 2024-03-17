@@ -27,3 +27,6 @@ class CarsModel(models.Model):
     name = models.CharField("Name", blank=True, null=True, max_length=255)
     vehicle_type = models.CharField('Vehicle type', max_length=255,
                                     choices=VehicleTYPES.choices, default='Car')
+
+    def __str__(self):
+        return self.name

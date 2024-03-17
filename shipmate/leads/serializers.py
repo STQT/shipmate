@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
 from .models import Leads
+from ..addresses.serializers import CitySerializer
+from ..cars.serializers import CarsModelSerializer
+from ..customers.serializers import CustomerSerializer
 
 
 class CreateLeadsSerializer(serializers.ModelSerializer):
@@ -33,7 +36,12 @@ class ListLeadsSerializer(serializers.ModelSerializer):
         return f"{obj.vehicle_year} {obj.vehicle.mark.name} {obj.vehicle.name}"
 
 
-class RetrieveLeadsSerializer(serializers.ModelSerializer):
+class RetrieveLeadsSerializer(ListLeadsSerializer):
+    customer = CustomerSerializer(many=False)
+    origin = CitySerializer(many=False)
+    destination = CitySerializer(many=False)
+    vehicle = CarsModelSerializer(many=False)
+
     class Meta:
         model = Leads
         fields = "__all__"

@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from .models import Leads
-from ..addresses.serializers import CitySerializer
-from ..cars.serializers import CarsModelSerializer
-from ..customers.serializers import CustomerSerializer
+from shipmate.leads.models import Leads
+from shipmate.addresses.serializers import CitySerializer
+from shipmate.cars.serializers import CarsModelSerializer
+from shipmate.customers.serializers import CustomerSerializer
 
 
 class CreateLeadsSerializer(serializers.ModelSerializer):

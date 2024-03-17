@@ -372,3 +372,5 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+IMAP_EMAIL_USER = env("EMAIL_HOST_USER")
+IMAP_EMAIL_PASSWORD = env("EMAIL_HOST_PASSWORD")

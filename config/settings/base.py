@@ -90,6 +90,7 @@ LOCAL_APPS = [
     "shipmate.customers",
     "shipmate.quotes",
     "shipmate.leads",
+    "shipmate.mails",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

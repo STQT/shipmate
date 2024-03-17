@@ -1,10 +1,9 @@
 import imaplib
 import email
+import logging
 from email.header import decode_header
 from dataclasses import dataclass
 from typing import List
-
-from django.conf import settings
 
 
 @dataclass
@@ -46,20 +45,17 @@ def fetch_emails(username, password, imap_server="imap.example.com", port=993) -
                         if part.get_content_type() == "text/plain":
                             body = part.get_payload(decode=True).decode(part.get_content_charset())
                             break
-                    emails.append(EmailMessage(subject, sender, recipient, date, body))
+                    emails.append(
+                        EmailMessage(subject=subject,
+                                     sender=sender,
+                                     recipient=recipient,
+                                     date=date,
+                                     body=body))
 
     except Exception as e:
-        print("An error occurred:", str(e))
+        logging.error(f"An error occurred: {str(e)}")
     finally:
         # Logout and close connection
         imap.logout()
 
     return emails
-
-
-# Example usage:
-# username = settings.IMAP_EMAIL_USER
-# password = settings.IMAP_EMAIL_PASSWORD
-# emails = fetch_emails(username, password, imap_server="imap.gmail.com")
-# for email in emails:
-#     print(email)

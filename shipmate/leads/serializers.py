@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
@@ -41,6 +42,7 @@ class RetrieveLeadsSerializer(ListLeadsSerializer):
     origin = CitySerializer(many=False)
     destination = CitySerializer(many=False)
     vehicle = CarsModelSerializer(many=False)
+    source = ProviderSmallDataSerializer(many=False)
 
     class Meta:
         model = Leads

@@ -12,7 +12,7 @@ from shipmate.leads.serializers import (
 
 
 class ListLeadsAPIView(ListAPIView):
-    queryset = Leads.objects.filter(status=LeadsStatusChoices.LEADS)
+    queryset = Leads.objects.all()
     serializer_class = ListLeadsSerializer
     filterset_class = LeadsFilter
 
@@ -35,8 +35,3 @@ class DeleteLeadsAPIView(DestroyAPIView):
 class DetailLeadsAPIView(RetrieveAPIView):
     queryset = Leads.objects.all()
     serializer_class = RetrieveLeadsSerializer
-
-
-class ArchiveListLeadsAPIView(ListAPIView):
-    queryset = Leads.objects.filter(status=LeadsStatusChoices.ARCHIVED)
-    serializer_class = ListLeadsSerializer

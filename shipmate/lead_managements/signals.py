@@ -7,6 +7,7 @@ from .models import Provider, ProviderLog
 @receiver(post_save, sender=Provider)
 def log_provider_update(sender, instance, created, **kwargs):
     timestamp = timezone.now()
+    updated_user_name = instance.updated_from.user.name if instance.updated_from else "Anonym"
     if not created:
         title = ""
         message = ""
@@ -18,12 +19,12 @@ def log_provider_update(sender, instance, created, **kwargs):
             new_value = getattr(instance, field_name)
             if old_value != new_value:
                 title += (f"- {field_name} field is edited on "
-                          f"{timestamp.strftime('%B %d, %Y %I:%M %p')} by {instance.user}\n")
+                          f"{timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n")
                 message += f"- {old_value} -> {new_value}\n"
 
         # Save log entry if any changes detected
         if title:
             ProviderLog.objects.create(provider=instance, title=title, message=message)
     else:
-        title = f"Lead provider is created on: {timestamp.strftime('%B %d, %Y %I:%M %p')} by {instance.user.name}\n"
+        title = f"Lead provider is created on: {timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n"
         ProviderLog.objects.create(provider=instance, title=title)

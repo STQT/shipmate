@@ -13,10 +13,16 @@ class CreateProviderAPIView(CreateAPIView):  # noqa
     queryset = Provider.objects.all()
     serializer_class = ProviderSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class UpdateProviderAPIView(UpdateAPIView):
     queryset = Provider.objects.all()
     serializer_class = ProviderSerializer
+
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
 
 class DeleteProviderAPIView(DestroyAPIView):

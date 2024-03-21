@@ -1,4 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+User = get_user_model()
 
 
 class Provider(models.Model):
@@ -17,6 +20,7 @@ class Provider(models.Model):
     email = models.EmailField()
     subject = models.CharField(max_length=320)
     is_external = models.BooleanField(default=True)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="providers", null=True, blank=True)
 
 
 class ProviderLog(models.Model):

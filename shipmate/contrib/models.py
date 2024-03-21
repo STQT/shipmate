@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 
@@ -30,6 +31,7 @@ class ConditionChoices(models.TextChoices):
 
 
 class LeadsAbstract(models.Model):
+    guid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(editable=False)
     status = models.CharField(max_length=20, choices=LeadsStatusChoices.choices, default=LeadsStatusChoices.LEADS)

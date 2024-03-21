@@ -5,11 +5,11 @@ from .serializers import *
 from ..contrib.models import QuoteStatusChoices
 
 
-class ListQuoteAPIView(ListAPIView):
+class ListQuoteAPIView(ListAPIView):  # noqa
     queryset = Quote.objects.all()
     serializer_class = ListQuoteSerializer
     filterset_class = QuoteFilter
-    ordering_fields = ['updated_at', 'id', 'customer', 'phone', 'vehicle', 'origin', 'destination', 'date_est_ship']
+    ordering = ("-id",)
 
 
 class CreateQuoteAPIView(CreateAPIView):
@@ -20,16 +20,19 @@ class CreateQuoteAPIView(CreateAPIView):
 class UpdateQuoteAPIView(UpdateAPIView):
     queryset = Quote.objects.all()
     serializer_class = UpdateQuoteSerializer
+    lookup_field = 'guid'
 
 
 class DeleteQuoteAPIView(DestroyAPIView):
     queryset = Quote.objects.all()
     serializer_class = CreateQuoteSerializer
+    lookup_field = 'guid'
 
 
 class DetailQuoteAPIView(RetrieveAPIView):
     queryset = Quote.objects.all()
     serializer_class = RetrieveQuoteSerializer
+    lookup_field = 'guid'
 
 
 class ArchiveListQuoteAPIView(ListAPIView):

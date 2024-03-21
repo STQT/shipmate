@@ -1,9 +1,15 @@
 from django.db import models
+from django.utils import timezone
 
 
 class TrailerTypeChoices(models.TextChoices):
     OPEN = "open", "Open"
     CLOSE = "enclosed", "Enclosed"
+
+
+class LeadsStatusChoices(models.TextChoices):
+    LEADS = "leads", "Leads"
+    ARCHIVED = "archived", "Archived"
 
 
 class QuoteStatusChoices(models.TextChoices):
@@ -14,9 +20,10 @@ class QuoteStatusChoices(models.TextChoices):
     UPCOMING = "upcoming", "Upcoming"
     ONHOLD = "onHold", "On hold"
     NOTNOW = "notNow", "Not now"
+    ARCHIVED = "archived", "Archived"
 
 
-class QuoteConditionChoices(models.TextChoices):
+class ConditionChoices(models.TextChoices):
     DRIVES = "run", "Run and drives"
     ROLLS = 'rols', "Inop, it rolls"
     FORKLIFT = 'forklift', "Inop, needs forklift "
@@ -24,25 +31,38 @@ class QuoteConditionChoices(models.TextChoices):
 
 class LeadsAbstract(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(editable=False)
+    status = models.CharField(max_length=20, choices=LeadsStatusChoices.choices, default=LeadsStatusChoices.LEADS)
     customer = models.ForeignKey("customers.Customer", on_delete=models.SET_NULL, null=True)
     vehicle = models.ForeignKey("cars.CarsModel", on_delete=models.SET_NULL, null=True)
     vehicle_year = models.PositiveSmallIntegerField()
     price = models.PositiveIntegerField(default=0)
-
-    reservation = models.PositiveIntegerField(default=200)
+    condition = models.CharField(max_length=50, choices=ConditionChoices.choices, default=ConditionChoices.DRIVES)
     trailer_type = models.CharField(choices=TrailerTypeChoices.choices, default=TrailerTypeChoices.OPEN, max_length=20)
+
+    reservation_price = models.PositiveIntegerField(default=200)
     date_est_ship = models.DateField()
-    is_archive = models.BooleanField(default=False, verbose_name='Is Archived')
+    source = models.ForeignKey("lead_managements.Provider", on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         default_related_name = 'leads'
         abstract = True
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # Object is being created, set created_at and updated_at
+            self.created_at = timezone.now()
+            self.updated_at = self.created_at
+        else:
+            # Object is being updated
+            old_instance = self.__class__.objects.get(pk=self.pk)
+            if self.status != old_instance.status:
+                # Status changed, update updated_at
+                self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
+
 
 class QuoteAbstract(LeadsAbstract):
-    condition = models.CharField(max_length=50, choices=QuoteConditionChoices.choices,
-                                 blank=True, null=True)
     status = models.CharField(max_length=20, choices=QuoteStatusChoices.choices, default=QuoteStatusChoices.QUOTES)
     # Payments
     payment_total_tariff = models.PositiveIntegerField(default=0)
@@ -59,7 +79,6 @@ class QuoteAbstract(LeadsAbstract):
     date_dispatched = models.DateField(null=True, blank=True)
     date_picked_up = models.DateField(null=True, blank=True)
     date_delivered = models.DateField(null=True, blank=True)
-
 
     class Meta:
         default_related_name = 'quotes'

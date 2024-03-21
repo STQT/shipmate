@@ -1,5 +1,7 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
 
+from shipmate.contrib.models import LeadsStatusChoices
+from shipmate.leads.filters import LeadsFilter
 from shipmate.leads.models import Leads
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
@@ -10,11 +12,12 @@ from shipmate.leads.serializers import (
 
 
 class ListLeadsAPIView(ListAPIView):
-    queryset = Leads.objects.filter(is_archive=False)
+    queryset = Leads.objects.filter(status=LeadsStatusChoices.LEADS)
     serializer_class = ListLeadsSerializer
+    filterset_class = LeadsFilter
 
 
-class CreateLeadsAPIView(CreateAPIView):
+class CreateLeadsAPIView(CreateAPIView):  # noqa
     queryset = Leads.objects.all()
     serializer_class = CreateLeadsSerializer
 
@@ -35,5 +38,5 @@ class DetailLeadsAPIView(RetrieveAPIView):
 
 
 class ArchiveListLeadsAPIView(ListAPIView):
-    queryset = Leads.objects.filter(is_archive=True)
+    queryset = Leads.objects.filter(status=LeadsStatusChoices.ARCHIVED)
     serializer_class = ListLeadsSerializer

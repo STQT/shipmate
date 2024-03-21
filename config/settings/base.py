@@ -91,6 +91,7 @@ LOCAL_APPS = [
     "shipmate.quotes",
     "shipmate.leads",
     "shipmate.mails",
+    "shipmate.lead_managements",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -329,9 +330,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ),
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        "shipmate.contrib.filters.CamelCaseOrderingFilter",
+    ],
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "shipmate.contrib.custom_auto_schema.CustomAutoSchema",
     'DEFAULT_RENDERER_CLASSES': (
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
         'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
@@ -346,7 +350,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'shipmate.contrib.pagination.CustomPagination',
     'DATETIME_FORMAT': '%m/%d/%Y %I:%M %p',
-
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup

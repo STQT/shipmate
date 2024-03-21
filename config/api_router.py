@@ -19,5 +19,6 @@ urlpatterns += [
     path('quote/', include('shipmate.quotes.urls'), name="quotes"),
     path('leads/', include('shipmate.leads.urls'), name="leades"),
     path('cars/', include('shipmate.cars.urls'), name="cars"),
-    path('customers/', include('shipmate.customers.urls'), name="customers")
+    path('customers/', include('shipmate.customers.urls'), name="customers"),
+    path('providers/', include('shipmate.lead_managements.urls'), name="providers")
 ]

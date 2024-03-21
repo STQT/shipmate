@@ -24,15 +24,15 @@ class ListLeadsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     @classmethod
-    def get_origin_name(cls, obj):
+    def get_origin_name(cls, obj) -> str:
         return f"{obj.origin.state.name}, {obj.origin.state.code} {obj.origin.zip}"
 
     @classmethod
-    def get_destination_name(cls, obj):
+    def get_destination_name(cls, obj) -> str:
         return f"{obj.destination.state.name}, {obj.destination.state.code} {obj.destination.zip}"
 
     @classmethod
-    def get_vehicle_name(cls, obj):
+    def get_vehicle_name(cls, obj) -> str:
         return f"{obj.vehicle_year} {obj.vehicle.mark.name} {obj.vehicle.name}"
 
 

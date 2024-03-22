@@ -167,3 +167,6 @@ SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
 # Your stuff...
 # ------------------------------------------------------------------------------
 CSRF_TRUSTED_ORIGINS = ["https://crmapi01xz.matelogisticss.com"]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]

@@ -4,7 +4,7 @@ from .views import (
     CreateLeadsAPIView,
     UpdateLeadsAPIView,
     DeleteLeadsAPIView,
-    DetailLeadsAPIView,
+    DetailLeadsAPIView, ConvertLeadToQuoteAPIView,
 )
 
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path('<str:guid>/update/', UpdateLeadsAPIView.as_view(), name='leads-update'),
     path('<str:guid>/detail/', DetailLeadsAPIView.as_view(), name='leads-detail'),
     path('<str:guid>/delete/', DeleteLeadsAPIView.as_view(), name='leads-delete'),
+    path('<str:guid>/convert/', ConvertLeadToQuoteAPIView.as_view(), name='leads-to-quote'),
 ]

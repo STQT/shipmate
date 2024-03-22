@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from shipmate.quotes.models import Quote
+
+
+@admin.register(Quote)
+class QuoteAdmin(admin.ModelAdmin):
+    ...

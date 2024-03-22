@@ -7,7 +7,7 @@ from .models import Provider, ProviderLog
 @receiver(post_save, sender=Provider)
 def log_provider_update(sender, instance, created, **kwargs):
     timestamp = timezone.now()
-    updated_user_name = instance.updated_from.user.name if instance.updated_from else "Anonym"
+    updated_user_name = instance.updated_from.name if instance.updated_from else "Anonym"
     if not created:
         title = ""
         message = ""

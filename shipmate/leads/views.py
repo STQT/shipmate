@@ -1,4 +1,7 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from shipmate.leads.filters import LeadsFilter
 from shipmate.leads.models import Leads
@@ -8,6 +11,8 @@ from shipmate.leads.serializers import (
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer
 )
+from shipmate.quotes.models import Quote
+from shipmate.quotes.serializers import CreateQuoteSerializer
 
 
 class ListLeadsAPIView(ListAPIView):  # noqa
@@ -38,3 +43,30 @@ class DetailLeadsAPIView(RetrieveAPIView):
     queryset = Leads.objects.all()
     serializer_class = RetrieveLeadsSerializer
     lookup_field = 'guid'
+
+
+class ConvertLeadToQuoteAPIView(APIView):
+    def post(self, request, guid):
+        try:
+            lead = Leads.objects.get(guid=guid)
+        except Leads.DoesNotExist:
+            return Response({"error": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Convert lead instance to dictionary
+        lead_data = lead.__dict__
+
+        # Remove private attributes and Django-related attributes
+        lead_data.pop('_state', None)
+        lead_data.pop('id', None)
+        lead_data.pop('guid', None)
+
+        # Create quote instance using lead fields
+        quote_instance = Quote(**lead_data)
+        quote_instance.save()
+
+        # Serialize the quote instance
+        quote_serializer = CreateQuoteSerializer(quote_instance)
+
+        # TODO: Delete leads after converting to quote
+
+        return Response(quote_serializer.data, status=status.HTTP_201_CREATED)

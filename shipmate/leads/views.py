@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -46,6 +47,7 @@ class DetailLeadsAPIView(RetrieveAPIView):
 
 
 class ConvertLeadToQuoteAPIView(APIView):
+    @transaction.atomic
     def post(self, request, guid):
         try:
             lead = Leads.objects.get(guid=guid)
@@ -66,7 +68,6 @@ class ConvertLeadToQuoteAPIView(APIView):
 
         # Serialize the quote instance
         quote_serializer = CreateQuoteSerializer(quote_instance)
-
-        # TODO: Delete leads after converting to quote
+        lead.delete()
 
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)

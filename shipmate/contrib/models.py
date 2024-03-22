@@ -41,6 +41,7 @@ class LeadsAbstract(models.Model):
     price = models.PositiveIntegerField(default=0)
     condition = models.CharField(max_length=50, choices=ConditionChoices.choices, default=ConditionChoices.DRIVES)
     trailer_type = models.CharField(choices=TrailerTypeChoices.choices, default=TrailerTypeChoices.OPEN, max_length=20)
+    notes = models.TextField(blank=True)
 
     reservation_price = models.PositiveIntegerField(default=200)
     date_est_ship = models.DateField()

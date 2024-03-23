@@ -7,6 +7,7 @@ from .serializers import CarsModelSerializer, CarMarksSerializer
 class ListCarsModelAPIView(ListAPIView):
     queryset = CarsModel.objects.all()
     serializer_class = CarsModelSerializer
+    filterset_fields = ["mark"]
 
 
 class ListCarMarksAPIView(ListAPIView):

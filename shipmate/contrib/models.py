@@ -1,6 +1,10 @@
 import uuid
+
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+
+User = get_user_model()
 
 
 class TrailerTypeChoices(models.TextChoices):
@@ -85,4 +89,21 @@ class QuoteAbstract(LeadsAbstract):
 
     class Meta:
         default_related_name = 'quotes'
+        abstract = True
+
+
+class Attachments(models.Model):
+    class TypesChoices(models.Choices):
+        NOTE = "note", "Note"
+        TASK = "task", "Task"
+        PHONE = "phone", "Phone"
+        EMAIL = "email", "Email"
+        ACTIVITY = "activity", "Activity"
+
+    title = models.CharField(500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=10, choices=TypesChoices.choices)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+
+    class Meta:
         abstract = True

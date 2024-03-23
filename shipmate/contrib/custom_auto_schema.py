@@ -4,7 +4,7 @@ from drf_spectacular.openapi import AutoSchema
 class CustomAutoSchema(AutoSchema):
     def _get_pagination_parameters(self):
         paginator = getattr(self.view, 'pagination_class', None)
-        if paginator:
+        if paginator and self._is_list_view(paginator):
             return {
                 'name': paginator.page_query_param,
                 'in': 'query',

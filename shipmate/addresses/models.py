@@ -15,8 +15,8 @@ class City(models.Model):
     state = models.ForeignKey(States, on_delete=models.CASCADE, related_name="cities")
     zip = models.CharField('City zip', max_length=5, unique=True)
     text = models.CharField('Text', max_length=100, null=True, blank=True)
-    long = models.FloatField()
-    lat = models.FloatField()
+    long = models.FloatField(null=True, blank=True)
+    lat = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} | {self.state.name}"

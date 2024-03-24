@@ -5,21 +5,20 @@ from shipmate.addresses.models import City, States
 from geopy.geocoders import Nominatim
 
 
-def get_coordinates(city, zipcode, state):
+def get_coordinates(zipcode):
     # Construct the address string
-    address = f"{city}, {state} {zipcode}, USA"
-    print(f"Processing: {address}")
+    print(f"Processing: {zipcode}")
 
     # Initialize Nominatim geocoder
     geolocator = Nominatim(user_agent="shipmate")
 
     try:
-        # Get location based on address
-        location = geolocator.geocode(address)
+        # Get location based on ZIP code
+        location = geolocator.geocode(zipcode)
         if location:
             latitude = location.latitude
             longitude = location.longitude
-            print(f"######################: {longitude}, {latitude}")
+            print("FOUND")
             return latitude, longitude
         else:
             print("Not found")
@@ -53,7 +52,7 @@ class Command(BaseCommand):
                         fields = item['fields']
                         state = States.objects.get(id=fields['state'])
                         name = fields['name']['en']
-                        latitude, longitude = get_coordinates(name, fields['state'], state.name)
+                        latitude, longitude = get_coordinates(fields['zip'])
                         # Process each item and save to your model
                         city = City(
                             state_id=fields['state'],

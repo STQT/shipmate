@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Quote
+from .models import Quote, QuoteAttachment
 
 
 class CreateQuoteSerializer(serializers.ModelSerializer):

@@ -92,18 +92,30 @@ class QuoteAbstract(LeadsAbstract):
         abstract = True
 
 
+class OrderAbstract(QuoteAbstract):
+    ...
+
+    class Meta:
+        default_related_name = 'orders'
+        abstract = True
+
+
 class Attachments(models.Model):
-    class TypesChoices(models.Choices):
+    class TypesChoices(models.TextChoices):
         NOTE = "note", "Note"
-        TASK = "task", "Task"
-        PHONE = "phone", "Phone"
-        EMAIL = "email", "Email"
         ACTIVITY = "activity", "Activity"
+        TASK = "task", "Task"  # API
+        PHONE = "phone", "Phone"  # API
+        EMAIL = "email", "Email"  # API
+        FILE = "file", "File"  # API
 
     title = models.CharField(500)
+    second_title = models.CharField(max_length=150, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=10, choices=TypesChoices.choices)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    marked = models.BooleanField(default=False)
+    link = models.BigIntegerField(help_text="Link to base attachment ID")  # NOTE: this field for another ATTACHMENT CLASS
 
     class Meta:
         abstract = True

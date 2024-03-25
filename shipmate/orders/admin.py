@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from shipmate.orders.models import Order, OrderAttachment
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(OrderAttachment)
+class OrderAttachmentAdmin(admin.ModelAdmin):
+    ...

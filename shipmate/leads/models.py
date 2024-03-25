@@ -1,6 +1,6 @@
 from django.db import models
 
-from shipmate.contrib.models import LeadsAbstract
+from shipmate.contrib.models import LeadsAbstract, Attachments
 
 
 class Leads(LeadsAbstract):
@@ -11,3 +11,10 @@ class Leads(LeadsAbstract):
     class Meta:
         verbose_name = "Lead"
         verbose_name_plural = "Leads"
+
+
+class LeadsAttachment(Attachments):
+    lead = models.ForeignKey(Leads, on_delete=models.CASCADE)
+
+    class Meta:
+        default_related_name = "leads"

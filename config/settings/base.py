@@ -88,10 +88,12 @@ LOCAL_APPS = [
     "shipmate.addresses",
     "shipmate.cars",
     "shipmate.customers",
-    "shipmate.quotes",
     "shipmate.leads",
+    "shipmate.quotes",
+    "shipmate.orders",
     "shipmate.mails",
     "shipmate.lead_managements",
+    "shipmate.attachments",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

@@ -13,6 +13,7 @@ from ..attachments.serializers import (
 from ..leads.models import LeadsAttachment
 from ..orders.models import OrderAttachment
 from ..quotes.models import QuoteAttachment
+from rest_framework.exceptions import ValidationError
 
 
 class BaseAttachmentAPIView(CreateAPIView):
@@ -32,13 +33,21 @@ class BaseAttachmentAPIView(CreateAPIView):
             AttachmentType.LEAD.value: "lead_id",
             AttachmentType.ORDER.value: "order_id"
         }
+
+        # Pre-check if the related object exists
+        related_model = attachment_class_map[endpoint_type]
+        related_field = field_map[endpoint_type]
+        if not related_model.objects.filter(pk=rel).exists():
+            raise ValidationError({"rel": f"The related object: {related_model.__name__} "
+                                          f"with id {rel} does not exist."})
+
         # Create the TaskAttachment instance
         task_attachment_instance = serializer.save()
         create_attachment(
             task_attachment_instance,
-            attachment_class_map[endpoint_type],
+            related_model,
             {
-                field_map[endpoint_type]: int(rel),
+                related_field: int(rel),
                 "type": self.attachment_type,
                 "link": task_attachment_instance.id,
             }

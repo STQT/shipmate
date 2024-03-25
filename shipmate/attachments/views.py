@@ -1,8 +1,10 @@
 from django.db import transaction
+from rest_framework import generics
 from rest_framework.generics import CreateAPIView
 
 from shipmate.contrib.models import Attachments
 from shipmate.attachments.methods import create_attachment
+from .models import TaskAttachment, PhoneAttachment, EmailAttachment, FileAttachment
 from ..attachments.serializers import (
     TaskAttachmentSerializer,
     EmailAttachmentSerializer,
@@ -72,3 +74,23 @@ class CreateEmailAttachmentAPIView(BaseAttachmentAPIView):
 class CreateFileAttachmentAPIView(BaseAttachmentAPIView):
     serializer_class = FileAttachmentSerializer
     attachment_type = Attachments.TypesChoices.FILE
+
+
+class TaskAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TaskAttachment.objects.all()
+    serializer_class = TaskAttachmentSerializer
+
+
+class PhoneAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PhoneAttachment.objects.all()
+    serializer_class = PhoneAttachmentSerializer
+
+
+class EmailAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = EmailAttachment.objects.all()
+    serializer_class = EmailAttachmentSerializer
+
+
+class FileAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = FileAttachment.objects.all()
+    serializer_class = FileAttachmentSerializer

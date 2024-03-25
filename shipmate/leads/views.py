@@ -47,6 +47,8 @@ class DetailLeadsAPIView(RetrieveAPIView):
 
 
 class ConvertLeadToQuoteAPIView(APIView):
+    serializer_class = None
+
     @transaction.atomic
     def post(self, request, guid):
         try:

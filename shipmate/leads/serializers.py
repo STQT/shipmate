@@ -26,15 +26,41 @@ class ListLeadsSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_origin_name(cls, obj) -> str:
-        return f"{obj.origin.state.name}, {obj.origin.state.code} {obj.origin.zip}"
+        state_name = "NaN"  # noqa
+        state_code = "NaN"
+        city_zip = "NaN"
+
+        if obj.origin:
+            if obj.origin.state:
+                state_name = obj.origin.state.name
+                state_code = obj.origin.state.code
+            city_zip = obj.origin.zip
+
+        return f"{state_name}, {state_code} {city_zip}"
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
-        return f"{obj.destination.state.name}, {obj.destination.state.code} {obj.destination.zip}"
+        state_name = "NaN"  # noqa
+        state_code = "NaN"
+        city_zip = "NaN"
+
+        if obj.destination:
+            if obj.destination.state:
+                state_name = obj.destination.state.name
+                state_code = obj.destination.state.code
+            city_zip = obj.destination.zip
+
+        return f"{state_name}, {state_code} {city_zip}"
 
     @classmethod
     def get_vehicle_name(cls, obj) -> str:
-        return f"{obj.vehicle_year} {obj.vehicle.mark.name} {obj.vehicle.name}"
+        vehicle_mark = "NaN"
+        vehicle_name = "NaN"
+        if obj.vehicle:
+            if obj.vehicle.mark:
+                vehicle_mark = obj.vehicle.mark.name
+            vehicle_name = obj.vehicle.name
+        return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
 
 
 class RetrieveLeadsSerializer(ListLeadsSerializer):

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
-from shipmate.leads.models import Leads
+from shipmate.leads.models import Leads, LeadsAttachment
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
 from shipmate.customers.serializers import CustomerSerializer
@@ -78,4 +78,10 @@ class RetrieveLeadsSerializer(ListLeadsSerializer):
 class UpdateLeadsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leads
+        fields = "__all__"
+
+
+class LeadsAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadsAttachment
         fields = "__all__"

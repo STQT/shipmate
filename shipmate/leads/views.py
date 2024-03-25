@@ -5,12 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shipmate.leads.filters import LeadsFilter
-from shipmate.leads.models import Leads
+from shipmate.leads.models import Leads, LeadsAttachment
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
     CreateLeadsSerializer,
     UpdateLeadsSerializer,
-    RetrieveLeadsSerializer
+    RetrieveLeadsSerializer, LeadsAttachmentSerializer
 )
 from shipmate.quotes.models import Quote
 from shipmate.quotes.serializers import CreateQuoteSerializer
@@ -73,3 +73,11 @@ class ConvertLeadToQuoteAPIView(APIView):
         lead.delete()
 
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class LeadsAttachmentListView(ListAPIView):
+    serializer_class = LeadsAttachmentSerializer
+
+    def get_queryset(self):
+        lead_id = self.kwargs.get('leadId')  # Retrieve the lead_id from URL kwargs
+        return LeadsAttachment.objects.filter(lead_id=lead_id).order_by("-id")

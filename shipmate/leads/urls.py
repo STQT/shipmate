@@ -4,12 +4,13 @@ from .views import (
     CreateLeadsAPIView,
     UpdateLeadsAPIView,
     DeleteLeadsAPIView,
-    DetailLeadsAPIView, ConvertLeadToQuoteAPIView,
+    DetailLeadsAPIView, ConvertLeadToQuoteAPIView, LeadsAttachmentListView,
 )
 
 urlpatterns = [
     path('', ListLeadsAPIView.as_view(), name='leads-list'),
     path('create/', CreateLeadsAPIView.as_view(), name='leads-create'),
+    path("attachments/<int:leadId>/", LeadsAttachmentListView.as_view(), name="leads-attachments"),
     path('<str:guid>/update/', UpdateLeadsAPIView.as_view(), name='leads-update'),
     path('<str:guid>/detail/', DetailLeadsAPIView.as_view(), name='leads-detail'),
     path('<str:guid>/delete/', DeleteLeadsAPIView.as_view(), name='leads-delete'),

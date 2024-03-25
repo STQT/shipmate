@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Mail(models.Model):
-    subject = models.CharField(max_length=100)
+    subject = models.CharField(max_length=130)
     sender = models.CharField(max_length=320)
     recipient = models.CharField(max_length=320)
     date = models.CharField(max_length=50)

@@ -43,7 +43,12 @@ def fetch_emails(username, password, imap_server="imap.example.com", port=993) -
                     # Process email body as needed
                     for part in email_message.walk():
                         if part.get_content_type() == "text/plain":
-                            body = part.get_payload(decode=True).decode(part.get_content_charset())
+                            charset = part.get_content_charset()
+                            if charset:
+                                body = part.get_payload(decode=True).decode(charset)
+                            else:
+                                # If charset is not specified, assume UTF-8
+                                body = part.get_payload(decode=True).decode('utf-8', 'ignore')
                             break
                     emails.append(
                         EmailMessage(subject=subject,

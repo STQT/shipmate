@@ -9,4 +9,4 @@ class StatesAdmin(admin.ModelAdmin):
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    fields = ["name", "state", "zip", "long", "lat"]
+    list_display = ["name", "state", "zip", "long", "lat"]

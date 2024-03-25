@@ -11,7 +11,7 @@ class AttachmentType(Enum):
 
 
 class BaseAttachmentSerializer(serializers.ModelSerializer):
-    link = serializers.IntegerField(write_only=True)
+    rel = serializers.IntegerField(write_only=True)
     endpoint_type = serializers.ChoiceField(choices=[(tag.value, tag.name.title()) for tag in AttachmentType],
                                             write_only=True)
 

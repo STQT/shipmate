@@ -20,27 +20,27 @@ class BaseAttachmentAPIView(CreateAPIView):
 
     @transaction.atomic
     def perform_create(self, serializer):
-        link = serializer.validated_data.pop('link')
+        rel = serializer.validated_data.pop('rel')
         endpoint_type = serializer.validated_data.pop('endpoint_type')
         attachment_class_map = {
-            AttachmentType.QUOTE: QuoteAttachment,
-            AttachmentType.LEAD: LeadsAttachment,
-            AttachmentType.ORDER: OrderAttachment
+            AttachmentType.QUOTE.value: QuoteAttachment,
+            AttachmentType.LEAD.value: LeadsAttachment,
+            AttachmentType.ORDER.value: OrderAttachment
         }
         field_map = {
-            AttachmentType.QUOTE: "quote",
-            AttachmentType.LEAD: "lead",
-            AttachmentType.ORDER: "order"
+            AttachmentType.QUOTE.value: "quote_id",
+            AttachmentType.LEAD.value: "lead_id",
+            AttachmentType.ORDER.value: "order_id"
         }
-
         # Create the TaskAttachment instance
         task_attachment_instance = serializer.save()
         create_attachment(
             task_attachment_instance,
             attachment_class_map[endpoint_type],
             {
-                field_map[endpoint_type]: link,
-                "type": self.attachment_type
+                field_map[endpoint_type]: int(rel),
+                "type": self.attachment_type,
+                "link": task_attachment_instance.id,
             }
         )
 

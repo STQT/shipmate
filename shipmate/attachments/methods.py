@@ -1,8 +1,9 @@
 def create_attachment(task_serializer, class_name, rel_data):
-    task_attachment_instance = task_serializer.save()
+    """ Created QuoteAttachment, LeadsAttachment and OrderAttachment instances"""
     class_name.objects.create(
-        title=task_attachment_instance.text,
-        user=task_attachment_instance.user,
+        title=task_serializer.text,
+        user=task_serializer.user,
         marked=False,
         **rel_data
     )
+    # TODO: Update title, second title for any attachment types

@@ -115,7 +115,7 @@ class Attachments(models.Model):
     type = models.CharField(max_length=10, choices=TypesChoices.choices)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     marked = models.BooleanField(default=False)
-    link = models.BigIntegerField(help_text="Link to base attachment ID")  # NOTE: this field for another ATTACHMENT CLASS
+    link = models.BigIntegerField(help_text="Link to base attachment ID")
 
     class Meta:
         abstract = True

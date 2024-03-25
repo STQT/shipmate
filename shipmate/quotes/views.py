@@ -1,12 +1,8 @@
-from django.db import transaction
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
 
 from .filters import QuoteFilter
 from .serializers import *
-from shipmate.contrib.models import QuoteStatusChoices, Attachments
-from shipmate.attachments.methods import create_attachment
-from ..attachments.serializers import TaskAttachmentSerializer, EmailAttachmentSerializer, PhoneAttachmentSerializer, \
-    FileAttachmentSerializer
+from shipmate.contrib.models import QuoteStatusChoices
 
 
 class ListQuoteAPIView(ListAPIView):  # noqa

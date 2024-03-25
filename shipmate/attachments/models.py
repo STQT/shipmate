@@ -25,6 +25,11 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class NoteAttachment(BaseModel):
+    class Meta:
+        default_related_name = "note_attachments"
+
+
 class TaskAttachment(BaseModel):
     class TypeChoices(models.TextChoices):
         CALL = "call", "Call"

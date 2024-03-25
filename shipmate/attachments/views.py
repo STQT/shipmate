@@ -10,7 +10,8 @@ from ..attachments.serializers import (
     EmailAttachmentSerializer,
     PhoneAttachmentSerializer,
     FileAttachmentSerializer,
-    AttachmentType
+    AttachmentType,
+    NoteAttachmentSerializer
 )
 from ..leads.models import LeadsAttachment
 from ..orders.models import OrderAttachment
@@ -59,6 +60,11 @@ class BaseAttachmentAPIView(CreateAPIView):
 class CreateTaskAttachmentAPIView(BaseAttachmentAPIView):
     serializer_class = TaskAttachmentSerializer
     attachment_type = Attachments.TypesChoices.TASK
+
+
+class CreateNoteAttachmentAPIView(BaseAttachmentAPIView):
+    serializer_class = NoteAttachmentSerializer
+    attachment_type = Attachments.TypesChoices.NOTE
 
 
 class CreatePhoneAttachmentAPIView(BaseAttachmentAPIView):

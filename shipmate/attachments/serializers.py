@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from shipmate.attachments.models import TaskAttachment, FileAttachment, EmailAttachment, PhoneAttachment
+from shipmate.attachments.models import (
+    TaskAttachment,
+    FileAttachment,
+    EmailAttachment,
+    PhoneAttachment,
+    NoteAttachment
+)
 from enum import Enum
 
 
@@ -17,6 +23,12 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskAttachment
+        fields = "__all__"
+
+
+class NoteAttachmentSerializer(BaseAttachmentSerializer):
+    class Meta:
+        model = NoteAttachment
         fields = "__all__"
 
 

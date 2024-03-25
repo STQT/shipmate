@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shipmate.leads.filters import LeadsFilter
+from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
 from shipmate.leads.models import Leads, LeadsAttachment
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
@@ -77,6 +77,7 @@ class ConvertLeadToQuoteAPIView(APIView):
 
 class LeadsAttachmentListView(ListAPIView):
     serializer_class = LeadsAttachmentSerializer
+    filterset_class = LeadsAttachmentFilter
 
     def get_queryset(self):
         lead_id = self.kwargs.get('leadId')  # Retrieve the lead_id from URL kwargs

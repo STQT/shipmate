@@ -4,9 +4,10 @@ from .models import *
 
 @admin.register(States)
 class StatesAdmin(admin.ModelAdmin):
-    ...
+    search_fields = ["name"]
 
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     list_display = ["name", "state", "zip", "long", "lat"]
+    search_fields = ["name"]

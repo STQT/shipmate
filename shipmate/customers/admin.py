@@ -10,3 +10,5 @@ class ExternalContactsInline(admin.TabularInline):
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [ExternalContactsInline]
+    search_fields = ["name", "phone", "email"]
+    ordering = ["-id"]

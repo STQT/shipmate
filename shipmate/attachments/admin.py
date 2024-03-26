@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TaskAttachment, EmailAttachment, FileAttachment, PhoneAttachment
+from .models import TaskAttachment, EmailAttachment, FileAttachment, PhoneAttachment, NoteAttachment
 
 
 @admin.register(TaskAttachment)
@@ -19,4 +19,9 @@ class FileAttachmentAdmin(admin.ModelAdmin):
 
 @admin.register(PhoneAttachment)
 class PhoneAttachmentAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(NoteAttachment)
+class NoteAttachmentAdmin(admin.ModelAdmin):
     ...

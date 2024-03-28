@@ -27,6 +27,11 @@ class BaseAttachmentAPIView(CreateAPIView):
         rel = serializer.validated_data.pop('rel')
         endpoint_type = serializer.validated_data.pop('endpoint_type')
         attachment_class_map = {
+            AttachmentType.QUOTE.value: QuoteAttachment,
+            AttachmentType.LEAD.value: LeadsAttachment,
+            AttachmentType.ORDER.value: OrderAttachment
+        }
+        provider_class_map = {
             AttachmentType.QUOTE.value: Quote,
             AttachmentType.LEAD.value: Leads,
             AttachmentType.ORDER.value: Order
@@ -39,9 +44,10 @@ class BaseAttachmentAPIView(CreateAPIView):
 
         # Pre-check if the related object exists
         related_model = attachment_class_map[endpoint_type]
+        provider_model = provider_class_map[endpoint_type]
         related_field = field_map[endpoint_type]
-        if not related_model.objects.filter(pk=rel).exists():
-            raise ValidationError({"rel": f"The related object: {related_model.__name__} "
+        if not provider_model.objects.filter(pk=rel).exists():
+            raise ValidationError({"rel": f"The related object: {provider_model.__name__} "
                                           f"with id {rel} does not exist."})
 
         # Create the TaskAttachment instance

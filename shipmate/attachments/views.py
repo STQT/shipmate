@@ -13,9 +13,9 @@ from ..attachments.serializers import (
     AttachmentType,
     NoteAttachmentSerializer
 )
-from ..leads.models import LeadsAttachment
-from ..orders.models import OrderAttachment
-from ..quotes.models import QuoteAttachment
+from ..leads.models import LeadsAttachment, Leads
+from ..orders.models import OrderAttachment, Order
+from ..quotes.models import QuoteAttachment, Quote
 from rest_framework.exceptions import ValidationError
 
 
@@ -27,9 +27,9 @@ class BaseAttachmentAPIView(CreateAPIView):
         rel = serializer.validated_data.pop('rel')
         endpoint_type = serializer.validated_data.pop('endpoint_type')
         attachment_class_map = {
-            AttachmentType.QUOTE.value: QuoteAttachment,
-            AttachmentType.LEAD.value: LeadsAttachment,
-            AttachmentType.ORDER.value: OrderAttachment
+            AttachmentType.QUOTE.value: Quote,
+            AttachmentType.LEAD.value: Leads,
+            AttachmentType.ORDER.value: Order
         }
         field_map = {
             AttachmentType.QUOTE.value: "quote_id",

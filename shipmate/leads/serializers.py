@@ -1,24 +1,73 @@
 from rest_framework import serializers
 
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
-from shipmate.leads.models import Leads, LeadsAttachment
+from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
 from shipmate.customers.serializers import CustomerSerializer
 
 
+class VehicleLeadsSerializer(serializers.ModelSerializer):
+    vehicle_name = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = LeadVehicles
+        fields = "__all__"
+
+
+class ListVehicleLeadsSerializer(serializers.ModelSerializer):
+    vehicle_name = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = LeadVehicles
+        fields = ["vehicle_name"]
+
+    @classmethod
+    def get_vehicle_name(cls, obj) -> str:
+        vehicle_mark = "NaN"
+        vehicle_name = "NaN"
+        if obj.vehicle:
+            if obj.vehicle.mark:
+                vehicle_mark = obj.vehicle.mark.name
+            vehicle_name = obj.vehicle.name
+        return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
+
+
+class DetailVehicleLeadsSerializer(serializers.ModelSerializer):
+    vehicle = CarsModelSerializer(many=False)
+
+    class Meta:
+        model = LeadVehicles
+        fields = "__all__"
+
+
+class CreateVehicleLeadsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadVehicles
+        fields = ["vehicle", "vehicle_year"]
+
+
 class CreateLeadsSerializer(serializers.ModelSerializer):
+    vehicles = CreateVehicleLeadsSerializer(many=True, write_only=True)
+
     class Meta:
         model = Leads
         fields = "__all__"
 
+    def create(self, validated_data):
+        vehicles_data = validated_data.pop('vehicles')
+        lead = Leads.objects.create(**validated_data)
+        for vehicle_data in vehicles_data:
+            LeadVehicles.objects.create(lead=lead, **vehicle_data)
+        return lead
+
 
 class ListLeadsSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.name')
+    customer_name = serializers.CharField(source='customer.name')  # noqa
     customer_phone = serializers.CharField(source='customer.phone')
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
-    vehicle_name = serializers.SerializerMethodField()
+    lead_vehicles = ListVehicleLeadsSerializer(many=True)
 
     class Meta:
         model = Leads
@@ -52,22 +101,12 @@ class ListLeadsSerializer(serializers.ModelSerializer):
 
         return f"{state_name}, {state_code} {city_zip}"
 
-    @classmethod
-    def get_vehicle_name(cls, obj) -> str:
-        vehicle_mark = "NaN"
-        vehicle_name = "NaN"
-        if obj.vehicle:
-            if obj.vehicle.mark:
-                vehicle_mark = obj.vehicle.mark.name
-            vehicle_name = obj.vehicle.name
-        return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
-
 
 class RetrieveLeadsSerializer(ListLeadsSerializer):
     customer = CustomerSerializer(many=False)
     origin = CitySerializer(many=False)
     destination = CitySerializer(many=False)
-    vehicle = CarsModelSerializer(many=False)
+    lead_vehicles = DetailVehicleLeadsSerializer(many=True)
     source = ProviderSmallDataSerializer(many=False)
 
     class Meta:

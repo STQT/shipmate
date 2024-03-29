@@ -1,23 +1,27 @@
 from django.db import transaction
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import (
+    ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView, RetrieveUpdateDestroyAPIView
+)
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
-from shipmate.leads.models import Leads, LeadsAttachment
+from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
     CreateLeadsSerializer,
     UpdateLeadsSerializer,
-    RetrieveLeadsSerializer, LeadsAttachmentSerializer
+    RetrieveLeadsSerializer,
+    LeadsAttachmentSerializer,
+    VehicleLeadsSerializer
 )
 from shipmate.quotes.models import Quote
 from shipmate.quotes.serializers import CreateQuoteSerializer
 
 
 class ListLeadsAPIView(ListAPIView):  # noqa
-    queryset = Leads.objects.all()
+    queryset = Leads.objects.prefetch_related("lead_vehicles")
     serializer_class = ListLeadsSerializer
     filterset_class = LeadsFilter
     ordering = ("-id",)
@@ -41,9 +45,18 @@ class DeleteLeadsAPIView(DestroyAPIView):
 
 
 class DetailLeadsAPIView(RetrieveAPIView):
-    queryset = Leads.objects.all()
+    queryset = Leads.objects.prefetch_related("lead_vehicles")
     serializer_class = RetrieveLeadsSerializer
     lookup_field = 'guid'
+
+
+class CreateVehicleLeadsAPIView(CreateAPIView):  # noqa
+    queryset = LeadVehicles.objects.all()
+    serializer_class = VehicleLeadsSerializer
+
+class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdateDestroyAPIView):  # noqa
+    queryset = LeadVehicles.objects.all()
+    serializer_class = VehicleLeadsSerializer
 
 
 class ConvertLeadToQuoteAPIView(APIView):

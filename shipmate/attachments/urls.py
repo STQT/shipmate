@@ -15,4 +15,6 @@ urlpatterns = [
          name='email_attachment_detail'),
     path('file/<int:pk>/', FileAttachmentRetrieveUpdateDestroyAPIView.as_view(),
          name='file_attachment_detail'),
+    path('note/<int:pk>/', NoteAttachmentRetrieveUpdateDestroyAPIView.as_view(),
+         name='note_attachment_detail'),
 ]

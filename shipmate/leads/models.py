@@ -1,6 +1,6 @@
 from django.db import models
 
-from shipmate.contrib.models import LeadsAbstract, Attachments
+from shipmate.contrib.models import LeadsAbstract, Attachments, VehicleAbstract
 
 
 class Leads(LeadsAbstract):
@@ -17,4 +17,11 @@ class LeadsAttachment(Attachments):
     lead = models.ForeignKey(Leads, on_delete=models.CASCADE)
 
     class Meta:
-        default_related_name = "leads"
+        default_related_name = "lead_attachments"
+
+
+class LeadVehicles(VehicleAbstract):
+    lead = models.ForeignKey(Leads, on_delete=models.CASCADE)
+
+    class Meta:
+        default_related_name = "lead_vehicles"

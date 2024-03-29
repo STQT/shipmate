@@ -1,4 +1,5 @@
 from drf_spectacular.openapi import AutoSchema
+from rest_framework.parsers import MultiPartParser
 
 
 class CustomAutoSchema(AutoSchema):
@@ -34,3 +35,18 @@ class CustomAutoSchema(AutoSchema):
     #         print(self.view.pagination_class)
     #         print(x)
     #     return x
+
+
+from drf_spectacular.generators import SchemaGenerator
+
+
+class CustomSchemaGenerator(SchemaGenerator):
+    # Override the get_parser_classes method to include your custom parser
+    def get_request_body_content(self, *args, **kwargs):
+        print("EEEEEEE")
+        content = super().get_request_body_content(*args, **kwargs)
+        # Change the default content type to 'multipart/form-data'
+        content['multipart/form-data'] = content.pop('application/json', None)
+        return content
+
+

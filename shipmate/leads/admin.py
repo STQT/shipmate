@@ -5,9 +5,9 @@ from shipmate.leads.models import Leads, LeadsAttachment
 
 @admin.register(Leads)
 class LeadsAdmin(admin.ModelAdmin):
-    autocomplete_fields = ["origin", "destination", "customer", "vehicle"]
+    autocomplete_fields = ["origin", "destination", "customer",]
     ordering = ["-id"]
-    list_display = ["customer", "status", "vehicle", "price"]
+    list_display = ["customer", "status", "price"]
 
 
 @admin.register(LeadsAttachment)

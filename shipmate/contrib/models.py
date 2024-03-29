@@ -34,14 +34,21 @@ class ConditionChoices(models.TextChoices):
     FORKLIFT = 'forklift', "Inop, needs forklift "
 
 
+class VehicleAbstract(models.Model):
+    vehicle = models.ForeignKey("cars.CarsModel", on_delete=models.SET_NULL, null=True)
+    vehicle_year = models.PositiveSmallIntegerField()
+
+    class Meta:
+        default_related_name = 'vehicles'
+        abstract = True
+
+
 class LeadsAbstract(models.Model):
     guid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(editable=False)
     status = models.CharField(max_length=20, choices=LeadsStatusChoices.choices, default=LeadsStatusChoices.LEADS)
     customer = models.ForeignKey("customers.Customer", on_delete=models.SET_NULL, null=True)
-    vehicle = models.ForeignKey("cars.CarsModel", on_delete=models.SET_NULL, null=True)
-    vehicle_year = models.PositiveSmallIntegerField()
     price = models.PositiveIntegerField(default=0)
     condition = models.CharField(max_length=50, choices=ConditionChoices.choices, default=ConditionChoices.DRIVES)
     trailer_type = models.CharField(choices=TrailerTypeChoices.choices, default=TrailerTypeChoices.OPEN, max_length=20)

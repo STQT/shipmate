@@ -4,7 +4,7 @@ from rest_framework.generics import CreateAPIView
 
 from shipmate.contrib.models import Attachments
 from shipmate.attachments.methods import create_attachment
-from .models import TaskAttachment, PhoneAttachment, EmailAttachment, FileAttachment
+from .models import TaskAttachment, PhoneAttachment, EmailAttachment, FileAttachment, NoteAttachment
 from ..attachments.serializers import (
     TaskAttachmentSerializer,
     EmailAttachmentSerializer,
@@ -106,3 +106,8 @@ class EmailAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroy
 class FileAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FileAttachment.objects.all()
     serializer_class = FileAttachmentSerializer
+
+
+class NoteAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = NoteAttachment.objects.all()
+    serializer_class = NoteAttachmentSerializer

@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDe
 
 from .filters import CarMarksFilter, CarsModelFilter
 from .models import CarsModel, CarMarks
-from .serializers import CarsModelSerializer, CarMarksSerializer
+from .serializers import CarsModelSerializer, CarMarksSerializer, CreateCarsModelSerializer
 
 
 class ListCarsModelAPIView(ListAPIView): # noqa
@@ -13,7 +13,7 @@ class ListCarsModelAPIView(ListAPIView): # noqa
 
 class CreateCarsModelAPIView(CreateAPIView):  # noqa
     queryset = CarsModel.objects.all()
-    serializer_class = CarsModelSerializer
+    serializer_class = CreateCarsModelSerializer
 
 
 class UpdateRetrieveDestroyCarsModelAPIView(RetrieveUpdateDestroyAPIView):

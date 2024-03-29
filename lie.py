@@ -1,22 +1,11 @@
-#  Enum qo'shish create-order (payment uchun)
-# — Payment link olib kelish
-# — Payment ga endpointlar berish
-# — PreOrder delete method
-# — PreOrderDetail, OrderDetail, OrderHistory  da driver haqida: ismi, rasmi, gosnomer kerak
-# — OrderHistory ga category name kerak
-# — category preorderda null boʻlishi kerak
-
-
 import pyautogui
 import random
 import string
 import time
 
-
 # Function to generate random string of characters
 def random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
-
 
 # Main loop
 while True:
@@ -27,7 +16,14 @@ while True:
     # Generate random string and type it
     random_text = random_string(random.randint(1, 20))
     pyautogui.typewrite(random_text)
-    univorm = random.uniform(0, 2)
-    print(univorm)
-    # Wait for 10 seconds before the next iteration
-    time.sleep(univorm)
+
+    # Generate random scroll action (up or down)
+    scroll_direction = random.choice(["up", "down"])
+    scroll_amount = random.randint(50, 200)  # Adjust scroll amount as needed
+    if scroll_direction == "up":
+        pyautogui.scroll(scroll_amount)
+    else:
+        pyautogui.scroll(-scroll_amount)
+
+    # Wait for a random duration before the next iteration
+    time.sleep(random.uniform(0, 2))

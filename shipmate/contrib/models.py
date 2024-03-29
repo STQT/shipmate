@@ -119,3 +119,11 @@ class Attachments(models.Model):
 
     class Meta:
         abstract = True
+
+    def delete(self, *args, **kwargs):
+        rel_model_dict = {
+
+        }
+        ModelC.objects.filter(pk=self.link).delete()
+        # Continue with the deletion of ModelB instance
+        super().delete(*args, **kwargs)

@@ -10,7 +10,7 @@ class CarMarksSerializer(serializers.ModelSerializer):
 
 
 class CarsModelSerializer(serializers.ModelSerializer):
-    mark = CarMarksSerializer(many=False)
+    mark = CarMarksSerializer(many=False, read_only=True)
 
     class Meta:
         model = CarsModel

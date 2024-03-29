@@ -1,11 +1,11 @@
-from rest_framework.generics import ListAPIView, UpdateAPIView, DestroyAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 
 from .filters import CarMarksFilter, CarsModelFilter
 from .models import CarsModel, CarMarks
 from .serializers import CarsModelSerializer, CarMarksSerializer
 
 
-class ListCarsModelAPIView(ListAPIView):
+class ListCarsModelAPIView(ListAPIView): # noqa
     queryset = CarsModel.objects.all()
     serializer_class = CarsModelSerializer
     filterset_class = CarsModelFilter

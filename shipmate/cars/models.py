@@ -26,7 +26,7 @@ class CarsModel(models.Model):
     mark = models.ForeignKey(CarMarks, on_delete=models.CASCADE, related_name='cars')
     name = models.CharField("Name", blank=True, null=True, max_length=255)
     vehicle_type = models.CharField('Vehicle type', max_length=255,
-                                    choices=VehicleTYPES.choices, default='Car')
+                                    choices=VehicleTYPES.choices, default=VehicleTYPES.CAR)
 
     def __str__(self):
         return self.name

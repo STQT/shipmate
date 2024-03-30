@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView, RetrieveUpdateDestroyAPIView
 )
@@ -14,9 +15,9 @@ from shipmate.leads.serializers import (
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer,
     LeadsAttachmentSerializer,
-    VehicleLeadsSerializer
+    VehicleLeadsSerializer, LeadConvertSerializer
 )
-from shipmate.quotes.models import Quote
+from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
 
 
@@ -54,38 +55,62 @@ class CreateVehicleLeadsAPIView(CreateAPIView):  # noqa
     queryset = LeadVehicles.objects.all()
     serializer_class = VehicleLeadsSerializer
 
+
 class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdateDestroyAPIView):  # noqa
     queryset = LeadVehicles.objects.all()
     serializer_class = VehicleLeadsSerializer
 
 
 class ConvertLeadToQuoteAPIView(APIView):
-    serializer_class = None
+    serializer_class = LeadConvertSerializer
 
+    @extend_schema(
+        description='Convert lead to quote',
+        request=LeadConvertSerializer,
+        responses={200: CreateQuoteSerializer(many=False)}
+    )
     @transaction.atomic
     def post(self, request, guid):
-        try:
-            lead = Leads.objects.get(guid=guid)
-        except Leads.DoesNotExist:
-            return Response({"error": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(data=request.data)
 
-        # Convert lead instance to dictionary
-        lead_data = lead.__dict__
+        # Check if the data is valid
+        if serializer.is_valid():
+            price = serializer.validated_data.get('price')
+            reservation_price = serializer.validated_data.get('reservation_price')
 
-        # Remove private attributes and Django-related attributes
-        lead_data.pop('_state', None)
-        lead_data.pop('id', None)
-        lead_data.pop('guid', None)
+            try:
+                lead = Leads.objects.prefetch_related("lead_vehicles").get(guid=guid)
+                lead_vehicles = lead.lead_vehicles.all()
+            except Leads.DoesNotExist:
+                return Response({"error": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Create quote instance using lead fields
-        quote_instance = Quote(**lead_data)
-        quote_instance.save()
+            lead_data = lead.__dict__
+            lead.delete()
+            lead_data.pop('_state', None)
+            lead_data.pop('id', None)
+            lead_data.pop('guid', None)
+            lead_data.pop('price', None)
+            lead_data.pop('reservation_price', None)
+            lead_data.pop('_prefetched_objects_cache', None)
 
-        # Serialize the quote instance
-        quote_serializer = CreateQuoteSerializer(quote_instance)
-        lead.delete()
+            quote_instance = Quote(price=price, reservation_price=reservation_price, **lead_data)
+            quote_instance.save()
 
-        return Response(quote_serializer.data, status=status.HTTP_201_CREATED)
+            if lead_vehicles:
+                quote_vehicles = [
+                    QuoteVehicles(
+                        quote=quote_instance,
+                        vehicle=lead_vehicle.vehicle,
+                        vehicle_year=lead_vehicle.vehicle_year
+                    )
+                    for lead_vehicle in lead_vehicles
+                ]
+                QuoteVehicles.objects.bulk_create(quote_vehicles)
+
+            quote_serializer = CreateQuoteSerializer(quote_instance)
+            return Response(quote_serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeadsAttachmentListView(ListAPIView):

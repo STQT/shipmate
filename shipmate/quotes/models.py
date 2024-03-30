@@ -1,6 +1,6 @@
 from django.db import models
 
-from shipmate.contrib.models import QuoteAbstract, Attachments
+from shipmate.contrib.models import QuoteAbstract, Attachments, VehicleAbstract
 
 
 class Quote(QuoteAbstract):
@@ -18,3 +18,10 @@ class QuoteAttachment(Attachments):
 
     class Meta:
         default_related_name = "quotes"
+
+
+class QuoteVehicles(VehicleAbstract):
+    quote = models.ForeignKey(Quote, on_delete=models.CASCADE)
+
+    class Meta:
+        default_related_name = "quote_vehicles"

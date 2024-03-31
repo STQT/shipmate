@@ -16,6 +16,8 @@ while True:
     # Generate random string and type it
     random_text = random_string(random.randint(1, 20))
     pyautogui.typewrite(random_text)
+    univorm = random.uniform(0, 2)
+    print(univorm)
 
     # Generate random scroll action (up or down)
     scroll_direction = random.choice(["up", "down"])

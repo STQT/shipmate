@@ -1,4 +1,6 @@
 import json
+import logging
+
 from django.core.management.base import BaseCommand
 from shipmate.addresses.models import City, States
 
@@ -6,25 +8,20 @@ from geopy.geocoders import Nominatim
 
 
 def get_coordinates(zipcode):
-    # Construct the address string
-    print(f"Processing: {zipcode}")
-
-    # Initialize Nominatim geocoder
+    logging.info(f"Processing: {zipcode}")
     geolocator = Nominatim(user_agent="shipmate")
-
     try:
-        # Get location based on ZIP code
         location = geolocator.geocode(zipcode)
         if location:
             latitude = location.latitude
             longitude = location.longitude
-            print("FOUND")
+            logging.info("FOUND")
             return latitude, longitude
         else:
-            print("Not found")
+            logging.warning("Not found")
             return None, None
     except Exception as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}")
         return None, None
 
 

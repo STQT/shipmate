@@ -4,14 +4,17 @@ from rest_framework.generics import CreateAPIView
 
 from shipmate.contrib.models import Attachments
 from shipmate.attachments.methods import create_attachment
-from .models import TaskAttachment, PhoneAttachment, EmailAttachment, FileAttachment, NoteAttachment
+from .models import TaskAttachment, FileAttachment, NoteAttachment
 from ..attachments.serializers import (
+    AttachmentType,
     TaskAttachmentSerializer,
     EmailAttachmentSerializer,
     PhoneAttachmentSerializer,
     FileAttachmentSerializer,
-    AttachmentType,
-    NoteAttachmentSerializer
+    NoteAttachmentSerializer,
+    UpdateTaskAttachmentSerializer,
+    UpdateFileAttachmentSerializer,
+    UpdateNoteAttachmentSerializer
 )
 from ..leads.models import LeadsAttachment, Leads
 from ..orders.models import OrderAttachment, Order
@@ -43,8 +46,8 @@ class BaseAttachmentAPIView(CreateAPIView):
         }
 
         # Pre-check if the related object exists
-        related_model = attachment_class_map[endpoint_type]
-        provider_model = provider_class_map[endpoint_type]
+        related_model = attachment_class_map[endpoint_type]  # LeadsAttachment | QuoteAttachment | OrderAttachment
+        provider_model = provider_class_map[endpoint_type]  # Leads | Quote | Order
         related_field = field_map[endpoint_type]
         if not provider_model.objects.filter(pk=rel).exists():
             raise ValidationError({"rel": f"The related object: {provider_model.__name__} "
@@ -88,26 +91,16 @@ class CreateFileAttachmentAPIView(BaseAttachmentAPIView):
     attachment_type = Attachments.TypesChoices.FILE
 
 
-class TaskAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class TaskAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):
     queryset = TaskAttachment.objects.all()
-    serializer_class = TaskAttachmentSerializer
+    serializer_class = UpdateTaskAttachmentSerializer
 
 
-class PhoneAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PhoneAttachment.objects.all()
-    serializer_class = PhoneAttachmentSerializer
-
-
-class EmailAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = EmailAttachment.objects.all()
-    serializer_class = EmailAttachmentSerializer
-
-
-class FileAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class FileAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):
     queryset = FileAttachment.objects.all()
-    serializer_class = FileAttachmentSerializer
+    serializer_class = UpdateFileAttachmentSerializer
 
 
-class NoteAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class NoteAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):
     queryset = NoteAttachment.objects.all()
-    serializer_class = NoteAttachmentSerializer
+    serializer_class = UpdateNoteAttachmentSerializer

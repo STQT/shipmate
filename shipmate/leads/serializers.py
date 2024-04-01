@@ -9,8 +9,6 @@ from shipmate.quotes.models import Quote
 
 
 class VehicleLeadsSerializer(serializers.ModelSerializer):
-    vehicle_name = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = LeadVehicles
         fields = "__all__"

@@ -64,24 +64,3 @@ class MyTokenVerifyView(TokenVerifyView):
                 # Add token to cache with a short expiry time
                 cache.set(token, 'valid', timeout=60 * 5)  # 5 minutes
             return response
-
-
-class LogoutAPIView(APIView):
-    serializer_class = LogoutSerializer
-
-    def post(self, request):
-        refresh_token = request.data.get('refresh')
-
-        if not refresh_token:
-            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            # Blacklist refresh token
-            refresh_token_obj = RefreshToken(refresh_token)
-            refresh_token_obj.blacklist()
-
-        except Exception as e:
-            return Response({'error': f'Error during logout: {str(e)}'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({'success': 'Logged out successfully'}, status=status.HTTP_200_OK)

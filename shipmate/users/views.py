@@ -4,11 +4,11 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken
 
-from shipmate.users.serializers import UserMeSerializer, FeatureSerializer, UserSerializer, LogoutSerializer
+from shipmate.users.models import Feature, Role
+from shipmate.users.serializers import UserMeSerializer, FeatureSerializer, UserSerializer, RoleSerializer
 
 User = get_user_model()
 
@@ -64,3 +64,55 @@ class MyTokenVerifyView(TokenVerifyView):
                 # Add token to cache with a short expiry time
                 cache.set(token, 'valid', timeout=60 * 5)  # 5 minutes
             return response
+
+
+#       FEATURE
+class FeatureCreateAPIView(generics.CreateAPIView): # noqa
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer
+
+
+class FeatureDetailAPIView(generics.RetrieveAPIView):
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer
+
+
+class FeatureListAPIView(generics.ListAPIView):
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer
+
+
+class FeatureUpdateAPIView(generics.UpdateAPIView):
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer
+
+
+class FeatureDestroyAPIView(generics.DestroyAPIView):
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer
+
+
+#        ROLE
+class RoleCreateAPIView(generics.CreateAPIView): # noqa
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+
+class RoleDetailAPIView(generics.RetrieveAPIView):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+
+class RoleListAPIView(generics.ListAPIView):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+
+class RoleUpdateAPIView(generics.UpdateAPIView):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+
+class RoleDestroyAPIView(generics.DestroyAPIView):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer

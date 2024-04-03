@@ -8,12 +8,18 @@ class FeatureSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'endpoint', 'method')
 
 
-class RoleSerializer(serializers.ModelSerializer):
+class RetrieveRoleSerializer(serializers.ModelSerializer):
     included_features = FeatureSerializer(many=True, read_only=True)
 
     class Meta:
         model = Role
         fields = ('id', 'access_name', 'access_status', 'included_features')  # Add more fields as needed
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,7 +31,3 @@ class UserSerializer(serializers.ModelSerializer):
 class UserMeSerializer(serializers.Serializer):
     user = UserSerializer(many=False)
     features = FeatureSerializer(many=True)
-
-
-class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()

@@ -171,3 +171,4 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'https://crm01xz.matelogisticss.com'
 ]
+SIMPLE_JWT['SIGNING_KEY'] = SECRET_KEY

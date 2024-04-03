@@ -1,10 +1,12 @@
-import logging
-
+from django.contrib.auth.models import Group
 from django.db import transaction
+from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
-    ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView, RetrieveUpdateDestroyAPIView,
+    ListAPIView, RetrieveAPIView,
+    DestroyAPIView, CreateAPIView,
+    UpdateAPIView, RetrieveUpdateDestroyAPIView,
     get_object_or_404
 )
 from rest_framework import status
@@ -24,6 +26,8 @@ from shipmate.leads.serializers import (
 )
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
+
+Group
 
 
 class ListLeadsAPIView(ListAPIView):  # noqa
@@ -51,7 +55,9 @@ class DeleteLeadsAPIView(DestroyAPIView):
 
 
 class DetailLeadsAPIView(RetrieveAPIView):
-    queryset = Leads.objects.prefetch_related("lead_vehicles")
+    queryset = Leads.objects.prefetch_related(
+        Prefetch('lead_vehicles', queryset=LeadVehicles.objects.order_by('id'))
+    )
     serializer_class = RetrieveLeadsSerializer
     lookup_field = 'guid'
 
@@ -111,7 +117,6 @@ class ConvertLeadToQuoteAPIView(APIView):
                     for lead_vehicle in lead_vehicles
                 ]
                 QuoteVehicles.objects.bulk_create(quote_vehicles)
-
             quote_serializer = CreateQuoteSerializer(quote_instance)
             return Response(quote_serializer.data, status=status.HTTP_200_OK)
         else:
@@ -128,6 +133,8 @@ class LeadsAttachmentListView(ListAPIView):
 
 
 class AttachmentDeleteAPIView(DestroyAPIView):
+    serializer_class = LeadsAttachmentSerializer
+
     @transaction.atomic
     def delete(self, request, id):
         lead_attachment = get_object_or_404(LeadsAttachment, id=id)

@@ -5,22 +5,17 @@ User = get_user_model()
 
 
 class Provider(models.Model):
-    class StatusChoices(models.TextChoices):
-        ACTIVE = "active", "Active"
-        INACTIVE = "inactive", "Inactive"
-
-    class TypeChoices(models.TextChoices):
-        STANDARD = "standard", "Standard"
-        EXCLUSIVE = "exclusive", "Exclusive"
-
     name = models.CharField(max_length=255)
-    status = models.CharField(max_length=50, choices=StatusChoices.choices, default=StatusChoices.INACTIVE)
-    type = models.CharField(max_length=50, choices=TypeChoices.choices, default=TypeChoices.EXCLUSIVE)
-    # TODO: add included users M:M field for leads adding
+    is_active = models.BooleanField(default=False)
+    is_exclusive = models.BooleanField(default=False)  # NOTE: for field exclusive_users
+    is_effective = models.BooleanField(default=False)  # NOTE: for field effective_users_count
+    exclusive_users = models.ManyToManyField(User, related_name='providers', blank=True)
+    effective_users_count = models.PositiveSmallIntegerField(null=True, blank=True)
     email = models.EmailField()
     subject = models.CharField(max_length=320)
     is_external = models.BooleanField(default=True)
-    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="providers", null=True, blank=True)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="provider_updates",
+                                     null=True, blank=True)
 
 
 class ProviderLog(models.Model):

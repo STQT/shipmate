@@ -1,43 +1,87 @@
+from rest_framework import generics
+
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, RedirectView, UpdateView
+from django.core.cache import cache
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken
+
+from shipmate.users.serializers import UserMeSerializer, FeatureSerializer, UserSerializer, LogoutSerializer
 
 User = get_user_model()
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
-    model = User
-    slug_field = "id"
-    slug_url_kwarg = "id"
-
-
-user_detail_view = UserDetailView.as_view()
-
-
-class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = User
-    fields = ["name"]
-    success_message = _("Information successfully updated")
-
-    def get_success_url(self):
-        assert self.request.user.is_authenticated  # for mypy to know that the user is authenticated
-        return self.request.user.get_absolute_url()
+class UserMeAPIView(generics.RetrieveAPIView):
+    serializer_class = UserMeSerializer
 
     def get_object(self):
         return self.request.user
 
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        user_roles = user.roles.prefetch_related('included_features')
+        serialized_user = UserSerializer(user).data
+        features = []
+        for role in user_roles:
+            features.extend(role.included_features.all())
 
-user_update_view = UserUpdateView.as_view()
+        serialized_features = FeatureSerializer(features, many=True).data
+        data = {
+            'user': serialized_user,
+            'features': serialized_features
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-    permanent = False
+class MyTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):  # noqa
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == status.HTTP_200_OK:
+            refresh_token = response.data.get('refresh')
+            if refresh_token:
+                # Cache the refresh token with a short expiry time
+                cache.set(refresh_token, 'valid', timeout=60 * 60 * 24)  # 1 day
+        return response
 
-    def get_redirect_url(self):
-        return reverse("users:detail", kwargs={"pk": self.request.user.pk})
+
+class MyTokenRefreshView(TokenRefreshView):
+    ...
 
 
-user_redirect_view = UserRedirectView.as_view()
+class MyTokenVerifyView(TokenVerifyView):
+    def post(self, request, *args, **kwargs):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        response = super().post(request, *args, **kwargs)
+        # Check if token is in cache
+        if cache.get(token):
+            return response
+        else:
+            if response.status_code == status.HTTP_200_OK:
+                # Add token to cache with a short expiry time
+                cache.set(token, 'valid', timeout=60 * 5)  # 5 minutes
+            return response
+
+
+class LogoutAPIView(APIView):
+    serializer_class = LogoutSerializer
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Blacklist refresh token
+            refresh_token_obj = RefreshToken(refresh_token)
+            refresh_token_obj.blacklist()
+
+        except Exception as e:
+            return Response({'error': f'Error during logout: {str(e)}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'success': 'Logged out successfully'}, status=status.HTTP_200_OK)

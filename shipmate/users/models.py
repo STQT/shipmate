@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db.models import CharField, EmailField
+from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -33,3 +34,46 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"pk": self.id})
+
+
+class Feature(models.Model):
+    class MethodChoices(models.TextChoices):
+        EDIT = "edit", "Edit"
+        VIEW = "view", "View"
+        CREATE = "create", "Create"
+        DELETE = "delete", "Delete"
+    name = models.CharField(max_length=255)
+    for_all_data = models.BooleanField(default=False)
+    endpoint = models.CharField(max_length=32)
+    method = models.CharField(max_length=10, choices=MethodChoices.choices, default=MethodChoices.VIEW)
+
+    def __str__(self):
+        return self.name
+
+
+class Role(models.Model):
+    class RoleAccessStatusChoices(models.TextChoices):
+        ACTIVE = 'active', 'Active'
+        INACTIVE = 'inactive', 'Inactive'
+
+    access_name = models.CharField(max_length=255)
+    access_status = models.CharField(max_length=10, choices=RoleAccessStatusChoices.choices, default='active')
+    included_users = models.ManyToManyField('User', related_name='roles', blank=True)
+    included_features = models.ManyToManyField('Feature', related_name='roles', blank=True)
+
+    def __str__(self):
+        return self.access_name
+
+
+class Team(models.Model):
+    class TeamStatusChoices(models.TextChoices):
+        active = "active", "Active"
+        inactive = "inactive", "Inactive"
+
+    name = CharField(max_length=255)
+    status = CharField(max_length=10, choices=TeamStatusChoices.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+    users = models.ManyToManyField('User', related_name='teams', blank=True)
+
+    def __str__(self):
+        return self.name

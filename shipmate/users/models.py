@@ -42,6 +42,7 @@ class Feature(models.Model):
         VIEW = "view", "View"
         CREATE = "create", "Create"
         DELETE = "delete", "Delete"
+
     name = models.CharField(max_length=255)
     for_all_data = models.BooleanField(default=False)
     endpoint = models.CharField(max_length=32)
@@ -77,3 +78,11 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class OTPCode(models.Model):
+    code = models.CharField(max_length=6)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="otp")
+
+    def __str__(self):
+        return f"{self.user} | {self.code}"

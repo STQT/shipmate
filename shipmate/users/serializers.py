@@ -31,3 +31,16 @@ class UserSerializer(serializers.ModelSerializer):
 class UserMeSerializer(serializers.Serializer):
     user = UserSerializer(many=False)
     features = FeatureSerializer(many=True)
+
+
+class UserEmailResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ConfirmOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField()

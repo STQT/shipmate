@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model, decorators
 from django.utils.translation import gettext_lazy as _
 
 from shipmate.users.forms import UserAdminChangeForm, UserAdminCreationForm
-from shipmate.users.models import Team, Role, Feature
+from shipmate.users.models import Team, Role, Feature, OTPCode
 
 User = get_user_model()
 
@@ -56,4 +56,9 @@ class RoleAdmin(admin.ModelAdmin):
 
 @admin.register(Feature)
 class FeatureAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(OTPCode)
+class OTPCodeAdmin(admin.ModelAdmin):
     ...

@@ -1,14 +1,21 @@
+from django.conf import settings
 from rest_framework import generics
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.contrib.auth.hashers import make_password
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
-from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from shipmate.users.models import Feature, Role
-from shipmate.users.serializers import UserMeSerializer, FeatureSerializer, UserSerializer, RoleSerializer
+from shipmate.users.models import Feature, Role, OTPCode
+from shipmate.users.serializers import UserMeSerializer, FeatureSerializer, UserSerializer, RoleSerializer, \
+    UserEmailResetSerializer, ConfirmOTPSerializer, ChangePasswordSerializer
 
 User = get_user_model()
 
@@ -36,6 +43,8 @@ class UserMeAPIView(generics.RetrieveAPIView):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
+    permission_classes = (AllowAny,)
+
     def post(self, request, *args, **kwargs):  # noqa
         response = super().post(request, *args, **kwargs)
         if response.status_code == status.HTTP_200_OK:
@@ -47,10 +56,12 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class MyTokenRefreshView(TokenRefreshView):
-    ...
+    permission_classes = (AllowAny,)
 
 
 class MyTokenVerifyView(TokenVerifyView):
+    permission_classes = (AllowAny,)
+
     def post(self, request, *args, **kwargs):
         token = request.data.get('token')
         if not token:
@@ -66,8 +77,80 @@ class MyTokenVerifyView(TokenVerifyView):
             return response
 
 
+class PasswordResetRequestAPIView(APIView):
+    serializer_class = UserEmailResetSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        email = request.data.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generate OTP
+        otp_code = get_random_string(length=6, allowed_chars='0123456789')
+
+        # Send OTP code via email
+        subject = 'Password Reset OTP'
+        message = f'Your OTP code for password reset is: {otp_code}'
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [email]
+        OTPCode.objects.update_or_create(user=user, defaults={"code": otp_code})
+        send_mail(subject, message, from_email, to_email)  # TODO: convert to celery task
+
+        # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
+
+        return Response({"message": "An OTP code has been sent to your email address."}, status=status.HTTP_200_OK)
+
+
+class ConfirmOTPAPIView(APIView):
+    serializer_class = ConfirmOTPSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "User with this email does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        if hasattr(user, "otp"):
+            if user.otp.code == code:
+                refresh = RefreshToken.for_user(user)
+                access = refresh.access_token
+
+                return Response({
+                    "message": "OTP code is valid.",
+                    "refresh": str(refresh),
+                    "access": str(access)
+                }, status=status.HTTP_200_OK)
+            return Response({"error": "OTP code is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
+
+        return Response({"message": "An OTP code has been sent to your email address."}, status=status.HTTP_200_OK)
+
+
+class ChangePasswordAPIView(APIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        password = request.data.get('password')
+        user = request.user
+        user.password = make_password(password)
+        user.save()
+
+        # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
+
+        return Response({"message": "Password has changed"}, status=status.HTTP_200_OK)
+
+
 #       FEATURE
-class FeatureCreateAPIView(generics.CreateAPIView): # noqa
+class FeatureCreateAPIView(generics.CreateAPIView):  # noqa
     queryset = Feature.objects.all()
     serializer_class = FeatureSerializer
 
@@ -93,7 +176,7 @@ class FeatureDestroyAPIView(generics.DestroyAPIView):
 
 
 #        ROLE
-class RoleCreateAPIView(generics.CreateAPIView): # noqa
+class RoleCreateAPIView(generics.CreateAPIView):  # noqa
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
 

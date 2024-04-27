@@ -169,6 +169,8 @@ SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
 CSRF_TRUSTED_ORIGINS = ["https://crmapi01xz.matelogisticss.com"]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
     'https://crm01xz.matelogisticss.com'
 ]
 SIMPLE_JWT['SIGNING_KEY'] = SECRET_KEY

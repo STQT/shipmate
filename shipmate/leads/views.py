@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from django.db import transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema
@@ -27,7 +26,7 @@ from shipmate.leads.serializers import (
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
 
-Group
+
 
 
 class ListLeadsAPIView(ListAPIView):  # noqa

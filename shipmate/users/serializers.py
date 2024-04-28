@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Feature, Role
+from shipmate.users.models import User, Feature, Role
 
 
 class FeatureSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class RetrieveRoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
-        fields = ('id', 'access_name', 'access_status', 'included_features')  # Add more fields as needed
+        fields = ('id', 'access_name', 'access_status', 'included_features')
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -26,6 +26,19 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'email']
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ["is_staff", "groups", "user_permissions"]
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'last_login': {'read_only': True},
+            'date_joined': {'read_only': True},
+            'is_superuser': {'read_only': True},
+            'is_active': {'read_only': True},
+        }
 
 
 class UserMeSerializer(serializers.Serializer):

@@ -53,7 +53,7 @@ class UpdateBaseAttachmentSerializer(serializers.ModelSerializer):
             _type = Attachments.TypesChoices.FILE
         else:
             _type = Attachments.TypesChoices.TASK
-        Class = attachment_class_map[endpoint_type] # noqa
+        Class = attachment_class_map[endpoint_type]  # noqa
         attachment = Class.objects.filter(type=_type, link=instance.pk).first()
         if attachment:
             text = validated_data.get('text')
@@ -70,6 +70,12 @@ class NoteAttachmentSerializer(BaseAttachmentSerializer):  # noqa
 
 
 class TaskAttachmentSerializer(BaseAttachmentSerializer):
+    class Meta:
+        model = TaskAttachment
+        fields = "__all__"
+
+
+class ListTaskAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskAttachment
         fields = "__all__"

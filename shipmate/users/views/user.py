@@ -13,9 +13,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from shipmate.users.models import Feature, Role, OTPCode
-from shipmate.users.serializers import UserMeSerializer, FeatureSerializer, UserSerializer, RoleSerializer, \
-    UserEmailResetSerializer, ConfirmOTPSerializer, ChangePasswordSerializer
+from shipmate.users.models import OTPCode
+from shipmate.users.serializers import (
+    UserMeSerializer, FeatureSerializer,
+    UserSerializer,
+    UserEmailResetSerializer,
+    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer
+)
 
 User = get_user_model()
 
@@ -40,6 +44,22 @@ class UserMeAPIView(generics.RetrieveAPIView):
             'features': serialized_features
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class UserCreateViewSet(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = CreateUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = CreateUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            user.set_password(request.data.get('password'))
+            user.is_active = True
+            user.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -153,55 +173,3 @@ class ChangePasswordAPIView(APIView):
         # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
 
         return Response({"message": "Password has changed"}, status=status.HTTP_200_OK)
-
-
-#       FEATURE
-class FeatureCreateAPIView(generics.CreateAPIView):  # noqa
-    queryset = Feature.objects.all()
-    serializer_class = FeatureSerializer
-
-
-class FeatureDetailAPIView(generics.RetrieveAPIView):
-    queryset = Feature.objects.all()
-    serializer_class = FeatureSerializer
-
-
-class FeatureListAPIView(generics.ListAPIView):
-    queryset = Feature.objects.all()
-    serializer_class = FeatureSerializer
-
-
-class FeatureUpdateAPIView(generics.UpdateAPIView):
-    queryset = Feature.objects.all()
-    serializer_class = FeatureSerializer
-
-
-class FeatureDestroyAPIView(generics.DestroyAPIView):
-    queryset = Feature.objects.all()
-    serializer_class = FeatureSerializer
-
-
-#        ROLE
-class RoleCreateAPIView(generics.CreateAPIView):  # noqa
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-
-
-class RoleDetailAPIView(generics.RetrieveAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-
-
-class RoleListAPIView(generics.ListAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-
-
-class RoleUpdateAPIView(generics.UpdateAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-
-
-class RoleDestroyAPIView(generics.DestroyAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer

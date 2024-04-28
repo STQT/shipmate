@@ -1,7 +1,7 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
 
 from .filters import QuoteFilter
-from .serializers import *
+from shipmate.quotes.serializers import *
 from shipmate.contrib.models import QuoteStatusChoices
 
 
@@ -38,5 +38,3 @@ class DetailQuoteAPIView(RetrieveAPIView):
 class ArchiveListQuoteAPIView(ListAPIView):
     queryset = Quote.objects.filter(status=QuoteStatusChoices.ARCHIVED)
     serializer_class = ListQuoteSerializer
-
-

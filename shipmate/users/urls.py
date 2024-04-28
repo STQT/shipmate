@@ -6,10 +6,11 @@ from .views import (
     MyTokenVerifyView,
     FeatureCreateAPIView, FeatureDetailAPIView, FeatureListAPIView, FeatureUpdateAPIView, FeatureDestroyAPIView,
     RoleCreateAPIView, RoleDetailAPIView, RoleListAPIView, RoleUpdateAPIView, RoleDestroyAPIView,
-    PasswordResetRequestAPIView, ConfirmOTPAPIView, ChangePasswordAPIView,
+    PasswordResetRequestAPIView, ConfirmOTPAPIView, ChangePasswordAPIView, UserCreateViewSet,
 )
 
 urlpatterns = [
+    path('create/', UserCreateViewSet.as_view(), name='create'),  # Create
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Login
     path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),  # Refresh token
     path('token/verify/', MyTokenVerifyView.as_view(), name='token_verify'),  # Verify token

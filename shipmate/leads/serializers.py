@@ -5,7 +5,6 @@ from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
 from shipmate.customers.serializers import CustomerSerializer
-from shipmate.quotes.models import Quote
 
 
 class VehicleLeadsSerializer(serializers.ModelSerializer):

@@ -16,9 +16,17 @@ class User(AbstractUser):
 
     # First and last name do not cover name patterns around the globe
     name = CharField(_("Name of User"), blank=True, max_length=255)
-    first_name = None  # type: ignore
-    last_name = None  # type: ignore
+    first_name = CharField(_("First name"), max_length=255, blank=True, null=True)
+    last_name = CharField(_("First name"), max_length=255, blank=True, null=True)
+    phone = CharField(_("Phone"), max_length=20, blank=True, null=True)
+    ext = CharField(_("Ext"), max_length=10, blank=True, null=True)
     email = EmailField(_("email address"), unique=True)
+    team = models.ForeignKey("Team", verbose_name="Team",
+                             on_delete=models.SET_NULL, blank=True, null=True, related_name="users")
+    access = models.ForeignKey("Role", verbose_name="Access",
+                               on_delete=models.SET_NULL, blank=True, null=True, related_name="access_users")
+    position = models.ForeignKey("Role", verbose_name="Position",
+                                 on_delete=models.SET_NULL, blank=True, null=True, related_name="position_users")
     username = None  # type: ignore
 
     USERNAME_FIELD = "email"
@@ -58,7 +66,8 @@ class Role(models.Model):
         INACTIVE = 'inactive', 'Inactive'
 
     access_name = models.CharField(max_length=255)
-    access_status = models.CharField(max_length=10, choices=RoleAccessStatusChoices.choices, default='active')
+    access_status = models.CharField(max_length=10, choices=RoleAccessStatusChoices.choices,
+                                     default=RoleAccessStatusChoices.ACTIVE)
     included_users = models.ManyToManyField('User', related_name='roles', blank=True)
     included_features = models.ManyToManyField('Feature', related_name='roles', blank=True)
 
@@ -74,7 +83,6 @@ class Team(models.Model):
     name = CharField(max_length=255)
     status = CharField(max_length=10, choices=TeamStatusChoices.choices)
     created_at = models.DateTimeField(auto_now_add=True)
-    users = models.ManyToManyField('User', related_name='teams', blank=True)
 
     def __str__(self):
         return self.name

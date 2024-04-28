@@ -14,7 +14,7 @@ from ..attachments.serializers import (
     NoteAttachmentSerializer,
     UpdateTaskAttachmentSerializer,
     UpdateFileAttachmentSerializer,
-    UpdateNoteAttachmentSerializer
+    UpdateNoteAttachmentSerializer, ListTaskAttachmentSerializer
 )
 from ..leads.models import LeadsAttachment, Leads
 from ..orders.models import OrderAttachment, Order
@@ -91,7 +91,14 @@ class CreateFileAttachmentAPIView(BaseAttachmentAPIView):
     attachment_type = Attachments.TypesChoices.FILE
 
 
-class TaskAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):
+# class TaskAttachmentListAPIView(generics.ListAPIView):
+#   TODO: create list view for lead|quote|order id and date filter
+#
+#     serializer_class = ListTaskAttachmentSerializer
+#     queryset = TaskAttachment.objects.all()
+
+
+class TaskAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):  # noqa
     queryset = TaskAttachment.objects.all()
     serializer_class = UpdateTaskAttachmentSerializer
 

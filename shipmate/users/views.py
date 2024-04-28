@@ -98,11 +98,17 @@ class PasswordResetRequestAPIView(APIView):
         from_email = settings.EMAIL_HOST_USER
         to_email = [email]
         OTPCode.objects.update_or_create(user=user, defaults={"code": otp_code})
-        send_mail(subject, message, from_email, to_email)  # TODO: convert to celery task
-
+        try:
+            send_mail(subject, message, from_email, to_email)  # TODO: convert to celery task
+        except:
+            pass
         # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
 
-        return Response({"message": "An OTP code has been sent to your email address."}, status=status.HTTP_200_OK)
+        return Response({
+            "message": "An OTP code has been sent to your email address.",
+            "otp": otp_code
+        },
+            status=status.HTTP_200_OK)
 
 
 class ConfirmOTPAPIView(APIView):

@@ -40,6 +40,8 @@ class UserEmailResetSerializer(serializers.Serializer):
 class ConfirmOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField()
+    access = serializers.CharField(read_only=True)
+    refresh = serializers.CharField(read_only=True)
 
 
 class ChangePasswordSerializer(serializers.Serializer):

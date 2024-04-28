@@ -327,8 +327,8 @@ CORS_URLS_REGEX = r"^/api/.*$"
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that
 # See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
 SPECTACULAR_SETTINGS = {
-    "TITLE": "ShipMate API",
-    "DESCRIPTION": "Documentation of API endpoints of ShipMate",
+    "TITLE": "Connecta API",
+    "DESCRIPTION": "Documentation of API endpoints of Connecta CRM",
     "VERSION": "1.0.0",
     "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
     'SERVE_INCLUDE_SCHEMA': False,

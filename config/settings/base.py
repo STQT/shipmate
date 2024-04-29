@@ -354,8 +354,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Adjust as needed
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=2),  # Adjust as needed
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Adjust as needed
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Adjust as needed
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 }

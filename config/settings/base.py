@@ -306,7 +306,7 @@ REST_FRAMEWORK = {
         "shipmate.contrib.filters.CamelCaseOrderingFilter",
     ],
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
-    "DEFAULT_SCHEMA_CLASS": "shipmate.contrib.custom_auto_schema.CustomAutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     'DEFAULT_RENDERER_CLASSES': (
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
         # Any other renders

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from shipmate.lead_managements.models import Provider
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.addresses.serializers import CitySerializer
@@ -127,3 +128,18 @@ class LeadsAttachmentSerializer(serializers.ModelSerializer):
 class LeadConvertSerializer(serializers.Serializer):
     price = serializers.IntegerField(write_only=True)
     reservation_price = serializers.IntegerField(write_only=True)
+
+
+class ProviderLeadListSerializer(serializers.ModelSerializer):
+    lead_count = serializers.SerializerMethodField()
+
+    def get_lead_count(self, provider):
+        status = self.context['request'].query_params.get('status', None)
+        queryset = Leads.objects.filter(source=provider)
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset.count()
+
+    class Meta:
+        model = Provider
+        fields = ['id', 'name', 'lead_count']

@@ -1,6 +1,6 @@
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import Prefetch
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView,
@@ -9,10 +9,12 @@ from rest_framework.generics import (
     get_object_or_404
 )
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
+from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.leads.serializers import (
@@ -21,18 +23,42 @@ from shipmate.leads.serializers import (
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer,
     LeadsAttachmentSerializer,
-    VehicleLeadsSerializer, LeadConvertSerializer
+    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer
 )
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
 
 
+class LeadsPagination(LimitOffsetPagination):
+    default_limit = 10
+    max_limit = 1000
+
+    def __init__(self):
+        self.sum_price = 0
+        self.reservation_price = 0
+
+    def paginate_queryset(self, queryset, request, view=None):
+        self.sum_price = queryset.aggregate(
+            total_price=models.Sum('price')
+        )['total_price'] or 0
+        self.reservation_price = queryset.aggregate(
+            total_reservation_price=models.Sum('reservation_price')
+        )['total_reservation_price'] or 0
+
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data):
+        response = super().get_paginated_response(data)
+        response.data['sum_price'] = self.sum_price
+        response.data['reservation_price'] = self.reservation_price
+        return response
 
 
 class ListLeadsAPIView(ListAPIView):  # noqa
     queryset = Leads.objects.prefetch_related("lead_vehicles")
     serializer_class = ListLeadsSerializer
     filterset_class = LeadsFilter
+    pagination_class = LeadsPagination
     ordering = ("-id",)
 
 
@@ -152,3 +178,13 @@ class AttachmentDeleteAPIView(DestroyAPIView):
         attachment_instance = model_class.objects.get(id=lead_attachment.link)
         attachment_instance.delete()
         return Response({'message': 'Attachment deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(parameters=[
+    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY,
+                     description='Calculating leadsCount with status Leads | Archived'),
+])
+class ProviderLeadListAPIView(ListAPIView):
+    queryset = Provider.objects.filter(is_active=True)
+    pagination_class = None
+    serializer_class = ProviderLeadListSerializer

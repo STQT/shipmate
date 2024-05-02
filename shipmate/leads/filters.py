@@ -14,18 +14,11 @@ class LeadsFilter(django_filters.FilterSet):
                                                       queryset=Provider.objects.all())
     user = django_filters.ModelChoiceFilter(field_name='user', queryset=User.objects.all())
     extraUser = django_filters.ModelChoiceFilter(field_name='extra_user', queryset=User.objects.all())
-
-    class Meta:
-        model = Leads
-        fields = ['status', 'source', 'user', 'extraUser']
-
-
-class LeadsSearchFilter(django_filters.FilterSet):
     q = django_filters.CharFilter(method='custom_filter')
 
     class Meta:
         model = Leads
-        fields = ['q']
+        fields = ['status', 'source', 'user', 'extraUser', 'q']
 
     def custom_filter(self, queryset, name, value):
         if value:
@@ -40,6 +33,7 @@ class LeadsSearchFilter(django_filters.FilterSet):
             )
 
         return queryset
+
 
 
 class LeadsAttachmentFilter(django_filters.FilterSet):

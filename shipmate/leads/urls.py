@@ -9,11 +9,12 @@ from .views import (
     LeadsAttachmentListView,
     CreateVehicleLeadsAPIView,
     RetrieveUpdateDestroyVehicleLeadsAPIView,
-    AttachmentDeleteAPIView, ProviderLeadListAPIView,
+    AttachmentDeleteAPIView, ProviderLeadListAPIView, LeadsSearchAPIView,
 )
 
 urlpatterns = [
     path('', ListLeadsAPIView.as_view(), name='leads-list'),
+    path('search/', LeadsSearchAPIView.as_view(), name='leads-search-list'),
     path('providers/', ProviderLeadListAPIView.as_view(), name='leads-provider-list'),
     path('create/', CreateLeadsAPIView.as_view(), name='leads-create'),
 

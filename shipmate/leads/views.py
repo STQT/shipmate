@@ -1,5 +1,5 @@
 from django.db import transaction, models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from shipmate.lead_managements.models import Provider
-from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
+from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter, LeadsSearchFilter
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
@@ -60,6 +60,13 @@ class ListLeadsAPIView(ListAPIView):  # noqa
     filterset_class = LeadsFilter
     pagination_class = LeadsPagination
     ordering = ("-id",)
+
+
+class LeadsSearchAPIView(ListAPIView):
+    serializer_class = ListLeadsSerializer
+    pagination_class = LeadsPagination
+    filterset_class = LeadsSearchFilter
+    queryset = Leads.objects.all().select_related("origin__state", "destination__state", "customer")
 
 
 class CreateLeadsAPIView(CreateAPIView):  # noqa

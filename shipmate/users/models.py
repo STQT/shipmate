@@ -1,3 +1,7 @@
+import random
+import io
+from PIL import Image, ImageDraw, ImageFont
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import AbstractUser
 from django.db.models import CharField, EmailField
 from django.db import models
@@ -15,7 +19,6 @@ class User(AbstractUser):
     """
 
     # First and last name do not cover name patterns around the globe
-    name = CharField(_("Name of User"), blank=True, max_length=255)
     first_name = CharField(_("First name"), max_length=255, blank=True, null=True)
     last_name = CharField(_("First name"), max_length=255, blank=True, null=True)
     phone = CharField(_("Phone"), max_length=20, blank=True, null=True)
@@ -27,6 +30,7 @@ class User(AbstractUser):
                                on_delete=models.SET_NULL, blank=True, null=True, related_name="access_users")
     position = models.ForeignKey("Role", verbose_name="Position",
                                  on_delete=models.SET_NULL, blank=True, null=True, related_name="position_users")
+    picture = models.ImageField(_("Profile Picture"), upload_to="profile_pictures", blank=True, null=True)
     username = None  # type: ignore
 
     USERNAME_FIELD = "email"
@@ -42,6 +46,39 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"pk": self.id})
+
+    def save(self, *args, **kwargs):
+        old = self._meta.model.objects.get(pk=self.pk)
+        if not self.picture or self.last_name != old.last_name or self.first_name != old.first_name:
+            initials = self.get_initials()
+            avatar = self.generate_avatar(initials)
+            self.picture.save(f"{self.id}.png", ContentFile(avatar), save=False)
+        super().save(*args, **kwargs)
+
+    def get_initials(self) -> str:
+        initials = ""
+        if self.first_name:
+            initials += self.first_name[0]
+        if self.last_name:
+            initials += self.last_name[0]
+        return initials.upper()
+
+    def generate_avatar(self, text: str, size=100):
+        foreground_colors = ['#FFFFFF', '#000000']  # White and Black
+        background_colors = ['#E74C3C', '#3498DB', '#2ECC71', '#F1C40F', '#E67E22',
+                             '#9B59B6']  # Red, Blue, Green, Yellow, Orange, Purple
+        foreground_color = random.choice(foreground_colors)
+        background_color = random.choice(background_colors)
+
+        image = Image.new("RGBA", (size, size), background_color)
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.load_default(size=70)
+        _, _, text_width, text_height = draw.textbbox((0, 0), text=text, font=font)
+        position = ((size - text_width) / 2, (size - text_height-10) / 2)
+        draw.text(position, text, fill=foreground_color, font=font)
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        return buffer.getvalue()
 
 
 class Feature(models.Model):

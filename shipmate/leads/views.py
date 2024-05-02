@@ -57,7 +57,7 @@ class LeadsPagination(LimitOffsetPagination):
 class ListLeadsAPIView(ListAPIView):  # noqa
     queryset = Leads.objects.prefetch_related(
         "lead_vehicles"
-    ).select_related("origin__state", "destination__state", "customer")
+    ).select_related("origin__state", "destination__state", "customer", "user", "extra_user")
     serializer_class = ListLeadsSerializer
     filterset_class = LeadsFilter
     pagination_class = LeadsPagination

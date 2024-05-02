@@ -25,7 +25,7 @@ class RoleSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'name', 'email']
+        fields = ['id', 'first_name', 'last_name', 'email']
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -59,3 +59,9 @@ class ConfirmOTPSerializer(serializers.Serializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField()
+
+
+class LeadListUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "picture"]

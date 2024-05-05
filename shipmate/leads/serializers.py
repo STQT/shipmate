@@ -90,6 +90,14 @@ class ListLeadsSerializer(serializers.ModelSerializer):
         return f"{state_name}, {state_code} {city_zip}"
 
     @classmethod
+    def get_customer_name(cls, obj) -> str:
+        return obj.customer.name if obj.customer else "NaN"
+
+    @classmethod
+    def get_customer_phone(cls, obj) -> str:
+        return obj.customer.phone if obj.customer else "NaN"
+
+    @classmethod
     def get_destination_name(cls, obj) -> str:
         state_name = "NaN"  # noqa
         state_code = "NaN"

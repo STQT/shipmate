@@ -52,7 +52,7 @@ class CreateLeadsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Leads
-        fields = "__all__"
+        exclude = ["price", "reservation_price"]
 
     def create(self, validated_data):
         vehicles_data = validated_data.pop('vehicles')
@@ -63,8 +63,8 @@ class CreateLeadsSerializer(serializers.ModelSerializer):
 
 
 class ListLeadsSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.name')  # noqa
-    customer_phone = serializers.CharField(source='customer.phone')
+    customer_name = serializers.SerializerMethodField(source='customer.name')  # noqa
+    customer_phone = serializers.SerializerMethodField(source='customer.phone')
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
     lead_vehicles = ListVehicleLeadsSerializer(many=True)

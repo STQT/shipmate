@@ -1,6 +1,7 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 
 from .serializers import *
+from shipmate.contrib.generics import UpdatePUTAPIView
 
 
 class ListProviderAPIView(ListAPIView):
@@ -17,7 +18,7 @@ class CreateProviderAPIView(CreateAPIView):  # noqa
         serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
 
-class UpdateProviderAPIView(UpdateAPIView):
+class UpdateProviderAPIView(UpdatePUTAPIView):
     queryset = Provider.objects.all()
     serializer_class = ProviderSerializer
 

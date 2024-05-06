@@ -10,7 +10,7 @@ from .views import (
 urlpatterns = [
     path('', ListProviderAPIView.as_view(), name='provider-list'),
     path('create/', CreateProviderAPIView.as_view(), name='provider-create'),
-    path('<int:pk>/update/', UpdateProviderAPIView.as_view(), name='provider-update'),
-    path('<int:pk>/detail/', DetailProviderAPIView.as_view(), name='provider-detail'),
-    path('<int:pk>/delete/', DeleteProviderAPIView.as_view(), name='provider-delete'),
+    path('update/<int:pk>/', UpdateProviderAPIView.as_view(), name='provider-update'),
+    path('detail/<int:pk>/', DetailProviderAPIView.as_view(), name='provider-detail'),
+    path('delete/<int:pk>/', DeleteProviderAPIView.as_view(), name='provider-delete'),
 ]

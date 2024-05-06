@@ -24,9 +24,9 @@ urlpatterns = [
     path("attachments/<int:leadId>/", LeadsAttachmentListView.as_view(), name="leads-attachments"),
     path('attachments/delete/<int:id>/', AttachmentDeleteAPIView.as_view(), name='attachment-delete'),
 
-    path('<str:guid>/update/', UpdateLeadsAPIView.as_view(), name='leads-update'),
-    path('<str:guid>/detail/', DetailLeadsAPIView.as_view(), name='leads-detail'),
-    path('<str:guid>/delete/', DeleteLeadsAPIView.as_view(), name='leads-delete'),
-    path('<str:guid>/convert/', ConvertLeadToQuoteAPIView.as_view(), name='leads-to-quote'),
+    path('update/<str:guid>/', UpdateLeadsAPIView.as_view(), name='leads-update'),
+    path('detail/<str:guid>/', DetailLeadsAPIView.as_view(), name='leads-detail'),
+    path('delete/<str:guid>/', DeleteLeadsAPIView.as_view(), name='leads-delete'),
+    path('convert/<str:guid>/', ConvertLeadToQuoteAPIView.as_view(), name='leads-to-quote'),
 
 ]

@@ -1,5 +1,6 @@
 from rest_framework import generics # noqa
 
+from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.users.models import Feature
 from shipmate.users.serializers import (
     FeatureSerializer
@@ -21,7 +22,7 @@ class FeatureListAPIView(generics.ListAPIView):
     serializer_class = FeatureSerializer
 
 
-class FeatureUpdateAPIView(generics.UpdateAPIView):
+class FeatureUpdateAPIView(UpdatePUTAPIView):
     queryset = Feature.objects.all()
     serializer_class = FeatureSerializer
 

@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.generics import CreateAPIView
 
 from shipmate.contrib.models import Attachments
+from shipmate.contrib.generics import RetrieveUpdatePUTAPIView
 from shipmate.attachments.methods import create_attachment
 from .models import TaskAttachment, FileAttachment, NoteAttachment
 from ..attachments.serializers import (
@@ -14,7 +15,7 @@ from ..attachments.serializers import (
     NoteAttachmentSerializer,
     UpdateTaskAttachmentSerializer,
     UpdateFileAttachmentSerializer,
-    UpdateNoteAttachmentSerializer, ListTaskAttachmentSerializer
+    UpdateNoteAttachmentSerializer
 )
 from ..leads.models import LeadsAttachment, Leads
 from ..orders.models import OrderAttachment, Order
@@ -98,16 +99,16 @@ class CreateFileAttachmentAPIView(BaseAttachmentAPIView):
 #     queryset = TaskAttachment.objects.all()
 
 
-class TaskAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):  # noqa
+class TaskAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):  # noqa
     queryset = TaskAttachment.objects.all()
     serializer_class = UpdateTaskAttachmentSerializer
 
 
-class FileAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):
+class FileAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):
     queryset = FileAttachment.objects.all()
     serializer_class = UpdateFileAttachmentSerializer
 
 
-class NoteAttachmentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateAPIView):
+class NoteAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):
     queryset = NoteAttachment.objects.all()
     serializer_class = UpdateNoteAttachmentSerializer

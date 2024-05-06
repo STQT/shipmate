@@ -1,8 +1,9 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 
 from .filters import QuoteFilter
 from shipmate.quotes.serializers import *
 from shipmate.contrib.models import QuoteStatusChoices
+from shipmate.contrib.generics import UpdatePUTAPIView
 
 
 class ListQuoteAPIView(ListAPIView):  # noqa
@@ -17,7 +18,7 @@ class CreateQuoteAPIView(CreateAPIView):
     serializer_class = CreateQuoteSerializer
 
 
-class UpdateQuoteAPIView(UpdateAPIView):
+class UpdateQuoteAPIView(UpdatePUTAPIView):
     queryset = Quote.objects.all()
     serializer_class = UpdateQuoteSerializer
     lookup_field = 'guid'

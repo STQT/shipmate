@@ -1,7 +1,9 @@
 from .filters import CustomerFilter
 from .models import Customer, ExternalContacts
 from .serializers import CustomerSerializer, ExternalContactsSerializer, DetailCustomerSerializer
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
+
+from shipmate.contrib.generics import UpdatePUTAPIView
 
 
 class ListCustomerAPIView(ListAPIView):
@@ -10,7 +12,7 @@ class ListCustomerAPIView(ListAPIView):
     filterset_class = CustomerFilter
 
 
-class UpdateCustomerAPIView(UpdateAPIView):
+class UpdateCustomerAPIView(UpdatePUTAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 

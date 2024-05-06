@@ -11,7 +11,7 @@ urlpatterns = [
     path('', ListCustomerAPIView.as_view(), name='customer-list'),
     path('create-contact/', CreateExternalContactsAPIView.as_view(), name='contact-create'),
     path('create/', CreateCustomerAPIView.as_view(), name='customer-create'),
-    path('<int:pk>/update/', UpdateCustomerAPIView.as_view(), name='customer-update'),
-    path('<int:pk>/detail/', DetailCustomerAPIView.as_view(), name='customer-detail'),
-    path('<int:pk>/delete/', DeleteCustomerAPIView.as_view(), name='customer-delete'),
+    path('update/<int:pk>/', UpdateCustomerAPIView.as_view(), name='customer-update'),
+    path('detail/<int:pk>/', DetailCustomerAPIView.as_view(), name='customer-detail'),
+    path('delete/<int:pk>/', DeleteCustomerAPIView.as_view(), name='customer-delete'),
 ]

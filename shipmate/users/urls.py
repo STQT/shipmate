@@ -21,14 +21,14 @@ urlpatterns = [
 
     path('feature/', FeatureListAPIView.as_view(), name='feature-list'),
     path('feature/create/', FeatureCreateAPIView.as_view(), name='feature-create'),
-    path('feature/<int:pk>/update/', FeatureUpdateAPIView.as_view(), name='feature-update'),
-    path('feature/<int:pk>/detail/', FeatureDetailAPIView.as_view(), name='feature-detail'),
-    path('feature/<int:pk>/delete/', FeatureDestroyAPIView.as_view(), name='feature-delete'),
+    path('feature/update/<int:pk>/', FeatureUpdateAPIView.as_view(), name='feature-update'),
+    path('feature/detail/<int:pk>/', FeatureDetailAPIView.as_view(), name='feature-detail'),
+    path('feature/delete/<int:pk>/', FeatureDestroyAPIView.as_view(), name='feature-delete'),
 
     path('role/', RoleListAPIView.as_view(), name='role-list'),
     path('role/create/', RoleCreateAPIView.as_view(), name='role-create'),
-    path('role/<int:pk>/update/', RoleUpdateAPIView.as_view(), name='role-update'),
-    path('role/<int:pk>/detail/', RoleDetailAPIView.as_view(), name='role-detail'),
-    path('role/<int:pk>/delete/', RoleDestroyAPIView.as_view(), name='role-delete'),
+    path('role/update/<int:pk>/', RoleUpdateAPIView.as_view(), name='role-update'),
+    path('role/detail/<int:pk>/', RoleDetailAPIView.as_view(), name='role-detail'),
+    path('role/delete/<int:pk>/', RoleDestroyAPIView.as_view(), name='role-delete'),
 
 ]

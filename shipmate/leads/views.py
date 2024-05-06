@@ -5,7 +5,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView,
     DestroyAPIView, CreateAPIView,
-    UpdateAPIView, RetrieveUpdateDestroyAPIView,
     get_object_or_404
 )
 from rest_framework import status
@@ -14,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
+from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
@@ -23,7 +23,7 @@ from shipmate.leads.serializers import (
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer,
     LeadsAttachmentSerializer,
-    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer
+    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, UpdateLeadsResponseSerializer
 )
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
@@ -69,10 +69,21 @@ class CreateLeadsAPIView(CreateAPIView):  # noqa
     serializer_class = CreateLeadsSerializer
 
 
-class UpdateLeadsAPIView(UpdateAPIView):
+class UpdateLeadsAPIView(UpdatePUTAPIView):
     queryset = Leads.objects.all()
     serializer_class = UpdateLeadsSerializer
     lookup_field = 'guid'
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(instance=self.get_object(), data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(RetrieveLeadsSerializer(serializer.instance).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={200: RetrieveLeadsSerializer})
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
 
 class DeleteLeadsAPIView(DestroyAPIView):
@@ -94,7 +105,7 @@ class CreateVehicleLeadsAPIView(CreateAPIView):  # noqa
     serializer_class = VehicleLeadsSerializer
 
 
-class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdateDestroyAPIView):  # noqa
+class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
     queryset = LeadVehicles.objects.all()
     serializer_class = VehicleLeadsSerializer
 

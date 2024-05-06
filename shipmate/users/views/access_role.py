@@ -1,5 +1,6 @@
 from rest_framework import generics  # noqa
 
+from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.users.models import Role
 from shipmate.users.serializers import (
     RoleSerializer,
@@ -21,7 +22,7 @@ class RoleListAPIView(generics.ListAPIView):
     serializer_class = RoleSerializer
 
 
-class RoleUpdateAPIView(generics.UpdateAPIView):
+class RoleUpdateAPIView(UpdatePUTAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
 

@@ -77,17 +77,17 @@ class ListLeadsSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_origin_name(cls, obj) -> str:
-        state_name = "NaN"  # noqa
+        city_name = "NaN"  # noqa
         state_code = "NaN"
         city_zip = "NaN"
 
         if obj.origin:
             if obj.origin.state:
-                state_name = obj.origin.state.name
+                city_name = obj.origin.name
                 state_code = obj.origin.state.code
             city_zip = obj.origin.zip
 
-        return f"{state_name}, {state_code} {city_zip}"
+        return f"{city_name}, {state_code} {city_zip}"
 
     @classmethod
     def get_customer_name(cls, obj) -> str:
@@ -99,17 +99,17 @@ class ListLeadsSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
-        state_name = "NaN"  # noqa
+        city_name = "NaN"  # noqa
         state_code = "NaN"
         city_zip = "NaN"
 
         if obj.destination:
             if obj.destination.state:
-                state_name = obj.destination.state.name
+                city_name = obj.destination.name
                 state_code = obj.destination.state.code
             city_zip = obj.destination.zip
 
-        return f"{state_name}, {state_code} {city_zip}"
+        return f"{city_name}, {state_code} {city_zip}"
 
 
 class RetrieveLeadsSerializer(ListLeadsSerializer):

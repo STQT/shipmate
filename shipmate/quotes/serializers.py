@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from .models import Quote, QuoteAttachment
+from .models import Quote
+from ..leads.serializers import DetailVehicleLeadsSerializer
 
 
 class CreateQuoteSerializer(serializers.ModelSerializer):
@@ -14,7 +15,7 @@ class ListQuoteSerializer(serializers.ModelSerializer):
     customer_phone = serializers.CharField(source='customer.phone')
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
-    vehicle_name = serializers.SerializerMethodField()
+    quote_vehicles = DetailVehicleLeadsSerializer(many=True)
 
     class Meta:
         model = Quote
@@ -22,17 +23,17 @@ class ListQuoteSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_origin_name(cls, obj) -> str:
-        state_name = "NaN"  # noqa
+        city_name = "NaN"  # noqa
         state_code = "NaN"
         city_zip = "NaN"
 
         if obj.origin:
             if obj.origin.state:
-                state_name = obj.origin.state.name
+                city_name = obj.origin.name
                 state_code = obj.origin.state.code
             city_zip = obj.origin.zip
 
-        return f"{state_name}, {state_code} {city_zip}"
+        return f"{city_name}, {state_code} {city_zip}"
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
@@ -47,16 +48,6 @@ class ListQuoteSerializer(serializers.ModelSerializer):
             city_zip = obj.destination.zip
 
         return f"{state_name}, {state_code} {city_zip}"
-
-    @classmethod
-    def get_vehicle_name(cls, obj) -> str:
-        vehicle_mark = "NaN"
-        vehicle_name = "NaN"
-        if obj.vehicle:
-            if obj.vehicle.mark:
-                vehicle_mark = obj.vehicle.mark.name
-            vehicle_name = obj.vehicle.name
-        return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
 
 
 class RetrieveQuoteSerializer(serializers.ModelSerializer):

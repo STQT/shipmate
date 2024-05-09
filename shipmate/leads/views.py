@@ -8,7 +8,7 @@ from rest_framework.generics import (
     get_object_or_404
 )
 from rest_framework import status
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import LimitOffsetPagination, _positive_int
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -52,6 +52,27 @@ class LeadsPagination(LimitOffsetPagination):
         response.data['sum_price'] = self.sum_price
         response.data['reservation_price'] = self.reservation_price
         return response
+
+    # def get_offset(self, request):
+    #
+    #     try:
+    #         print("BYE")
+    #         return _positive_int(
+    #             request.query_params[self.offset_query_param],
+    #         )
+    #     except (KeyError, ValueError):
+    #         print("HELLO")
+    #         return 1
+
+    def get_offset(self, request):
+        """
+        Override to set the offset.
+        """
+        # Get the offset from the request query parameters
+        offset = super().get_offset(request)
+
+        # Adjust offset to start from 1 instead of 0
+        return max(0, offset - 1)
 
 
 class ListLeadsAPIView(ListAPIView):  # noqa

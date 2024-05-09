@@ -18,12 +18,30 @@ class DetailVehicleQuoteSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
+    vehicle_name = serializers.SerializerMethodField(read_only=True) # noqa
+
+    class Meta:
+        model = QuoteVehicles
+        fields = ["vehicle_name"]
+
+    @classmethod
+    def get_vehicle_name(cls, obj) -> str:
+        vehicle_mark = "NaN"
+        vehicle_name = "NaN"
+        if obj.vehicle:
+            if obj.vehicle.mark:
+                vehicle_mark = obj.vehicle.mark.name
+            vehicle_name = obj.vehicle.name
+        return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
+
+
 class ListQuoteSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(source='customer.name')
     customer_phone = serializers.CharField(source='customer.phone')
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
-    quote_vehicles = DetailVehicleQuoteSerializer(many=True)
+    quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
 
     class Meta:
         model = Quote
@@ -45,17 +63,17 @@ class ListQuoteSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
-        state_name = "NaN"  # noqa
+        city_name = "NaN"  # noqa
         state_code = "NaN"
         city_zip = "NaN"
 
         if obj.destination:
             if obj.destination.state:
-                state_name = obj.destination.state.name
+                city_name = obj.destination.name
                 state_code = obj.destination.state.code
             city_zip = obj.destination.zip
 
-        return f"{state_name}, {state_code} {city_zip}"
+        return f"{city_name}, {state_code} {city_zip}"
 
 
 class RetrieveQuoteSerializer(serializers.ModelSerializer):

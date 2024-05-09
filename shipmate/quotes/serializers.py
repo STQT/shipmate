@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from .models import Quote
-from ..leads.serializers import DetailVehicleLeadsSerializer
+from .models import Quote, QuoteVehicles
+from ..cars.serializers import CarsModelSerializer
 
 
 class CreateQuoteSerializer(serializers.ModelSerializer):
@@ -10,12 +10,20 @@ class CreateQuoteSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class DetailVehicleQuoteSerializer(serializers.ModelSerializer):
+    vehicle = CarsModelSerializer(many=False)
+
+    class Meta:
+        model = QuoteVehicles
+        fields = "__all__"
+
+
 class ListQuoteSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(source='customer.name')
     customer_phone = serializers.CharField(source='customer.phone')
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
-    quote_vehicles = DetailVehicleLeadsSerializer(many=True)
+    quote_vehicles = DetailVehicleQuoteSerializer(many=True)
 
     class Meta:
         model = Quote

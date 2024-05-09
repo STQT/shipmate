@@ -1,12 +1,18 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from shipmate.contrib.models import QuoteAbstract, Attachments, VehicleAbstract
+
+User = get_user_model()
 
 
 class Quote(QuoteAbstract):
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='quotes_origin')
     destination = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True,
                                     related_name='quotes_destination')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quote_user')
+    extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
+                                   related_name='quote_extra_user')
 
     class Meta:
         verbose_name = "Quote"

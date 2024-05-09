@@ -145,6 +145,7 @@ class LeadsAttachmentSerializer(serializers.ModelSerializer):
 class LeadConvertSerializer(serializers.Serializer):
     price = serializers.IntegerField(write_only=True)
     reservation_price = serializers.IntegerField(write_only=True)
+    quote = serializers.BooleanField()
 
 
 class ProviderLeadListSerializer(serializers.ModelSerializer):

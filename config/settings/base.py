@@ -319,6 +319,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'shipmate.contrib.pagination.CustomPagination',
     'DATETIME_FORMAT': '%m/%d/%Y %I:%M %p',
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+    'DATE_FORMAT': '%Y-%m-%d'
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup

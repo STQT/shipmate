@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Prefetch
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -82,7 +83,9 @@ class DeleteQuoteAPIView(DestroyAPIView):
 
 
 class DetailQuoteAPIView(RetrieveAPIView):
-    queryset = Quote.objects.all()
+    queryset = Quote.objects.prefetch_related(
+        Prefetch('lead_vehicles', queryset=QuoteVehicles.objects.order_by('id'))
+    )
     serializer_class = RetrieveQuoteSerializer
     lookup_field = 'guid'
 

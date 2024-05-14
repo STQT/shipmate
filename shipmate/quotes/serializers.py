@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
 from .models import Quote, QuoteVehicles
+from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
+from ..customers.serializers import CustomerSerializer
+from ..lead_managements.serializers import ProviderSmallDataSerializer
+from ..users.serializers import ListUserSerializer
 
 
 class CreateVehicleQuoteSerializer(serializers.ModelSerializer):
@@ -52,11 +56,13 @@ class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
 
 
 class ListQuoteSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source='customer.name')
-    customer_phone = serializers.CharField(source='customer.phone')
+    customer_name = serializers.SerializerMethodField()
+    customer_phone = serializers.SerializerMethodField()
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
     quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
+    user = ListUserSerializer(many=False)
+    extra_user = ListUserSerializer(many=False, allow_null=True)
 
     class Meta:
         model = Quote
@@ -77,6 +83,14 @@ class ListQuoteSerializer(serializers.ModelSerializer):
         return f"{city_name}, {state_code} {city_zip}"
 
     @classmethod
+    def get_customer_name(cls, obj) -> str:
+        return obj.customer.name if obj.customer else "NaN"
+
+    @classmethod
+    def get_customer_phone(cls, obj) -> str:
+        return obj.customer.phone if obj.customer else "NaN"
+
+    @classmethod
     def get_destination_name(cls, obj) -> str:
         city_name = "NaN"  # noqa
         state_code = "NaN"
@@ -92,6 +106,12 @@ class ListQuoteSerializer(serializers.ModelSerializer):
 
 
 class RetrieveQuoteSerializer(serializers.ModelSerializer):
+    customer = CustomerSerializer(many=False)  # noqa
+    origin = CitySerializer(many=False)
+    destination = CitySerializer(many=False)
+    quote_vehicles = DetailVehicleQuoteSerializer(many=True)
+    source = ProviderSmallDataSerializer(many=False)
+
     class Meta:
         model = Quote
         fields = "__all__"

@@ -61,7 +61,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 
-class LeadListUserSerializer(serializers.ModelSerializer):
+class ListUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "picture"]

@@ -6,7 +6,7 @@ from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
 from shipmate.customers.serializers import CustomerSerializer
-from shipmate.users.serializers import LeadListUserSerializer
+from shipmate.users.serializers import ListUserSerializer
 
 
 class VehicleLeadsSerializer(serializers.ModelSerializer):
@@ -63,13 +63,13 @@ class CreateLeadsSerializer(serializers.ModelSerializer):
 
 
 class ListLeadsSerializer(serializers.ModelSerializer):
-    customer_name = serializers.SerializerMethodField(source='customer.name')  # noqa
-    customer_phone = serializers.SerializerMethodField(source='customer.phone')
+    customer_name = serializers.SerializerMethodField()  # noqa
+    customer_phone = serializers.SerializerMethodField()
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
     lead_vehicles = ListVehicleLeadsSerializer(many=True)
-    user = LeadListUserSerializer(many=False)
-    extra_user = LeadListUserSerializer(many=False, allow_null=True)
+    user = ListUserSerializer(many=False)
+    extra_user = ListUserSerializer(many=False, allow_null=True)
 
     class Meta:
         model = Leads

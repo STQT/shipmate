@@ -4,10 +4,25 @@ from .models import Quote, QuoteVehicles
 from ..cars.serializers import CarsModelSerializer
 
 
+class CreateVehicleQuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuoteVehicles
+        fields = ["vehicle", "vehicle_year"]
+
+
 class CreateQuoteSerializer(serializers.ModelSerializer):
+    vehicles = CreateVehicleQuoteSerializer(many=True, write_only=True)
+
     class Meta:
         model = Quote
         fields = "__all__"
+
+    def create(self, validated_data):
+        vehicles_data = validated_data.pop('vehicles')
+        quote = Quote.objects.create(**validated_data)
+        for vehicle_data in vehicles_data:
+            QuoteVehicles.objects.create(quote=quote, **vehicle_data)
+        return quote
 
 
 class DetailVehicleQuoteSerializer(serializers.ModelSerializer):
@@ -19,7 +34,7 @@ class DetailVehicleQuoteSerializer(serializers.ModelSerializer):
 
 
 class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
-    vehicle_name = serializers.SerializerMethodField(read_only=True) # noqa
+    vehicle_name = serializers.SerializerMethodField(read_only=True)  # noqa
 
     class Meta:
         model = QuoteVehicles

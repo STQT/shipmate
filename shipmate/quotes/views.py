@@ -6,7 +6,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from .filters import QuoteFilter
 from shipmate.quotes.serializers import *
 from shipmate.contrib.models import QuoteStatusChoices
-from shipmate.contrib.generics import UpdatePUTAPIView
+from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 
 
 class QuotePagination(LimitOffsetPagination):
@@ -95,13 +95,11 @@ class ArchiveListQuoteAPIView(ListAPIView):
     serializer_class = ListQuoteSerializer
 
 
-
-class CreateVehicleLeadsAPIView(CreateAPIView):  # noqa
+class CreateVehicleQuoteAPIView(CreateAPIView):  # noqa
     queryset = QuoteVehicles.objects.all()
     serializer_class = VehicleQuoteSerializer
 
 
-class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
+class RetrieveUpdateDestroyVehicleQuoteAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
     queryset = QuoteVehicles.objects.all()
     serializer_class = VehicleQuoteSerializer
-

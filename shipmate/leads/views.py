@@ -1,4 +1,4 @@
-from django.db import transaction, models
+from django.db import transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.exceptions import ValidationError

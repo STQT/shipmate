@@ -84,7 +84,7 @@ class DeleteQuoteAPIView(DestroyAPIView):
 
 class DetailQuoteAPIView(RetrieveAPIView):
     queryset = Quote.objects.prefetch_related(
-        Prefetch('lead_vehicles', queryset=QuoteVehicles.objects.order_by('id'))
+        Prefetch('quote_vehicles', queryset=QuoteVehicles.objects.order_by('id'))
     )
     serializer_class = RetrieveQuoteSerializer
     lookup_field = 'guid'

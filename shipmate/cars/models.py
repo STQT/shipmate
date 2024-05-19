@@ -2,7 +2,8 @@ from django.db import models
 
 
 class CarMarks(models.Model):
-    name = models.CharField('Name', max_length=255, blank=True, null=True)
+    name = models.CharField('Name', max_length=255, blank=True, null=True, db_index=True)
+    is_active = models.BooleanField("Is Active?", default=True, db_index=True)
 
     def __str__(self):
         return self.name
@@ -24,9 +25,10 @@ class CarsModel(models.Model):
         OTHER = 'other', "Other"
 
     mark = models.ForeignKey(CarMarks, on_delete=models.CASCADE, related_name='cars')
-    name = models.CharField("Name", blank=True, null=True, max_length=255)
+    name = models.CharField("Name", blank=True, null=True, max_length=255, db_index=True)
     vehicle_type = models.CharField('Vehicle type', max_length=255,
                                     choices=VehicleTYPES.choices, default=VehicleTYPES.CAR)
+    is_active = models.BooleanField("Is Active?", default=True, db_index=True)
 
     def __str__(self):
         return self.name

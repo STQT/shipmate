@@ -23,7 +23,7 @@ class UpdateRetrieveDestroyCarsModelAPIView(RetrieveUpdatePUTDestroyAPIView):
 
 
 class ListCarMarksAPIView(ListAPIView):  # noqa
-    queryset = CarMarks.objects.all()
+    queryset = CarMarks.objects.filter(is_active=True)
     serializer_class = CarMarksSerializer
     filterset_class = CarMarksFilter
 

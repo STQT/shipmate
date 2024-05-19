@@ -93,3 +93,15 @@ class DetailQuoteAPIView(RetrieveAPIView):
 class ArchiveListQuoteAPIView(ListAPIView):
     queryset = Quote.objects.filter(status=QuoteStatusChoices.ARCHIVED)
     serializer_class = ListQuoteSerializer
+
+
+
+class CreateVehicleLeadsAPIView(CreateAPIView):  # noqa
+    queryset = QuoteVehicles.objects.all()
+    serializer_class = VehicleQuoteSerializer
+
+
+class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
+    queryset = QuoteVehicles.objects.all()
+    serializer_class = VehicleQuoteSerializer
+

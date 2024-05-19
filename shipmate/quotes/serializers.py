@@ -121,3 +121,9 @@ class UpdateQuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         fields = "__all__"
+
+
+class VehicleQuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuoteVehicles
+        fields = "__all__"

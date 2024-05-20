@@ -1,12 +1,46 @@
 from django.db import models
 
-from shipmate.contrib.models import Attachments, OrderAbstract
+from shipmate.contrib.models import Attachments, OrderAbstract, VehicleAbstract
 
 
 class Order(OrderAbstract):
+    buyer_number = models.CharField(max_length=50, null=True, blank=True)
+
+    # origin
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='orders_origin')
+    origin_business_name = models.CharField(max_length=255, null=True, blank=True)
+    origin_business_phone = models.CharField(max_length=50, null=True, blank=True)
+    origin_contact_person = models.CharField(max_length=255, null=True, blank=True)
+    origin_phone = models.CharField(max_length=50, null=True, blank=True)
+    origin_second_phone = models.CharField(max_length=50, null=True, blank=True)
+    origin_buyer_number = models.CharField(max_length=50, null=True, blank=True)
+
+    # destination
     destination = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True,
                                     related_name='orders_destination')
+    destination_business_name = models.CharField(max_length=255, null=True, blank=True)
+    destination_business_phone = models.CharField(max_length=50, null=True, blank=True)
+    destination_contact_person = models.CharField(max_length=255, null=True, blank=True)
+    destination_phone = models.CharField(max_length=50, null=True, blank=True)
+    destination_second_phone = models.CharField(max_length=50, null=True, blank=True)
+
+    # Payments
+    payment_total_tariff = models.PositiveIntegerField(default=0)
+    payment_reservation = models.PositiveIntegerField(default=0)
+    payment_paid_reservation = models.PositiveIntegerField(default=0)
+    payment_carrier_pay = models.PositiveIntegerField(default=0)
+    payment_cod_to_carrier = models.PositiveIntegerField(default=0)
+    payment_paid_to_carrier = models.PositiveIntegerField(default=0)
+
+    # Date
+    date_est_pu = models.DateField(null=True, blank=True)
+    date_est_del = models.DateField(null=True, blank=True)
+    date_dispatched = models.DateField(null=True, blank=True)
+    date_picked_up = models.DateField(null=True, blank=True)
+    date_delivered = models.DateField(null=True, blank=True)
+
+    cd_note = models.CharField(max_length=255, null=True, blank=True)
+    cm_note = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         verbose_name = "Order"
@@ -18,3 +52,14 @@ class OrderAttachment(Attachments):
 
     class Meta:
         default_related_name = "orders"
+
+
+class OrderVehicles(VehicleAbstract):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    lot = models.CharField(max_length=20, null=True, blank=True)
+    vin = models.CharField(max_length=50, null=True, blank=True)
+    color = models.CharField(max_length=100, null=True, blank=True)
+    plate = models.CharField(max_length=50, null=True, blank=True)
+
+    class Meta:
+        default_related_name = "order_vehicles"

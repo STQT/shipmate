@@ -28,10 +28,23 @@ class QuoteStatusChoices(models.TextChoices):
     ARCHIVED = "archived", "Archived"
 
 
+class OrderStatusChoices(models.TextChoices):
+    ORDERS = "orders", "Orders"
+    BOOKED = "booked", "Booked"
+    POSTED = "posted", "Posted"
+    NOTSIGNED = "notsigned", "Not-Signed"
+    DISPATCHED = "dispatched", "Dispatched"
+    ISSUE = "issue", "Issue"
+    PICKEDUP = "pickedup", "Picked up"
+    COMPLETED = "completed", "Completed"
+    ONHOLD = "onhold", "On hold"
+    ARCHIVED = "archived", "Archived"
+
+
 class ConditionChoices(models.TextChoices):
     DRIVES = "run", "Run and drives"
     ROLLS = 'rols', "Inop, it rolls"
-    FORKLIFT = 'forklift', "Inop, needs forklift "
+    # FORKLIFT = 'forklift', "Inop, needs forklift "
 
 
 class VehicleAbstract(models.Model):
@@ -78,21 +91,7 @@ class LeadsAbstract(models.Model):
 
 class QuoteAbstract(LeadsAbstract):
     status = models.CharField(max_length=20, choices=QuoteStatusChoices.choices, default=QuoteStatusChoices.QUOTES)
-    # Payments
-    # payment_total_tariff = models.PositiveIntegerField(default=0)
-    # payment_reservation = models.PositiveIntegerField(default=0)
-    # payment_paid_reservation = models.PositiveIntegerField(default=0)
-    # payment_carrier_pay = models.PositiveIntegerField(default=0)
-    # payment_cod_to_carrier = models.PositiveIntegerField(default=0)
-    # payment_paid_to_carrier = models.PositiveIntegerField(default=0)
 
-    # Date
-    #
-    # date_est_pu = models.DateField(null=True, blank=True)
-    # date_est_del = models.DateField(null=True, blank=True)
-    # date_dispatched = models.DateField(null=True, blank=True)
-    # date_picked_up = models.DateField(null=True, blank=True)
-    # date_delivered = models.DateField(null=True, blank=True)
 
     class Meta:
         default_related_name = 'quotes'

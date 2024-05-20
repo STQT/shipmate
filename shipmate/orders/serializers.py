@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Quote, QuoteVehicles
+from .models import Order, OrderVehicles
 from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
@@ -8,40 +8,40 @@ from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..users.serializers import ListUserSerializer
 
 
-class CreateVehicleQuoteSerializer(serializers.ModelSerializer):
+class CreateVehicleOrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = QuoteVehicles
-        fields = ["vehicle", "vehicle_year"]
+        model = OrderVehicles
+        fields = ["vehicle", "vehicle_year", "lot", "vin", "color", "plate"]
 
 
-class CreateQuoteSerializer(serializers.ModelSerializer):
-    vehicles = CreateVehicleQuoteSerializer(many=True, write_only=True)
+class CreateOrderSerializer(serializers.ModelSerializer):
+    vehicles = CreateVehicleOrderSerializer(many=True, write_only=True)
 
     class Meta:
-        model = Quote
+        model = Order
         fields = "__all__"
 
     def create(self, validated_data):
         vehicles_data = validated_data.pop('vehicles')
-        quote = Quote.objects.create(**validated_data)
+        order = Order.objects.create(**validated_data)
         for vehicle_data in vehicles_data:
-            QuoteVehicles.objects.create(quote=quote, **vehicle_data)
-        return quote
+            OrderVehicles.objects.create(order=order, **vehicle_data)
+        return order
 
 
-class DetailVehicleQuoteSerializer(serializers.ModelSerializer):
+class DetailVehicleOrderSerializer(serializers.ModelSerializer):
     vehicle = CarsModelSerializer(many=False)
 
     class Meta:
-        model = QuoteVehicles
+        model = OrderVehicles
         fields = "__all__"
 
 
-class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
+class OrderVehicleLeadsSerializer(serializers.ModelSerializer):
     vehicle_name = serializers.SerializerMethodField(read_only=True)  # noqa
 
     class Meta:
-        model = QuoteVehicles
+        model = OrderVehicles
         fields = ["vehicle_name"]
 
     @classmethod
@@ -55,17 +55,17 @@ class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
         return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
 
 
-class ListQuoteSerializer(serializers.ModelSerializer):
+class ListOrderSerializer(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()
     customer_phone = serializers.SerializerMethodField()
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
-    quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
+    order_vehicles = OrderVehicleLeadsSerializer(many=True)
     user = ListUserSerializer(many=False)
     extra_user = ListUserSerializer(many=False, allow_null=True)
 
     class Meta:
-        model = Quote
+        model = Order
         fields = "__all__"
 
     @classmethod
@@ -105,25 +105,25 @@ class ListQuoteSerializer(serializers.ModelSerializer):
         return f"{city_name}, {state_code} {city_zip}"
 
 
-class RetrieveQuoteSerializer(ListQuoteSerializer):
+class RetrieveOrderSerializer(ListOrderSerializer):
     customer = CustomerSerializer(many=False)  # noqa
     origin = CitySerializer(many=False)
     destination = CitySerializer(many=False)
-    quote_vehicles = DetailVehicleQuoteSerializer(many=True)
+    order_vehicles = DetailVehicleOrderSerializer(many=True)
     source = ProviderSmallDataSerializer(many=False)
 
     class Meta:
-        model = Quote
+        model = Order
         fields = "__all__"
 
 
-class UpdateQuoteSerializer(serializers.ModelSerializer):
+class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Quote
+        model = Order
         fields = "__all__"
 
 
-class VehicleQuoteSerializer(serializers.ModelSerializer):
+class VehicleOrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = QuoteVehicles
+        model = OrderVehicles
         fields = "__all__"

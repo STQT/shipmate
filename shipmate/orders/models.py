@@ -1,10 +1,16 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from shipmate.contrib.models import Attachments, OrderAbstract, VehicleAbstract
 
+User = get_user_model()
+
 
 class Order(OrderAbstract):
     buyer_number = models.CharField(max_length=50, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_user')
+    extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
+                                   related_name='order_extra_user')
 
     # origin
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='orders_origin')

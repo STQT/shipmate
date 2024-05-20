@@ -92,14 +92,13 @@ class LeadsAbstract(models.Model):
 class QuoteAbstract(LeadsAbstract):
     status = models.CharField(max_length=20, choices=QuoteStatusChoices.choices, default=QuoteStatusChoices.QUOTES)
 
-
     class Meta:
         default_related_name = 'quotes'
         abstract = True
 
 
 class OrderAbstract(QuoteAbstract):
-    ...
+    status = models.CharField(max_length=20, choices=OrderStatusChoices.choices, default=OrderStatusChoices.ORDERS)
 
     class Meta:
         default_related_name = 'orders'

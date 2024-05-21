@@ -130,12 +130,6 @@ class UpdateLeadsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UpdateLeadsResponseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Leads
-        fields = ['id']
-
-
 class LeadsAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeadsAttachment

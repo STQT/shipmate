@@ -1,7 +1,10 @@
 from django.db import models
 from django.db.models import Prefetch
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 
 from .filters import QuoteFilter
 from shipmate.quotes.serializers import *
@@ -74,6 +77,17 @@ class UpdateQuoteAPIView(UpdatePUTAPIView):
     queryset = Quote.objects.all()
     serializer_class = UpdateQuoteSerializer
     lookup_field = 'guid'
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(instance=self.get_object(), data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(RetrieveQuoteSerializer(serializer.instance).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(responses={200: RetrieveQuoteSerializer})
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
 
 class DeleteQuoteAPIView(DestroyAPIView):

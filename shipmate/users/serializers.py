@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shipmate.users.models import User, Feature, Role
+from shipmate.users.models import User, Feature, Role, Team
 
 
 class FeatureSerializer(serializers.ModelSerializer):
@@ -65,3 +65,9 @@ class ListUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "picture"]
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = "__all__"

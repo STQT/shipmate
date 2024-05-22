@@ -145,7 +145,7 @@ class LeadConvertSerializer(serializers.Serializer):
 class ProviderLeadListSerializer(serializers.ModelSerializer):
     lead_count = serializers.SerializerMethodField()
 
-    def get_lead_count(self, provider):
+    def get_lead_count(self, provider) -> int:
         status = self.context['request'].query_params.get('status', None)
         queryset = Leads.objects.filter(source=provider)
         if status:

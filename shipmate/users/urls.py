@@ -4,8 +4,25 @@ from .views import (
     MyTokenObtainPairView,
     MyTokenRefreshView,
     MyTokenVerifyView,
-    FeatureCreateAPIView, FeatureDetailAPIView, FeatureListAPIView, FeatureUpdateAPIView, FeatureDestroyAPIView,
-    RoleCreateAPIView, RoleDetailAPIView, RoleListAPIView, RoleUpdateAPIView, RoleDestroyAPIView,
+
+    FeatureCreateAPIView,
+    FeatureDetailAPIView,
+    FeatureListAPIView,
+    FeatureUpdateAPIView,
+    FeatureDestroyAPIView,
+
+    TeamCreateAPIView,
+    TeamDetailAPIView,
+    TeamListAPIView,
+    TeamUpdateAPIView,
+    TeamDestroyAPIView,
+
+    RoleCreateAPIView,
+    RoleDetailAPIView,
+    RoleListAPIView,
+    RoleUpdateAPIView,
+    RoleDestroyAPIView,
+
     PasswordResetRequestAPIView, ConfirmOTPAPIView, ChangePasswordAPIView, UserCreateViewSet,
 )
 
@@ -24,6 +41,12 @@ urlpatterns = [
     path('feature/update/<int:pk>/', FeatureUpdateAPIView.as_view(), name='feature-update'),
     path('feature/detail/<int:pk>/', FeatureDetailAPIView.as_view(), name='feature-detail'),
     path('feature/delete/<int:pk>/', FeatureDestroyAPIView.as_view(), name='feature-delete'),
+
+    path('team/', TeamListAPIView.as_view(), name='team-list'),
+    path('team/create/', TeamCreateAPIView.as_view(), name='team-create'),
+    path('team/update/<int:pk>/', TeamUpdateAPIView.as_view(), name='team-update'),
+    path('team/detail/<int:pk>/', TeamDetailAPIView.as_view(), name='team-detail'),
+    path('team/delete/<int:pk>/', TeamDestroyAPIView.as_view(), name='team-delete'),
 
     path('role/', RoleListAPIView.as_view(), name='role-list'),
     path('role/create/', RoleCreateAPIView.as_view(), name='role-create'),

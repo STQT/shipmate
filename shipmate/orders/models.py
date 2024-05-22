@@ -6,11 +6,20 @@ from shipmate.contrib.models import Attachments, OrderAbstract, VehicleAbstract
 User = get_user_model()
 
 
+class OrderLocationTypeChoices(models.TextChoices):
+    R2R = "r2r", "Residential to residential"
+    R2B = "r2b", "Residential to business"
+    B2R = "b2r", "Business to residential"
+    B2B = "b2b", "Business to business"
+
+
 class Order(OrderAbstract):
     buyer_number = models.CharField(max_length=50, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_user')
     extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='order_extra_user')
+    location_type = models.CharField(max_length=3,
+                                     choices=OrderLocationTypeChoices.choices)
 
     # origin
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='orders_origin')

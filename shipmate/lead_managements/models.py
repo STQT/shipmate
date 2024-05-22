@@ -1,5 +1,9 @@
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.db import models
+
+from shipmate.contrib.models import BaseLog
 
 User = get_user_model()
 
@@ -18,8 +22,20 @@ class Provider(models.Model):
                                      null=True, blank=True)
 
 
-class ProviderLog(models.Model):
+class ProviderLog(BaseLog):
     provider = models.ForeignKey("Provider", on_delete=models.CASCADE, related_name="logs")
-    timestamp = models.DateTimeField(auto_now_add=True)
-    title = models.TextField()
-    message = models.TextField(blank=True, null=True)
+
+
+class Distribution(models.Model):
+    # TODO: add dynamic data for received_today and queue_now
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="distribution", editable=False)
+    multiple = models.PositiveSmallIntegerField(default=1)
+    start_hour = models.TimeField(default=datetime.time(0, 0))
+    finish_hour = models.TimeField(default=datetime.time(11, 59))
+    is_active = models.BooleanField(default=False)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="distribution_updates",
+                                     null=True, blank=True)
+
+
+class DistributionLog(BaseLog):
+    distribution = models.ForeignKey("Distribution", on_delete=models.CASCADE, related_name="logs")

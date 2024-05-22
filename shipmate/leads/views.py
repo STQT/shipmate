@@ -184,8 +184,8 @@ class AttachmentDeleteAPIView(DestroyAPIView):
 
 
 @extend_schema(parameters=[
-    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY,
-                     description='Calculating leadsCount with status Leads | Archived'),
+    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY, enum=["leads", "archived"],
+                     description='Calculating leadsCount with status leads | archived'),
 ])
 class ProviderLeadListAPIView(ListAPIView):
     queryset = Provider.objects.filter(is_active=True)

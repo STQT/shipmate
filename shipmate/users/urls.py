@@ -26,14 +26,14 @@ from .views import (
     PasswordResetRequestAPIView, ConfirmOTPAPIView, ChangePasswordAPIView, UserCreateViewSet, UserListViewSet,
 )
 
-urlpatterns = {
+urlpatterns = [
     path('create/', UserCreateViewSet.as_view(), name='create'),  # Create
-    path('list/', UserListViewSet.as_view(), name='user-list'),  # Create
+    path('list/', UserListViewSet.as_view(), name='user-list'),
 
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Login
     path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),  # Refresh token
     path('token/verify/', MyTokenVerifyView.as_view(), name='token_verify'),  # Verify token
-    path('reset-password-request/', PasswordResetRequestAPIView.as_view(), name='reset-password'),  # Reset password
+    path('reset-password-request/', PasswordResetRequestAPIView.as_view(), name='reset-password'),
     path('confirm-otp/', ConfirmOTPAPIView.as_view(), name='confirm-otp'),  # Verify token
     path('change-password/', ChangePasswordAPIView.as_view(), name='change-password'),  # Verify token
     path('me/', UserMeAPIView.as_view(), name='user-me'),
@@ -56,4 +56,4 @@ urlpatterns = {
     path('role/detail/<int:pk>/', RoleDetailAPIView.as_view(), name='role-detail'),
     path('role/delete/<int:pk>/', RoleDestroyAPIView.as_view(), name='role-delete'),
 
-}
+]

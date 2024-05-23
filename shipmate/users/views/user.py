@@ -65,6 +65,7 @@ class UserListViewSet(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     pagination_class = None
     serializer_class = ListUserViewSerializer
+    queryset = User.objects.all()
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

@@ -36,7 +36,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
             'last_login': {'read_only': True},
             'date_joined': {'read_only': True},
-            'is_superuser': {'read_only': True},
+            'is_superuser': {'read_only': True}
         }
 
 
@@ -69,7 +69,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 class ListUserViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "picture", "first_name", "last_name", "email", "created_at", ...]
+        fields = ["id", "picture", "first_name", "last_name", "email", "created_at",]
         # TODO: add position and status string field
 
 

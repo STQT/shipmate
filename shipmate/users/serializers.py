@@ -78,10 +78,10 @@ class ListUserViewSerializer(serializers.ModelSerializer):
     position_name = serializers.SerializerMethodField(allow_null=True)
 
     def get_access_role(self, obj):
-        return obj.access.access_name if obj.access else None
+        return obj.access.access_name if obj.access else "Anonym"
 
     def get_position_name(self, obj):
-        return obj.position.access_name if obj.position else None
+        return obj.position.access_name if obj.position else "Anonym"
 
     class Meta:
         model = User

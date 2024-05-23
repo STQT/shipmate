@@ -66,4 +66,4 @@ def log_provider_update(sender, instance, created, **kwargs):
             DistributionLog.objects.create(distribution=instance, title=title, message=message)
     else:
         title = f"Distribution is created on: {timestamp.strftime('%B %d, %Y %I:%M %p')}"
-        DistributionLog.objects.create(provider=instance, title=title)
+        DistributionLog.objects.create(distribution=instance, title=title)

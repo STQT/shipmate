@@ -18,7 +18,7 @@ from shipmate.users.serializers import (
     UserMeSerializer, FeatureSerializer,
     UserSerializer,
     UserEmailResetSerializer,
-    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer
+    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer, ListUserViewSerializer
 )
 
 User = get_user_model()
@@ -60,6 +60,11 @@ class UserCreateViewSet(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class UserListViewSet(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+    serializer_class = ListUserViewSerializer
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

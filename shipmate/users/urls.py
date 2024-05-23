@@ -23,11 +23,13 @@ from .views import (
     RoleUpdateAPIView,
     RoleDestroyAPIView,
 
-    PasswordResetRequestAPIView, ConfirmOTPAPIView, ChangePasswordAPIView, UserCreateViewSet,
+    PasswordResetRequestAPIView, ConfirmOTPAPIView, ChangePasswordAPIView, UserCreateViewSet, UserListViewSet,
 )
 
-urlpatterns = [
+urlpatterns = {
     path('create/', UserCreateViewSet.as_view(), name='create'),  # Create
+    path('list/', UserListViewSet.as_view(), name='user-list'),  # Create
+
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Login
     path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),  # Refresh token
     path('token/verify/', MyTokenVerifyView.as_view(), name='token_verify'),  # Verify token
@@ -54,4 +56,4 @@ urlpatterns = [
     path('role/detail/<int:pk>/', RoleDetailAPIView.as_view(), name='role-detail'),
     path('role/delete/<int:pk>/', RoleDestroyAPIView.as_view(), name='role-delete'),
 
-]
+}

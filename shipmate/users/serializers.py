@@ -63,10 +63,19 @@ class ChangePasswordSerializer(serializers.Serializer):
 class ListUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "picture"]
+        fields = ["id", "picture", "first_name", "last_name"]
+
+
+class ListUserViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "picture", "first_name", "last_name", "email", "created_at", ...]
+        # TODO: add position and status string field
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    users = ListUserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Team
         fields = "__all__"

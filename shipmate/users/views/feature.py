@@ -20,6 +20,7 @@ class FeatureDetailAPIView(generics.RetrieveAPIView):
 class FeatureListAPIView(generics.ListAPIView):
     queryset = Feature.objects.all()
     serializer_class = FeatureSerializer
+    pagination_class = None
 
 
 class FeatureUpdateAPIView(UpdatePUTAPIView):

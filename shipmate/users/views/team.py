@@ -1,6 +1,7 @@
 from rest_framework import generics # noqa
 
 from shipmate.contrib.generics import UpdatePUTAPIView
+from shipmate.users.filters import TeamFilter
 from shipmate.users.models import Team
 from shipmate.users.serializers import (
     TeamSerializer
@@ -20,6 +21,8 @@ class TeamDetailAPIView(generics.RetrieveAPIView):
 class TeamListAPIView(generics.ListAPIView):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
+    filterset_class = TeamFilter
+    pagination_class = None
 
 
 class TeamUpdateAPIView(UpdatePUTAPIView):

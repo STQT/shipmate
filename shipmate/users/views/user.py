@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from shipmate.users.filters import UserFilter
 from shipmate.users.models import OTPCode
 from shipmate.users.serializers import (
     UserMeSerializer, FeatureSerializer,
@@ -63,6 +64,7 @@ class UserListViewSet(generics.ListAPIView):
     pagination_class = None
     serializer_class = ListUserViewSerializer
     queryset = User.objects.all()
+    filterset_class = UserFilter
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

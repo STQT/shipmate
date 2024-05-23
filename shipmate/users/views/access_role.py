@@ -1,6 +1,7 @@
 from rest_framework import generics  # noqa
 
 from shipmate.contrib.generics import UpdatePUTAPIView
+from shipmate.users.filters import RoleFilter
 from shipmate.users.models import Role
 from shipmate.users.serializers import (
     RoleSerializer,
@@ -20,6 +21,8 @@ class RoleDetailAPIView(generics.RetrieveAPIView):
 class RoleListAPIView(generics.ListAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
+    filterset_class = RoleFilter
+    pagination_class = None
 
 
 class RoleUpdateAPIView(UpdatePUTAPIView):

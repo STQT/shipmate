@@ -29,7 +29,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         exclude = ["is_staff", "groups", "user_permissions"]
@@ -75,9 +74,20 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 
 class ListUserViewSerializer(serializers.ModelSerializer):
+    access_role = serializers.SerializerMethodField()
+    position_name = serializers.SerializerMethodField()
+
+    def get_access_role(self, obj):
+        return obj.acces.access_name
+
+    def get_position_name(self, obj):
+        return obj.position.access_name
+
     class Meta:
         model = User
-        fields = ["id", "picture", "first_name", "last_name", "email", "created_at",]
+        fields = ["id", "picture", "first_name", "last_name", "email", "created_at",
+                  "access_role", "position_name", "is_active"
+                  ]
         # TODO: add position and status string field
 
 

@@ -51,12 +51,9 @@ class UserCreateViewSet(generics.CreateAPIView):
     serializer_class = CreateUserSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = CreateUserSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            user.set_password(request.data.get('password'))
-            user.is_active = True
-            user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

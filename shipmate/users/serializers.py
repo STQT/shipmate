@@ -29,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         exclude = ["is_staff", "groups", "user_permissions"]
@@ -38,6 +39,14 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'date_joined': {'read_only': True},
             'is_superuser': {'read_only': True}
         }
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password')  # Remove confirm_password from validated data
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class UserMeSerializer(serializers.Serializer):

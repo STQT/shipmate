@@ -108,7 +108,6 @@ class Role(models.Model):
     access_name = models.CharField(max_length=255)
     access_status = models.CharField(max_length=10, choices=RoleAccessStatusChoices.choices,
                                      default=RoleAccessStatusChoices.ACTIVE)
-    included_users = models.ManyToManyField('User', related_name='roles', blank=True)
     included_features = models.ManyToManyField('Feature', related_name='roles', blank=True)
 
     def __str__(self):

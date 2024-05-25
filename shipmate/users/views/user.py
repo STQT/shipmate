@@ -27,19 +27,19 @@ User = get_user_model()
 
 class UserMeAPIView(generics.RetrieveAPIView):
     serializer_class = UserMeSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
 
     def get(self, request, *args, **kwargs):
         user = self.get_object()
-        user_roles = user.roles.prefetch_related('included_features')
         serialized_user = UserSerializer(user).data
-        features = []
-        for role in user_roles:
-            features.extend(role.included_features.all())
-
-        serialized_features = FeatureSerializer(features, many=True).data
+        serialized_features = []
+        user_access = user.access
+        if user_access:
+            features = user_access.included_features.all()
+            serialized_features = FeatureSerializer(features, many=True).data
         data = {
             'user': serialized_user,
             'features': serialized_features

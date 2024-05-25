@@ -28,8 +28,10 @@ class User(AbstractUser):
                              on_delete=models.SET_NULL, blank=True, null=True, related_name="users")
     access = models.ForeignKey("Role", verbose_name="Access",
                                on_delete=models.SET_NULL, blank=True, null=True, related_name="access_users")
+    # TODO: fix
     position = models.ForeignKey("Role", verbose_name="Position",
                                  on_delete=models.SET_NULL, blank=True, null=True, related_name="position_users")
+
     picture = models.ImageField(_("Profile Picture"), upload_to="profile_pictures", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     username = None  # type: ignore
@@ -90,9 +92,10 @@ class Feature(models.Model):
         VIEW = "view", "View"
         CREATE = "create", "Create"
         DELETE = "delete", "Delete"
+    # TODO: add endpoint choices
 
     name = models.CharField(max_length=255)
-    for_all_data = models.BooleanField(default=False)
+    for_all_data = models.BooleanField(default=False)  # TODO: remove this
     endpoint = models.CharField(max_length=32)
     method = models.CharField(max_length=10, choices=MethodChoices.choices, default=MethodChoices.VIEW)
 

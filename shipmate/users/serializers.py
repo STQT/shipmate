@@ -25,7 +25,7 @@ class RetrieveRoleSerializer(serializers.ModelSerializer):
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = "__all__"
+        exclude = ["included_features"]
 
 
 class UserSerializer(serializers.ModelSerializer):

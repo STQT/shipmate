@@ -20,7 +20,8 @@ class Order(OrderAbstract):
                                    related_name='order_extra_user')
     location_type = models.CharField(max_length=3,
                                      choices=OrderLocationTypeChoices.choices)
-    carrier = models.ForeignKey("carriers.Carrier", on_delete=models.CASCADE, related_name="orders")
+    carrier = models.ForeignKey("carriers.Carrier", on_delete=models.CASCADE, related_name="orders",
+                                null=True, blank=True)
 
     # origin
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='orders_origin')

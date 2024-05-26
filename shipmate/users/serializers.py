@@ -10,7 +10,7 @@ class FeatureSerializer(serializers.ModelSerializer):
 
 class RoleUserSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
-    email = serializers.EmailField(read_only=True)
+    first_name = serializers.EmailField(read_only=True)
 
 
 class RetrieveRoleSerializer(serializers.ModelSerializer):
@@ -23,6 +23,8 @@ class RetrieveRoleSerializer(serializers.ModelSerializer):
 
 
 class RoleSerializer(serializers.ModelSerializer):
+    access_users = RoleUserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Role
         exclude = ["included_features"]

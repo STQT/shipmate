@@ -4,6 +4,7 @@ from .models import Quote, QuoteVehicles
 from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
+from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..users.serializers import ListUserSerializer
 
@@ -127,3 +128,18 @@ class VehicleQuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuoteVehicles
         fields = "__all__"
+
+
+class ProviderQuoteListSerializer(serializers.ModelSerializer):
+    quote_count = serializers.SerializerMethodField()
+
+    def get_quote_count(self, provider) -> int:
+        status = self.context['request'].query_params.get('status', None)
+        queryset = Quote.objects.filter(source=provider)
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset.count()
+
+    class Meta:
+        model = Provider
+        fields = ['id', 'name', 'quote_count']

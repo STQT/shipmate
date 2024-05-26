@@ -7,11 +7,12 @@ from .views import (
     DetailQuoteAPIView,
     ArchiveListQuoteAPIView,
     CreateVehicleQuoteAPIView,
-    RetrieveUpdateDestroyVehicleQuoteAPIView
+    RetrieveUpdateDestroyVehicleQuoteAPIView, ProviderQuoteListAPIView
 )
 
 urlpatterns = [
     path('', ListQuoteAPIView.as_view(), name='quote-list'),
+    path('providers/', ProviderQuoteListAPIView.as_view(), name='quote-provider-list'),
     path('archive/list/', ArchiveListQuoteAPIView.as_view(), name='quote-archive-list'),
     path('create/', CreateQuoteAPIView.as_view(), name='quote-create'),
 

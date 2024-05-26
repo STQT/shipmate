@@ -90,6 +90,7 @@ LOCAL_APPS = [
     "shipmate.mails",
     "shipmate.lead_managements",
     "shipmate.attachments",
+    "shipmate.carriers",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

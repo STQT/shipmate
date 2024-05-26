@@ -20,4 +20,5 @@ urlpatterns += [
     path('providers/', include('shipmate.lead_managements.urls'), name="providers"),
     path('attachments/', include('shipmate.attachments.urls'), name="attachments"),
     path('users/', include('shipmate.users.urls'), name="users"),
+    path('carriers/', include('shipmate.carriers.urls'), name="carriers"),
 ]

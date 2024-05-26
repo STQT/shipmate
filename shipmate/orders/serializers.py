@@ -4,6 +4,7 @@ from .models import Order, OrderVehicles
 from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
+from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..users.serializers import ListUserSerializer
 
@@ -127,3 +128,18 @@ class VehicleOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderVehicles
         fields = "__all__"
+
+
+class ProviderOrderListSerializer(serializers.ModelSerializer):
+    order_count = serializers.SerializerMethodField()
+
+    def get_order_count(self, provider) -> int:
+        status = self.context['request'].query_params.get('status', None)
+        queryset = Order.objects.filter(source=provider)
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset.count()
+
+    class Meta:
+        model = Provider
+        fields = ['id', 'name', 'order_count']

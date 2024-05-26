@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
+from shipmate.contrib.models import LeadsStatusChoices
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
@@ -27,6 +28,9 @@ from shipmate.leads.serializers import (
 )
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
+
+VEHICLE_TAG = "leads/vehicle/"
+ATTACHMENTS_TAG = "leads/attachments/"
 
 
 class LeadsPagination(LimitOffsetPagination):
@@ -90,11 +94,13 @@ class DetailLeadsAPIView(RetrieveAPIView):
     lookup_field = 'guid'
 
 
+@extend_schema(tags=[VEHICLE_TAG])
 class CreateVehicleLeadsAPIView(CreateAPIView):  # noqa
     queryset = LeadVehicles.objects.all()
     serializer_class = VehicleLeadsSerializer
 
 
+@extend_schema(tags=[VEHICLE_TAG])
 class RetrieveUpdateDestroyVehicleLeadsAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
     queryset = LeadVehicles.objects.all()
     serializer_class = VehicleLeadsSerializer
@@ -151,6 +157,7 @@ class ConvertLeadToQuoteAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=[ATTACHMENTS_TAG])
 class LeadsAttachmentListView(ListAPIView):
     serializer_class = LeadsAttachmentSerializer
     filterset_class = LeadsAttachmentFilter
@@ -160,6 +167,7 @@ class LeadsAttachmentListView(ListAPIView):
         return LeadsAttachment.objects.filter(lead_id=lead_id).order_by("-id")
 
 
+@extend_schema(tags=[ATTACHMENTS_TAG])
 class AttachmentDeleteAPIView(DestroyAPIView):
     serializer_class = LeadsAttachmentSerializer
 
@@ -184,8 +192,9 @@ class AttachmentDeleteAPIView(DestroyAPIView):
 
 
 @extend_schema(parameters=[
-    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY, enum=["leads", "archived"],
-                     description='Calculating leadsCount with status leads | archived'),
+    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY,
+                     enum=LeadsStatusChoices.values,
+                     description='Calculating leadsCount with status leads | archived', required=True),
 ])
 class ProviderLeadListAPIView(ListAPIView):
     queryset = Provider.objects.filter(is_active=True)

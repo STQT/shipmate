@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Prefetch
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -9,6 +10,8 @@ from shipmate.contrib.models import OrderStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from .models import Order
 
+
+VEHICLE_TAG = "orders/vehicle/"
 
 class OrderPagination(LimitOffsetPagination):
     default_limit = 10
@@ -96,11 +99,24 @@ class ArchiveListOrderAPIView(ListAPIView):
     serializer_class = ListOrderSerializer
 
 
+@extend_schema(tags=[VEHICLE_TAG])
 class CreateVehicleOrderAPIView(CreateAPIView):  # noqa
     queryset = OrderVehicles.objects.all()
     serializer_class = VehicleOrderSerializer
 
 
+@extend_schema(tags=[VEHICLE_TAG])
 class RetrieveUpdateDestroyVehicleOrderAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
     queryset = OrderVehicles.objects.all()
     serializer_class = VehicleOrderSerializer
+
+
+@extend_schema(parameters=[
+    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY,
+                     enum=OrderStatusChoices.values,
+                     description='Calculating leadsCount with status', required=True),
+])
+class ProviderOrderListAPIView(ListAPIView):
+    queryset = Provider.objects.filter(is_active=True)
+    pagination_class = None
+    serializer_class = ProviderOrderListSerializer

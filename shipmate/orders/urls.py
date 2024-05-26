@@ -7,11 +7,12 @@ from .views import (
     DetailOrderAPIView,
     ArchiveListOrderAPIView,
     CreateVehicleOrderAPIView,
-    RetrieveUpdateDestroyVehicleOrderAPIView
+    RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView
 )
 
 urlpatterns = [
     path('', ListOrderAPIView.as_view(), name='order-list'),
+    path('providers/', ProviderOrderListAPIView.as_view(), name='order-provider-list'),
     path('archive/list/', ArchiveListOrderAPIView.as_view(), name='order-archive-list'),
     path('create/', CreateOrderAPIView.as_view(), name='order-create'),
 

@@ -12,11 +12,11 @@ from .views import (
 )
 
 urlpatterns = [
-    path('provider/', ListProviderAPIView.as_view(), name='provider-list'),
-    path('provider/create/', CreateProviderAPIView.as_view(), name='provider-create'),
-    path('provider/update/<int:pk>/', UpdateProviderAPIView.as_view(), name='provider-update'),
-    path('provider/detail/<int:pk>/', DetailProviderAPIView.as_view(), name='provider-detail'),
-    path('provider/delete/<int:pk>/', DeleteProviderAPIView.as_view(), name='provider-delete'),
+    path('', ListProviderAPIView.as_view(), name='provider-list'),
+    path('create/', CreateProviderAPIView.as_view(), name='provider-create'),
+    path('update/<int:pk>/', UpdateProviderAPIView.as_view(), name='provider-update'),
+    path('detail/<int:pk>/', DetailProviderAPIView.as_view(), name='provider-detail'),
+    path('delete/<int:pk>/', DeleteProviderAPIView.as_view(), name='provider-delete'),
 
     path('distribution/', ListDistributionAPIView.as_view(), name='distribution-list'),
     path('distribution/update/<int:pk>/', UpdateDistributionAPIView.as_view(), name='distribution-update'),

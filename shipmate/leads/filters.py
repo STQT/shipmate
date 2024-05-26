@@ -35,7 +35,6 @@ class LeadsFilter(django_filters.FilterSet):
         return queryset
 
 
-
 class LeadsAttachmentFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(field_name='type')
 

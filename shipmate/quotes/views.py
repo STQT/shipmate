@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Prefetch
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 from rest_framework.pagination import LimitOffsetPagination
@@ -10,6 +10,9 @@ from .filters import QuoteFilter
 from shipmate.quotes.serializers import *
 from shipmate.contrib.models import QuoteStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
+from ..lead_managements.models import Provider
+
+VEHICLE_TAG = "quote/vehicle/"
 
 
 class QuotePagination(LimitOffsetPagination):
@@ -109,11 +112,24 @@ class ArchiveListQuoteAPIView(ListAPIView):
     serializer_class = ListQuoteSerializer
 
 
+@extend_schema(tags=[VEHICLE_TAG])
 class CreateVehicleQuoteAPIView(CreateAPIView):  # noqa
     queryset = QuoteVehicles.objects.all()
     serializer_class = VehicleQuoteSerializer
 
 
+@extend_schema(tags=[VEHICLE_TAG])
 class RetrieveUpdateDestroyVehicleQuoteAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
     queryset = QuoteVehicles.objects.all()
     serializer_class = VehicleQuoteSerializer
+
+
+@extend_schema(parameters=[
+    OpenApiParameter(name='status', type=str, location=OpenApiParameter.QUERY,
+                     enum=QuoteStatusChoices.values,
+                     description='Calculating quoteCount with status', required=True),
+])
+class ProviderQuoteListAPIView(ListAPIView):
+    queryset = Provider.objects.filter(is_active=True)
+    pagination_class = None
+    serializer_class = ProviderQuoteListSerializer

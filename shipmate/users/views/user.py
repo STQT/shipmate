@@ -1,4 +1,5 @@
 from django.conf import settings
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 
 from django.contrib.auth import get_user_model
@@ -23,6 +24,8 @@ from shipmate.users.serializers import (
 )
 
 User = get_user_model()
+
+TOKEN_TAG = "users/token/"
 
 
 class UserMeAPIView(generics.RetrieveAPIView):
@@ -67,6 +70,7 @@ class UserListViewSet(generics.ListAPIView):
     filterset_class = UserFilter
 
 
+@extend_schema(tags=[TOKEN_TAG])
 class MyTokenObtainPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
 
@@ -80,10 +84,12 @@ class MyTokenObtainPairView(TokenObtainPairView):
         return response
 
 
+@extend_schema(tags=[TOKEN_TAG])
 class MyTokenRefreshView(TokenRefreshView):
     permission_classes = (AllowAny,)
 
 
+@extend_schema(tags=[TOKEN_TAG])
 class MyTokenVerifyView(TokenVerifyView):
     permission_classes = (AllowAny,)
 

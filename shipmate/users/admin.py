@@ -9,6 +9,18 @@ from shipmate.users.models import Team, Role, Feature, OTPCode
 User = get_user_model()
 
 
+class AccessUserInline(admin.TabularInline):
+    model = User
+    extra = 1
+    fields = ['first_name', 'last_name', 'email']
+    fk_name = 'access'
+
+
+class IncludedFeaturesInline(admin.TabularInline):
+    model = Role.included_features.through
+    extra = 1
+
+
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
@@ -52,7 +64,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
-    ...
+    inlines = [AccessUserInline]
 
 
 @admin.register(Feature)

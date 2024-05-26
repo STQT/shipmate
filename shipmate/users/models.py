@@ -29,8 +29,6 @@ class User(AbstractUser):
     access = models.ForeignKey("Role", verbose_name="Access",
                                on_delete=models.SET_NULL, blank=True, null=True, related_name="access_users")
     # TODO: fix
-    position = models.ForeignKey("Role", verbose_name="Position",
-                                 on_delete=models.SET_NULL, blank=True, null=True, related_name="position_users")
 
     picture = models.ImageField(_("Profile Picture"), upload_to="profile_pictures", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

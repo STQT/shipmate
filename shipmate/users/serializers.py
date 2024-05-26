@@ -8,12 +8,18 @@ class FeatureSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'endpoint', 'method')
 
 
+class RoleUserSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+
+
 class RetrieveRoleSerializer(serializers.ModelSerializer):
     included_features = FeatureSerializer(many=True, read_only=True)
+    access_users = RoleUserSerializer(many=True)
 
     class Meta:
         model = Role
-        fields = ('id', 'access_name', 'access_status', 'included_features')
+        fields = ('id', 'access_name', 'access_status', 'included_features', 'access_users')
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -77,10 +83,10 @@ class ListUserViewSerializer(serializers.ModelSerializer):
     access_role = serializers.SerializerMethodField(allow_null=True)
     position_name = serializers.SerializerMethodField(allow_null=True)
 
-    def get_access_role(self, obj):
+    def get_access_role(self, obj) -> str:
         return obj.access.access_name if obj.access else "Anonym"
 
-    def get_position_name(self, obj):
+    def get_position_name(self, obj) -> str:
         return obj.position.access_name if obj.position else "Anonym"
 
     class Meta:

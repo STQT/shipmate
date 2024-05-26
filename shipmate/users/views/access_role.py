@@ -5,13 +5,13 @@ from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.users.filters import RoleFilter
 from shipmate.users.models import Role
 from shipmate.users.serializers import (
-    RoleSerializer,
+    RoleSerializer, RetrieveRoleSerializer,
 )
 
 TAG = "users/role/"
 
 
-@extend_schema(tags=[TAG])
+@extend_schema(tags=[TAG]) # noqa
 class RoleCreateAPIView(generics.CreateAPIView):  # noqa
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
@@ -20,7 +20,7 @@ class RoleCreateAPIView(generics.CreateAPIView):  # noqa
 @extend_schema(tags=[TAG])
 class RoleDetailAPIView(generics.RetrieveAPIView):
     queryset = Role.objects.all()
-    serializer_class = RoleSerializer
+    serializer_class = RetrieveRoleSerializer
 
 
 @extend_schema(tags=[TAG])

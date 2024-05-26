@@ -9,7 +9,7 @@ class FeatureSerializer(serializers.ModelSerializer):
 
 
 class RoleUserSerializer(serializers.Serializer):
-    pk = serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
     first_name = serializers.EmailField(read_only=True)
 
 

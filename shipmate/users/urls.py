@@ -30,7 +30,7 @@ from .views import (
 urlpatterns = [
     path('create/', UserCreateViewSet.as_view(), name='create'),  # Create
     path('list/', UserListViewSet.as_view(), name='user-list'),
-    path('update/', UserUpdateViewSet.as_view(), name='user-update'),
+    path('update/<int:pk>/', UserUpdateViewSet.as_view(), name='user-update'),
 
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),  # Login
     path('token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),  # Refresh token

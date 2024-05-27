@@ -18,10 +18,18 @@ class RoleUserSerializer(serializers.Serializer):
 class RetrieveRoleSerializer(serializers.ModelSerializer):
     included_features = FeatureSerializer(many=True, read_only=True)
     access_users = RoleUserSerializer(many=True)
+    available_features = serializers.SerializerMethodField()
 
     class Meta:
         model = Role
-        fields = ('id', 'access_name', 'access_status', 'included_features', 'access_users')
+        fields = ('id', 'access_name', 'access_status', 'included_features', 'access_users', 'available_features')
+
+    def get_available_features(self, obj):
+        # Retrieve all features from the database
+        included_features = obj.included_features.all()
+        features = Feature.objects.exclude(id__in=included_features.values_list('id', flat=True))
+        # Serialize the features
+        return FeatureSerializer(features, many=True).data
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -30,6 +38,18 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         exclude = ["included_features"]
+
+
+class CreateRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = "__all__"
+
+
+class UpdateRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):

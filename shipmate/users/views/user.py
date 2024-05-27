@@ -76,9 +76,6 @@ class UserUpdateViewSet(UpdatePUTAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateUserSerializer
 
-    def get_object(self):
-        return self.request.user
-
 
 @extend_schema(tags=[TOKEN_TAG])
 class MyTokenObtainPairView(TokenObtainPairView):

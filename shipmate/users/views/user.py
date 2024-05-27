@@ -70,6 +70,9 @@ class UserListViewSet(generics.ListAPIView):
     filterset_class = UserFilter
 
 
+
+
+
 @extend_schema(tags=[TOKEN_TAG])
 class MyTokenObtainPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)

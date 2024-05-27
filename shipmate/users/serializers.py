@@ -83,20 +83,15 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 class ListUserViewSerializer(serializers.ModelSerializer):
     access_role = serializers.SerializerMethodField(allow_null=True)
-    position_name = serializers.SerializerMethodField(allow_null=True)
 
     def get_access_role(self, obj) -> str:
         return obj.access.access_name if obj.access else "Anonym"
 
-    def get_position_name(self, obj) -> str:
-        return obj.position.access_name if obj.position else "Anonym"
-
     class Meta:
         model = User
         fields = ["id", "picture", "first_name", "last_name", "email", "created_at",
-                  "access_role", "position_name", "is_active"
+                  "access_role", "is_active"
                   ]
-        # TODO: add position and status string field
 
 
 class TeamSerializer(serializers.ModelSerializer):

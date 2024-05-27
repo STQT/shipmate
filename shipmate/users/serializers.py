@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
 from shipmate.users.models import User, Feature, Role, Team
 
 
@@ -44,7 +46,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
             'last_login': {'read_only': True},
             'date_joined': {'read_only': True},
-            'is_superuser': {'read_only': True}
+            'is_superuser': {'read_only': True},
         }
 
     def create(self, validated_data):
@@ -53,6 +55,28 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    newpassword = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = User
+        exclude = ["is_staff", "groups", "user_permissions", "password"]
+        extra_kwargs = {
+            'last_login': {'read_only': True},
+            'date_joined': {'read_only': True},
+            'is_superuser': {'read_only': True},
+        }
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.pop('newpassword', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if new_password:
+            instance.set_password(new_password)
+        instance.save()
+        return instance
 
 
 class UserMeSerializer(serializers.Serializer):

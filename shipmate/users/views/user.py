@@ -14,13 +14,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.users.filters import UserFilter
 from shipmate.users.models import OTPCode
 from shipmate.users.serializers import (
     UserMeSerializer, FeatureSerializer,
     UserSerializer,
     UserEmailResetSerializer,
-    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer, ListUserViewSerializer
+    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer, ListUserViewSerializer, UpdateUserSerializer
 )
 
 User = get_user_model()
@@ -70,7 +71,13 @@ class UserListViewSet(generics.ListAPIView):
     filterset_class = UserFilter
 
 
+class UserUpdateViewSet(UpdatePUTAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = UpdateUserSerializer
 
+    def get_object(self):
+        return self.request.user
 
 
 @extend_schema(tags=[TOKEN_TAG])

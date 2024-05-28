@@ -134,8 +134,7 @@ class ListUserViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "picture", "first_name", "last_name", "email", "created_at",
-                  "access_role", "is_active"
-                  ]
+                  "access_role", "is_active", "ext", "phone", "team", "access"]
 
 
 class TeamSerializer(serializers.ModelSerializer):

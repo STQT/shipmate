@@ -78,7 +78,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
-    newpassword = serializers.CharField(write_only=True, required=False)
+    newpassword = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = User
@@ -87,6 +87,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             'last_login': {'read_only': True},
             'date_joined': {'read_only': True},
             'is_superuser': {'read_only': True},
+            'picture': {'read_only': True}
         }
 
     def update(self, instance, validated_data):
@@ -127,6 +128,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 class ListUserViewSerializer(serializers.ModelSerializer):
     access_role = serializers.SerializerMethodField(allow_null=True)
+    team_name = serializers.StringRelatedField(source="team.name", allow_null=True)
 
     def get_access_role(self, obj) -> str:
         return obj.access.access_name if obj.access else "Anonym"
@@ -134,7 +136,7 @@ class ListUserViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "picture", "first_name", "last_name", "email", "created_at",
-                  "access_role", "is_active", "ext", "phone", "team", "access"]
+                  "access_role", "is_active", "ext", "phone", "team", "access", "team_name"]
 
 
 class TeamSerializer(serializers.ModelSerializer):

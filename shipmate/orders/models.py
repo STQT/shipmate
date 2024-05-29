@@ -14,14 +14,58 @@ class OrderLocationTypeChoices(models.TextChoices):
 
 
 class Order(OrderAbstract):
+    class DispatchPaidByChoices(models.TextChoices):
+        CARRIER = "carrier", "COD to Carrier"
+        DELIVERY = "delivery", "COD to Delivery Terminal"
+        PICKUP = "pickup", "COD to Pickup Terminal"
+        ONPICKUP = "onpickup", "COP to Carrier (On Pickup)"
+        INVOICE = "invoice", "Shipper Invoice"
+        PREPAYMENT = "prepayment", "Additional Shipper Pre-payment"
+
+    class DispatchPaymentTermChoices(models.TextChoices):
+        IMMEDIATELY = "immediately", "Immediately"
+        TWO = "2days", "2 business days"
+        FIVE = "5days", "5 business days"
+        TEN = "10days", "10 business days"
+        FIFTEEN = "15days", "15 business days"
+        THIRTY = "30days", "30 business days"
+
+    class DispatchTermsChoices(models.TextChoices):
+        PICKUP = "pickup", "Pickup"
+        DELIVERY = "delivery", "Delivery"
+        SIGNED = "signed", "Receiving a signed Bill of Lading"
+
+    class DispatchCodMethodChoices(models.TextChoices):
+        CASH = "cash", "Cash/Certified Funds"
+        CHECK = "check", "Check"
+
+    class DispatchPaymentTypeChoices(models.TextChoices):
+        CASH = "cash", "Cash"
+        FUND = "fund", "Certified fund"
+        CHECK = "check", "Company check"
+        ACH = "ach", "ACH"
+        ZELLE = "zelle", "Zelle"
+        VENMO = "venmo", "Venmo"
+        CASHAPP = "cashapp", "CashApp"
+
     buyer_number = models.CharField(max_length=50, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_user')
     extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='order_extra_user')
     location_type = models.CharField(max_length=3,
                                      choices=OrderLocationTypeChoices.choices)
+
     carrier = models.ForeignKey("carriers.Carrier", on_delete=models.CASCADE, related_name="orders",
                                 null=True, blank=True)
+    dispatch_paid_by = models.CharField(max_length=10, null=True, blank=True, choices=DispatchPaidByChoices.choices)
+    dispatch_payment_term = models.CharField(max_length=11, null=True, blank=True,
+                                             choices=DispatchPaymentTermChoices.choices)
+    dispatch_term_begins = models.CharField(max_length=10, null=True, blank=True,
+                                            choices=DispatchTermsChoices.choices)
+    dispatch_cod_method = models.CharField(max_length=5, null=True, blank=True,
+                                           choices=DispatchCodMethodChoices.choices)
+    dispatch_payment_type = models.CharField(max_length=10, null=True, blank=True,
+                                             choices=DispatchPaymentTypeChoices.choices)
 
     # origin
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='orders_origin')

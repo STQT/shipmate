@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment
 from ..addresses.serializers import CitySerializer
+from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
 from ..lead_managements.models import Provider
@@ -56,6 +57,41 @@ class OrderVehicleLeadsSerializer(serializers.ModelSerializer):
         return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
 
 
+class DispatchingOrderSerializer(serializers.ModelSerializer):
+    carrier_data = CreateCarrierSerializer(source="carrier", many=False, allow_null=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            "dispatch_paid_by",
+            "dispatch_payment_term",
+            "dispatch_term_begins",
+            "dispatch_cod_method",
+            "dispatch_payment_type",
+            "carrier_data",
+        ]
+        extra_kwargs = {
+            "dispatch_paid_by": {"required": True},
+            "dispatch_payment_term": {"required": True},
+            "dispatch_term_begins": {"required": True},
+            "dispatch_cod_method": {"required": True},
+            "dispatch_payment_type": {"required": True},
+            "carrier": {"required": True}
+        }
+
+
+class OrderDatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            "date_est_pu",
+            "date_est_del",
+            "date_dispatched",
+            "date_picked_up",
+            "date_delivered",
+        ]
+
+
 class ListOrderSerializer(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()
     customer_phone = serializers.SerializerMethodField()
@@ -67,7 +103,12 @@ class ListOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = "__all__"
+        fields = [
+            "id", "guid",
+            "customer_name", "customer_phone", "origin_name",
+            "destination_name", "order_vehicles", "user", "extra_user",
+            "price", "date_est_ship", "condition", "trailer_type", "notes",
+        ]
 
     @classmethod
     def get_origin_name(cls, obj) -> str:
@@ -112,10 +153,16 @@ class RetrieveOrderSerializer(ListOrderSerializer):
     destination = CitySerializer(many=False)
     order_vehicles = DetailVehicleOrderSerializer(many=True)
     source = ProviderSmallDataSerializer(many=False)
+    dispatch_data = DispatchingOrderSerializer(source="*", allow_null=True, required=False)
+    dates = OrderDatesSerializer(many=False, source="*")
 
     class Meta:
         model = Order
-        fields = "__all__"
+        exclude = [
+            "dispatch_paid_by", "dispatch_payment_term", "dispatch_term_begins", "dispatch_cod_method",
+            "dispatch_payment_type", "carrier",
+            "date_est_pu", "date_est_del", "date_dispatched", "date_picked_up", "date_delivered",
+        ]
 
 
 class UpdateOrderSerializer(serializers.ModelSerializer):

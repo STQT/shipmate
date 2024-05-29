@@ -170,3 +170,12 @@ class ProviderOrderListAPIView(ListAPIView):
     queryset = Provider.objects.filter(status=Provider.ProviderStatusChoices.ACTIVE)
     pagination_class = None
     serializer_class = ProviderOrderListSerializer
+
+
+class DispatchingOrderCreateAPIView(UpdatePUTAPIView):
+    queryset = Order.objects.all()
+    serializer_class = DispatchingOrderSerializer
+    lookup_field = "guid"
+
+    def perform_update(self, serializer):
+        serializer.save(status=OrderStatusChoices.DISPATCHED)

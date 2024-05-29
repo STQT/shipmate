@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Carrier(models.Model):
-    class Status(models.TextChoices):
+    class CarrierStatus(models.TextChoices):
         FAVORITE = "favorite", "Favorite"
         ACTIVE = "active", "Active"
         INACTIVE = "inactive", "Inactive"
@@ -17,7 +17,7 @@ class Carrier(models.Model):
     phone_2 = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField()
     fax = models.CharField(max_length=20)
-    status = models.CharField(max_length=8, choices=Status.choices, default=Status.INACTIVE)
+    status = models.CharField(max_length=8, choices=CarrierStatus.choices, default=CarrierStatus.INACTIVE)
 
     class Meta:
         verbose_name = "Carrier"

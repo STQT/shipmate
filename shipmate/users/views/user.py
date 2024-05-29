@@ -21,7 +21,8 @@ from shipmate.users.serializers import (
     UserMeSerializer, FeatureSerializer,
     UserSerializer,
     UserEmailResetSerializer,
-    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer, ListUserViewSerializer, UpdateUserSerializer
+    ConfirmOTPSerializer, ChangePasswordSerializer, CreateUserSerializer, ListUserViewSerializer, UpdateUserSerializer,
+    DetailUserSerializer
 )
 
 User = get_user_model()
@@ -75,6 +76,12 @@ class UserUpdateViewSet(UpdatePUTAPIView):
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateUserSerializer
+
+
+class UserDetailViewSet(generics.RetrieveAPIView):
+    queryset = User.objects.prefetch_related("logs")
+    permission_classes = [IsAuthenticated]
+    serializer_class = DetailUserSerializer
 
 
 @extend_schema(tags=[TOKEN_TAG])

@@ -31,4 +31,4 @@ class CarsModel(models.Model):
     is_active = models.BooleanField("Is Active?", default=True, db_index=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.mark.name} | {self.name}"

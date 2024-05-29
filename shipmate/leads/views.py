@@ -197,6 +197,6 @@ class AttachmentDeleteAPIView(DestroyAPIView):
                      description='Calculating leadsCount with status leads | archived', required=True),
 ])
 class ProviderLeadListAPIView(ListAPIView):
-    queryset = Provider.objects.filter(is_active=True)
+    queryset = Provider.objects.filter(status=Provider.ProviderStatusChoices.ACTIVE)
     pagination_class = None
     serializer_class = ProviderLeadListSerializer

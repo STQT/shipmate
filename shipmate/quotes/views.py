@@ -168,6 +168,6 @@ class RetrieveUpdateDestroyVehicleQuoteAPIView(RetrieveUpdatePUTDestroyAPIView):
                      description='Calculating quoteCount with status', required=True),
 ])
 class ProviderQuoteListAPIView(ListAPIView):
-    queryset = Provider.objects.filter(is_active=True)
+    queryset = Provider.objects.filter(status=Provider.ProviderStatusChoices.ACTIVE)
     pagination_class = None
     serializer_class = ProviderQuoteListSerializer

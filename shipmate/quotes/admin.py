@@ -5,7 +5,10 @@ from shipmate.quotes.models import Quote, QuoteAttachment, QuoteVehicles
 
 @admin.register(Quote)
 class QuoteAdmin(admin.ModelAdmin):
-    ...
+    autocomplete_fields = ["customer", "origin", "destination"]
+    list_display = ['id', 'status']
+    list_filter = ['status']
+
 
 
 @admin.register(QuoteAttachment)

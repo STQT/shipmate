@@ -141,3 +141,7 @@ class BaseLog(models.Model):
 
     class Meta:
         abstract = True
+
+
+class UserLog(BaseLog):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="logs")

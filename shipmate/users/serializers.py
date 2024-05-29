@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 from shipmate.users.models import User, Feature, Role, Team
+from shipmate.contrib.models import UserLog
 
 
 class FeatureSerializer(serializers.ModelSerializer):
@@ -77,6 +78,12 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLog
+        fields = ("title", "message")
+
+
 class UpdateUserSerializer(serializers.ModelSerializer):
     newpassword = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
@@ -98,6 +105,14 @@ class UpdateUserSerializer(serializers.ModelSerializer):
             instance.set_password(new_password)
         instance.save()
         return instance
+
+
+class DetailUserSerializer(serializers.ModelSerializer):
+    logs = UserLogSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = "__all__"
 
 
 class UserMeSerializer(serializers.Serializer):

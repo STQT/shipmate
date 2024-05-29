@@ -77,7 +77,7 @@ class User(AbstractUser):
         draw = ImageDraw.Draw(image)
         font = ImageFont.load_default(size=70)
         _, _, text_width, text_height = draw.textbbox((0, 0), text=text, font=font)
-        position = ((size - text_width) / 2, (size - text_height-10) / 2)
+        position = ((size - text_width) / 2, (size - text_height - 10) / 2)
         draw.text(position, text, fill=foreground_color, font=font)
         buffer = io.BytesIO()
         image.save(buffer, format="PNG")
@@ -90,6 +90,7 @@ class Feature(models.Model):
         VIEW = "view", "View"
         CREATE = "create", "Create"
         DELETE = "delete", "Delete"
+
     # TODO: add endpoint choices
 
     name = models.CharField(max_length=255)

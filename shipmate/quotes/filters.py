@@ -3,13 +3,14 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from .models import Quote, QuoteAttachment
+from ..contrib.models import QuoteStatusChoices
 from ..lead_managements.models import Provider
 
 User = get_user_model()
 
 
 class QuoteFilter(django_filters.FilterSet):
-    status = django_filters.CharFilter(field_name='status')
+    status = django_filters.ChoiceFilter(choices=QuoteStatusChoices.choices)
     source = django_filters.ModelMultipleChoiceFilter(field_name='source',
                                                       queryset=Provider.objects.all())
     user = django_filters.ModelChoiceFilter(field_name='user', queryset=User.objects.all())

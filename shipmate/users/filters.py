@@ -1,6 +1,5 @@
 import django_filters
 from django.contrib.auth import get_user_model
-
 from shipmate.users.models import Team, Role
 
 User = get_user_model()

@@ -3,13 +3,14 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from .models import Order, OrderAttachment
+from ..contrib.models import OrderStatusChoices
 from ..lead_managements.models import Provider
 
 User = get_user_model()
 
 
 class OrderFilter(django_filters.FilterSet):
-    status = django_filters.CharFilter(field_name='status')
+    status = django_filters.ChoiceFilter(choices=OrderStatusChoices.choices)
     source = django_filters.ModelMultipleChoiceFilter(field_name='source',
                                                       queryset=Provider.objects.all())
     user = django_filters.ModelChoiceFilter(field_name='user', queryset=User.objects.all())

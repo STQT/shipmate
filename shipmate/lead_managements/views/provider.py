@@ -1,5 +1,6 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
 
+from shipmate.lead_managements.filters import ProviderFilter
 from shipmate.lead_managements.serializers import *
 from shipmate.contrib.generics import UpdatePUTAPIView
 
@@ -8,6 +9,7 @@ class ListProviderAPIView(ListAPIView):
     queryset = Provider.objects.all()
     pagination_class = None
     serializer_class = ProviderSmallDataSerializer
+    filterset_class = ProviderFilter
 
 
 class CreateProviderAPIView(CreateAPIView):  # noqa

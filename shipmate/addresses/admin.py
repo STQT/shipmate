@@ -4,7 +4,7 @@ from .models import *
 
 @admin.register(States)
 class StatesAdmin(admin.ModelAdmin):
-    search_fields = ["name"]
+    search_fields = ["name", "code"]
 
 
 @admin.register(City)

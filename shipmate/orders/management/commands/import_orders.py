@@ -1,66 +1,243 @@
-import random
+import csv
+import json
 
-from django.utils import timezone
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from shipmate.orders.models import Order
-from shipmate.quotes.models import Quote
-from shipmate.contrib.models import OrderStatusChoices
-from shipmate.addresses.models import City  # Adjust import as needed
-from shipmate.customers.models import Customer  # Adjust import as needed
-from shipmate.lead_managements.models import Provider  # Adjust import as needed
+from shipmate.cars.models import CarsModel, CarMarks
+from shipmate.contrib.db import update_sequences
+from shipmate.orders.models import Order, OrderVehicles
+from shipmate.quotes.models import Quote, QuoteVehicles
+from shipmate.contrib.models import OrderStatusChoices, QuoteStatusChoices, TrailerTypeChoices, ConditionChoices
+from shipmate.addresses.models import City, States
+from shipmate.customers.models import Customer
+from shipmate.lead_managements.models import Provider
 
 User = get_user_model()
 
+DEFAULT_ESTIMATED_SHIP_DATE = "27/05/2024"
+
+
+def read_csv(filename):
+    with open(filename, newline='') as csvfile:
+        csvreader = csv.reader(csvfile, quotechar='"', delimiter=',')
+        # Read the header
+        header = next(csvreader)
+        # Read the rest of the data
+        data = [row for row in csvreader]
+    return header, data
+
+
+username_mapper = {
+    'Ronald.matelog': 'Ronald@gmail.com',
+    'Scott.matelog': 'scott@matelogisticss.com',
+    'developer': 'brian@matelogisticss.com',
+    'James.matelog': 'brian@matelogisticss.com',
+    '\\N': 'brian@matelogisticss.com',
+    'Daniel.matelog': 'daniel@matelogisticss.com',
+    'Tony.matelog': 'brian@matelogisticss.com',
+    'Rachael.matelog': 'brian@matelogisticss.com',
+    'Richard.matelog': 'brian@matelogisticss.com',
+    'Ali.matelog': 'brian@matelogisticss.com',
+    'Patrick.matelog': 'brian@matelogisticss.com',
+    'Sean.matelog': 'brian@matelogisticss.com',
+    'Ben.matelog': 'brian@matelogisticss.com'
+}
+
+QUOTE_MAPPER = {
+    "2": QuoteStatusChoices.FOLLOWUP,  # noqa
+    "3": QuoteStatusChoices.ARCHIVED,  # noqa
+    "21": QuoteStatusChoices.ONHOLD  # noqa
+}
+
+ORDER_MAPPER = {
+    "4": OrderStatusChoices.ORDERS,
+    "7": OrderStatusChoices.POSTED,
+    "8": OrderStatusChoices.DISPATCHED,
+    "9": OrderStatusChoices.ONHOLD,
+    "10": OrderStatusChoices.COMPLETED,
+    "11": OrderStatusChoices.COMPLETED,  # noqa
+    "12": OrderStatusChoices.ARCHIVED,  # noqa
+    "13": OrderStatusChoices.ARCHIVED,  # noqa
+    "60": OrderStatusChoices.BOOKED,  # noqa
+    "61": OrderStatusChoices.ARCHIVED,
+    "80": OrderStatusChoices.NOTSIGNED,
+    "81": OrderStatusChoices.PICKEDUP
+
+}
+SHIP_VIA_ID = {
+    "1": TrailerTypeChoices.OPEN,
+    "2": TrailerTypeChoices.CLOSE,
+    "3": TrailerTypeChoices.OPEN
+}
+
+quote_status_list = ["2", "3", "21"]
+order_status_list = ["4", "7", "8", "9", "10", "11", "12", "13", "60", "61", "80", "81"]
+
+c = []
+
 
 class Command(BaseCommand):
-    help = 'Create 5 orders for each status'
+    help = 'Import CSV data to DB'
+
+    def add_arguments(self, parser):
+        parser.add_argument('csv_file', type=str, help='Path to the CSV file')
 
     def handle(self, *args, **kwargs):
-        user = User.objects.first()  # Assuming you have at least one user
-        if not user:
-            self.stdout.write(self.style.ERROR('No users found in the database.'))
-            return
-
-        for status in OrderStatusChoices.choices:
-            status_value = status[0]
-            for i in range(5):
-                order = Order.objects.create(
-                    source=Provider.objects.order_by("?").first(),
-                    customer=Customer.objects.order_by("?").first(),
-                    buyer_number=f'{random.randint(100000, 999999)}',
-                    user=user,
-                    extra_user=None,  # Assuming no extra user
-                    origin=City.objects.order_by('?').first(),
-                    origin_business_name=f'Business_{random.randint(1000, 9999)}',
-                    origin_business_phone=f'11-{random.randint(1000, 9999)}',
-                    origin_contact_person=f'Person_{random.randint(1000, 9999)}',
-                    origin_phone=f'11-{random.randint(1000, 9999)}',
-                    origin_second_phone=f'11-{random.randint(1000, 9999)}',
-                    origin_buyer_number=f'Buyer_{random.randint(1000, 9999)}',
-                    destination=City.objects.order_by('?').first(),
-                    destination_business_name=f'Business_{random.randint(1000, 9999)}',
-                    destination_business_phone=f'555-{random.randint(1000, 9999)}',
-                    destination_contact_person=f'Person_{random.randint(1000, 9999)}',
-                    destination_phone=f'11-{random.randint(100000, 999999)}',
-                    destination_second_phone=f'11-{random.randint(100000, 999999)}',
-                    payment_total_tariff=random.randint(1000, 5000),
-                    payment_reservation=random.randint(100, 500),
-                    payment_paid_reservation=random.randint(100, 500),
-                    payment_carrier_pay=random.randint(100, 500),
-                    payment_cod_to_carrier=random.randint(100, 500),
-                    payment_paid_to_carrier=random.randint(100, 500),
-                    date_est_ship=timezone.now().date(),
-                    date_est_pu=timezone.now().date(),
-                    date_est_del=timezone.now().date(),
-                    date_dispatched=timezone.now().date(),
-                    date_picked_up=timezone.now().date(),
-                    date_delivered=timezone.now().date(),
-                    cd_note=f'CD Note {random.randint(1000, 9999)}',
-                    cm_note=f'CM Note {random.randint(1000, 9999)}',
-                    status=status_value,
+        json_file_path = kwargs['csv_file']  # noqa
+        header, data = read_csv(json_file_path)
+        for num, row in enumerate(data[2700:]):
+            date_entered: datetime = datetime.strptime(row[1], "%d/%m/%Y %H:%M")  # 19/06/2022 19:55
+            phone: str = row[2]  # 2395608470
+            email: str = row[3]  # amkania@yahoo.com
+            if not email:
+                continue
+            print(num, phone)
+            first_name: str = row[4]  # Andrea
+            last_name: str = row[5]  # Kania
+            """
+            [{"id":"0","year":"2013","model":"4Runner","make":"Toyota","type":"SUV","recommended_price":"0.00",
+            "deposit":"200","total":"1950"}]
+            """
+            vehicles_str: str = row[6]
+            vehicles: list[dict] = json.loads(vehicles_str)
+            pickup_zip: str = row[7][:5] if row[7][:5].isdigit() else "00000"  # 95014
+            pickup_city: str = row[8].capitalize()  # CUPERTINO
+            pickup_state_code: str = row[9]  # CA
+            dropoff_zip: str = row[10][:5] if row[10][:5].isdigit() else "00000"  # 76134
+            dropoff_city: str = row[11].capitalize() if len(row[11]) < 100 else "None"  # FORTWORTH
+            dropoff_state_code: str = row[12]  # TX
+            price_total_total = row[13]
+            if price_total_total == "NaN":
+                price_total_total = vehicles[0]["total"]
+                if not price_total_total or not price_total_total.isdigit():
+                    price_total_total = "0"
+            try:
+                price_total_total = int(float(price_total_total))
+            except ValueError:
+                price_total_total = 0
+            if row[14] == "\\N" or len(row[14]) > 10:
+                estimated_ship_date = DEFAULT_ESTIMATED_SHIP_DATE
+            else:
+                estimated_ship_date = row[14]  # 28/06/2022
+            try:
+                estimated_ship_date_obj: datetime.date = datetime.strptime(
+                    estimated_ship_date, "%d/%m/%Y").date()
+            except ValueError:
+                estimated_ship_date_obj: datetime.date = datetime.strptime(
+                    DEFAULT_ESTIMATED_SHIP_DATE, "%d/%m/%Y").date()
+            ship_via_id: str = SHIP_VIA_ID[row[15]]  # 9
+            vehicle_runs: str = ConditionChoices.ROLLS if row[16] == "0"  else ConditionChoices.DRIVES # 9
+            provider_name: str = row[17]  # 9
+            lead_status: str = row[18]  # 9
+            user_name: str = row[20]
+            user_email_str: str = username_mapper[user_name]
+            user, _created = User.objects.get_or_create(
+                email=user_email_str, defaults={
+                    'first_name': user_name,
+                    'last_name': last_name,
+                    'phone': phone,
+                }
+            )
+            customer, _created = Customer.objects.get_or_create(
+                email=email, defaults={'name': first_name, "last_name": last_name, 'phone': phone}
+            )
+            origin = City.objects.filter(zip=pickup_zip)  # noqa
+            if origin.exists():
+                origin = origin.first()
+            else:
+                origin_state = States.objects.filter(code=pickup_state_code).first()
+                if not origin_state:
+                    origin_state, _created = States.objects.get_or_create(code="ZZ", defaults={"name": "No name"})
+                    pickup_city = "No name"
+                    pickup_zip = "00000"
+                origin, _created = City.objects.get_or_create(
+                    zip=pickup_zip, defaults={"name": pickup_city, "state": origin_state}
                 )
-                self.stdout.write(self.style.SUCCESS(f'Created order {order.id} with status {status_value}'))
 
-        self.stdout.write(self.style.SUCCESS('Finished creating orders'))
+            destination = City.objects.filter(zip=dropoff_zip)  # noqa
+            if destination.exists():
+                destination = destination.first()
+            else:
+
+                destination_state, _created = States.objects.get_or_create(
+                    code=dropoff_state_code, defaults={"name": dropoff_state_code})
+                destination, _created = City.objects.get_or_create(
+                    zip=dropoff_zip, defaults={"name": dropoff_city, "state": destination_state}
+                )
+            c.append(lead_status)
+            reservation_price = vehicles[0]['deposit'] if vehicles else 0
+            if not reservation_price or not reservation_price.isdigit():
+                reservation_price = 0
+
+            if lead_status in quote_status_list:
+                # QUOTE
+                quote = Quote.objects.create(
+                    created_at=date_entered,
+                    status=QUOTE_MAPPER[lead_status],
+                    price=price_total_total,
+                    reservation_price=reservation_price,
+                    customer=customer,
+                    date_est_ship=estimated_ship_date_obj,
+                    source=...,
+                    user=user,
+                    origin=origin,
+                    destination=destination,
+                    trailer_type=ship_via_id,
+                    condition=vehicle_runs,
+
+                )
+                self.add_vehicles(vehicles, QuoteVehicles, "quote", quote)
+                self.stdout.write(self.style.SUCCESS('Finished creating quote'))
+            elif lead_status in order_status_list:
+                # ORDER
+                order = Order.objects.create(
+                    created_at=...,
+                    price=...,
+                    reservation_price=...,
+                    date_est_ship=...,
+                    customer=customer,
+                    user=user,
+                    origin=origin,
+                    destination=destination,
+                    status=ORDER_MAPPER[lead_status],
+                    # source=...,  # TODO: add this
+                )
+            else:
+                print(row, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                print(lead_status)
+                break
+
+        self.update_used_sequences()
+        self.stdout.write(self.style.SUCCESS('Finished creating orders | quotes'))
+
+    def add_vehicles(self, vehicles, klass, field, rel):
+        for vehicle in vehicles:
+            vehicle_year = vehicle['year']
+            if not vehicle_year or not vehicle_year.isdigit() or int(vehicle_year) > 3000:
+                vehicle_year = 2024
+
+            car_mark, _created = CarMarks.objects.get_or_create(
+                name=vehicle['make'], defaults={"is_active": True}
+            )
+            car_model, _created = CarsModel.objects.get_or_create(
+                mark=car_mark,
+                name=vehicle['model'], vehicle_type=vehicle['type'])
+            vehicle_data = {
+                field: rel,
+                "vehicle_year": vehicle_year,
+                "vehicle": car_model
+            }
+            klass.objects.create(**vehicle_data)
+
+    def update_used_sequences(self):
+        update_sequences(City, 'addresses_city_id_seq')
+        update_sequences(States, 'addresses_states_id_seq')
+        update_sequences(QuoteVehicles, 'quotes_quotevehicles_id_seq')
+        update_sequences(Quote, 'quotes_quote_id_seq')
+        update_sequences(Order, 'orders_order_id_seq')
+        update_sequences(OrderVehicles, 'orders_ordervehicles_id_seq')
+        update_sequences(CarsModel, 'cars_carsmodel_id_seq')
+        update_sequences(CarMarks, 'cars_carmarks_id_seq')

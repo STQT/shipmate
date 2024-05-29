@@ -11,4 +11,5 @@ class ExternalContactsInline(admin.TabularInline):
 class CustomerAdmin(admin.ModelAdmin):
     inlines = [ExternalContactsInline]
     search_fields = ["name", "phone", "email"]
+    list_display = ["name", "phone", "email"]
     ordering = ["-id"]

@@ -4,7 +4,12 @@ import django.db.models.deletion
 
 def create_initial_carrier(apps, schema_editor):
     Carrier = apps.get_model("carriers", "Carrier")
+    States = apps.get_model("addresses", "States")
     City = apps.get_model("addresses", "City")
+    state, _created = States.objects.get_or_create(name='Washington', code="WA")
+    city, _created = City.objects.get_or_create(
+        name="Unknown", zip="00000", long=0, lat=0, state=state
+    )
     initial_carrier = Carrier(
         id=1,
         name="Initial Carrier",
@@ -16,7 +21,7 @@ def create_initial_carrier(apps, schema_editor):
         email="contact@initialcarrier.com",
         fax="123-456-7891",
         status="favorite",
-        location=City.objects.first()
+        location=city
     )
     initial_carrier.save()
 

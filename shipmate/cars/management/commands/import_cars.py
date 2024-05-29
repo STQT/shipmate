@@ -1,6 +1,7 @@
 import json
 from django.core.management.base import BaseCommand
 from shipmate.cars.models import CarsModel, CarMarks
+from shipmate.contrib.db import update_sequences
 
 
 class Command(BaseCommand):
@@ -10,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('json_file', type=str, help='Path to the JSON file')
 
     def handle(self, *args, **options):
-        json_file_path = options['json_file'] # noqa
+        json_file_path = options['json_file']  # noqa
 
         try:
             with open(json_file_path, 'r') as f:
@@ -32,6 +33,9 @@ class Command(BaseCommand):
                             vehicle_type=fields['vehicle_type']
                         )
                         carsmodel.save()
+
+                update_sequences(CarMarks, 'cars_carmarks_id_seq')
+                update_sequences(CarsModel, 'cars_carsmodel_id_seq')
 
                 self.stdout.write(self.style.SUCCESS('Data imported successfully'))
         except FileNotFoundError:

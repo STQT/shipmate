@@ -12,6 +12,7 @@ class ListDistributionAPIView(ListAPIView):  # noqa
     queryset = Distribution.objects.all()
     pagination_class = None
     serializer_class = DistributionSmallDataSerializer
+    filterset_class = DistributionFilter
 
 
 @extend_schema(tags=[DISTRIBUTION_TAG])

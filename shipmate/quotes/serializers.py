@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Quote, QuoteVehicles
+from .models import Quote, QuoteVehicles, QuoteAttachment
 from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
@@ -143,3 +143,9 @@ class ProviderQuoteListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Provider
         fields = ['id', 'name', 'quote_count']
+
+
+class QuoteAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuoteAttachment
+        fields = "__all__"

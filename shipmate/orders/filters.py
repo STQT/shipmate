@@ -2,7 +2,7 @@ import django_filters
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-from .models import Order
+from .models import Order, OrderAttachment
 from ..lead_managements.models import Provider
 
 User = get_user_model()
@@ -33,3 +33,11 @@ class OrderFilter(django_filters.FilterSet):
             )
 
         return queryset
+
+
+class OrderAttachmentFilter(django_filters.FilterSet):
+    type = django_filters.CharFilter(field_name='type')
+
+    class Meta:
+        model = OrderAttachment
+        fields = ['type']

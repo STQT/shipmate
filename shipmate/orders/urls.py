@@ -7,7 +7,8 @@ from .views import (
     DetailOrderAPIView,
     ArchiveListOrderAPIView,
     CreateVehicleOrderAPIView,
-    RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView
+    RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView, OrderAttachmentDeleteAPIView,
+    OrderAttachmentListView
 )
 
 urlpatterns = [
@@ -19,6 +20,8 @@ urlpatterns = [
     path('vehicle/add/', CreateVehicleOrderAPIView.as_view(), name='order-add-vehicle'),
     path('vehicle/<int:pk>/', RetrieveUpdateDestroyVehicleOrderAPIView.as_view(),
          name='order-add-vehicle'),
+    path("attachments/<int:leadId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
+    path('attachments/delete/<int:id>/', OrderAttachmentDeleteAPIView.as_view(), name='order-attachment-delete'),
 
     path('update/<str:guid>/', UpdateOrderAPIView.as_view(), name='order-update'),
     path('detail/<str:guid>/', DetailOrderAPIView.as_view(), name='order-detail'),

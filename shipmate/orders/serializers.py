@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Order, OrderVehicles
+from .models import Order, OrderVehicles, OrderAttachment
 from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
@@ -143,3 +143,9 @@ class ProviderOrderListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Provider
         fields = ['id', 'name', 'order_count']
+
+
+class OrderAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderAttachment
+        fields = "__all__"

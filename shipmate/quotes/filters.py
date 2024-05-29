@@ -2,7 +2,7 @@ import django_filters
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-from .models import Quote
+from .models import Quote, QuoteAttachment
 from ..lead_managements.models import Provider
 
 User = get_user_model()
@@ -33,3 +33,11 @@ class QuoteFilter(django_filters.FilterSet):
             )
 
         return queryset
+
+
+class QuoteAttachmentFilter(django_filters.FilterSet):
+    type = django_filters.CharFilter(field_name='type')
+
+    class Meta:
+        model = QuoteAttachment
+        fields = ['type']

@@ -1,18 +1,22 @@
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
-from .filters import QuoteFilter
+from .filters import QuoteFilter, QuoteAttachmentFilter
 from shipmate.quotes.serializers import *
 from shipmate.contrib.models import QuoteStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
+from .models import QuoteAttachment
+from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..lead_managements.models import Provider
 
 VEHICLE_TAG = "quote/vehicle/"
+ATTACHMENTS_TAG = "quote/attachments/"
 
 
 class QuotePagination(LimitOffsetPagination):
@@ -105,6 +109,40 @@ class DetailQuoteAPIView(RetrieveAPIView):
     )
     serializer_class = RetrieveQuoteSerializer
     lookup_field = 'guid'
+
+
+@extend_schema(tags=[ATTACHMENTS_TAG])
+class QuoteAttachmentListView(ListAPIView):
+    serializer_class = QuoteAttachmentSerializer
+    filterset_class = QuoteAttachmentFilter
+
+    def get_queryset(self):
+        lead_id = self.kwargs.get('leadId')  # Retrieve the lead_id from URL kwargs
+        return QuoteAttachment.objects.filter(lead_id=lead_id).order_by("-id")
+
+
+@extend_schema(tags=[ATTACHMENTS_TAG])
+class QuoteAttachmentDeleteAPIView(DestroyAPIView):
+    serializer_class = QuoteAttachmentSerializer  # noqa
+
+    @transaction.atomic
+    def delete(self, request, id):
+        quote_attachment = get_object_or_404(QuoteAttachment, id=id)
+        quote_attachment.delete()
+        model_mapping = {
+            'note': NoteAttachment,
+            'task': TaskAttachment,
+            'file': FileAttachment,
+            # Add more mappings as needed
+        }
+        model_class = model_mapping.get(quote_attachment.type)
+
+        if not model_class:
+            raise ValidationError({"type": f"`{quote_attachment.type}` doesn't found from allowed deleting attachment"})
+
+        attachment_instance = model_class.objects.get(id=quote_attachment.link)
+        attachment_instance.delete()
+        return Response({'message': 'Attachment deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class ArchiveListQuoteAPIView(ListAPIView):

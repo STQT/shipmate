@@ -20,7 +20,7 @@ urlpatterns = [
     path('vehicle/add/', CreateVehicleOrderAPIView.as_view(), name='order-add-vehicle'),
     path('vehicle/<int:pk>/', RetrieveUpdateDestroyVehicleOrderAPIView.as_view(),
          name='order-add-vehicle'),
-    path("attachments/<int:leadId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
+    path("attachments/<int:ordersId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
     path('attachments/delete/<int:id>/', OrderAttachmentDeleteAPIView.as_view(), name='order-attachment-delete'),
 
     path('update/<str:guid>/', UpdateOrderAPIView.as_view(), name='order-update'),

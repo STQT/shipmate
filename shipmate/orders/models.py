@@ -65,7 +65,7 @@ class Order(OrderAbstract):
 
 
 class OrderAttachment(Attachments):
-    lead = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     class Meta:
         default_related_name = "orders"

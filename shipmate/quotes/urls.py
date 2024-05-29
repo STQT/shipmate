@@ -21,7 +21,7 @@ urlpatterns = [
     path('vehicle/<int:pk>/', RetrieveUpdateDestroyVehicleQuoteAPIView.as_view(),
          name='quote-add-vehicle'),
 
-    path("attachments/<int:leadId>/", QuoteAttachmentListView.as_view(), name="quote-attachments"),
+    path("attachments/<int:quoteId>/", QuoteAttachmentListView.as_view(), name="quote-attachments"),
     path('attachments/delete/<int:id>/', QuoteAttachmentDeleteAPIView.as_view(), name='quote-attachment-delete'),
 
     path('update/<str:guid>/', UpdateQuoteAPIView.as_view(), name='quote-update'),

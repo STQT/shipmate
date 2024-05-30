@@ -1,8 +1,10 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
-from shipmate.users.models import User, Feature, Role, Team
+from shipmate.users.models import Feature, Role, Team
 from shipmate.contrib.models import UserLog
+
+User = get_user_model()
 
 
 class FeatureSerializer(serializers.ModelSerializer):
@@ -108,6 +110,8 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 
 
 class DetailUserSerializer(serializers.ModelSerializer):
+    access_name = serializers.StringRelatedField(source="access.access_name", allow_null=True)
+    team_name = serializers.StringRelatedField(source="team.name", allow_null=True)
     logs = UserLogSerializer(many=True)
 
     class Meta:

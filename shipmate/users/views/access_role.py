@@ -19,7 +19,7 @@ class RoleCreateAPIView(generics.CreateAPIView):  # noqa
 
 @extend_schema(tags=[TAG])
 class RoleDetailAPIView(generics.RetrieveAPIView):
-    queryset = Role.objects.all()
+    queryset = Role.objects.prefetch_related("logs")
     serializer_class = RetrieveRoleSerializer
 
 

@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from shipmate.users.models import Feature, Role, Team
+from shipmate.users.models import Feature, Role, Team, RoleLog
 from shipmate.contrib.models import UserLog
 
 User = get_user_model()
@@ -13,6 +13,11 @@ class FeatureSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'endpoint', 'method')
 
 
+class LogSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    message = serializers.CharField(allow_null=True)
+
+
 class RoleUserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     first_name = serializers.EmailField(read_only=True)
@@ -22,6 +27,7 @@ class RetrieveRoleSerializer(serializers.ModelSerializer):
     included_features = FeatureSerializer(many=True, read_only=True)
     access_users = RoleUserSerializer(many=True)
     available_features = serializers.SerializerMethodField()
+    logs = LogSerializer(many=True)
 
     class Meta:
         model = Role
@@ -80,12 +86,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserLog
-        fields = ("title", "message")
-
-
 class UpdateUserSerializer(serializers.ModelSerializer):
     newpassword = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
@@ -112,7 +112,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
 class DetailUserSerializer(serializers.ModelSerializer):
     access_name = serializers.StringRelatedField(source="access.access_name", allow_null=True)
     team_name = serializers.StringRelatedField(source="team.name", allow_null=True)
-    logs = UserLogSerializer(many=True)
+    logs = LogSerializer(many=True)
 
     class Meta:
         model = User
@@ -160,6 +160,15 @@ class ListUserViewSerializer(serializers.ModelSerializer):
 
 class TeamSerializer(serializers.ModelSerializer):
     users = ListUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Team
+        fields = "__all__"
+
+
+class TeamDetailSerializer(serializers.ModelSerializer):
+    users = ListUserSerializer(many=True, read_only=True)
+    logs = LogSerializer(many=True)
 
     class Meta:
         model = Team

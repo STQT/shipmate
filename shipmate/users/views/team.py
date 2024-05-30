@@ -5,7 +5,7 @@ from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.users.filters import TeamFilter
 from shipmate.users.models import Team
 from shipmate.users.serializers import (
-    TeamSerializer
+    TeamSerializer, TeamDetailSerializer
 )
 
 TAG = "users/team/"
@@ -19,8 +19,8 @@ class TeamCreateAPIView(generics.CreateAPIView):  # noqa
 
 @extend_schema(tags=[TAG])
 class TeamDetailAPIView(generics.RetrieveAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+    queryset = Team.objects.prefetch_related("logs")
+    serializer_class = TeamDetailSerializer
 
 
 @extend_schema(tags=[TAG])

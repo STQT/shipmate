@@ -1,38 +1,46 @@
 from django.utils import timezone
 
 
-def log_update(sender, instance, created, log_klass, field_name, **kwargs):
+def store_old_values(sender, instance, **kwargs):
+    if instance.pk:  # Check if the instance already exists in the database
+        old_instance = sender.objects.get(pk=instance.pk)
+
+        instance._old_values = {field.name: getattr(old_instance, field.name) for field in instance._meta.fields}
+        print(instance._old_values)
+    else:
+        instance._old_values = {}
+
+
+def log_update(sender, instance, created, log_klass, klas_field_name, **kwargs):
     timestamp = timezone.now()
-    updated_user_name = instance.updated_from.name if instance.updated_from else "Anonym"
+    updated_user_name = (instance.updated_from.first_name + " " + instance.updated_from.last_name
+                         if instance.updated_from else "Anonym")
     if not created:
-        title = ""
-        message = ""
-        print(dir(instance))
+
+        old_values = getattr(instance, '_old_values', {})
         # Log all the updated fields
         for field in instance._meta.fields:
+            title = ""
+            message = ""
             field_name = field.name
-            old_field_name = f"get_old_{field_name}"
+            old_value = old_values.get(field_name)
+            new_value = getattr(instance, field_name)
+            if old_value != new_value:
+                title += (f"{field_name} field was edited on "
+                          f"{timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n")
+                message += f"{old_value}     →    {new_value}\n"
 
-            if hasattr(instance, old_field_name):
-                old_value = getattr(instance, old_field_name)()
-                new_value = getattr(instance, field_name)
-                if old_value != new_value:
-                    title += (f"- {field_name} field is edited on "
-                              f"{timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n")
-                    message += f"- {old_value} -> {new_value}\n"
-        print(title)
-        # Save log entry if any changes detected
-        if title:
-            data = {
-                field_name: instance,
-                "title": title,
-                "message": message
-            }
-            log_klass.objects.create(**data)
+            if title:
+                data = {
+                    klas_field_name: instance,
+                    'title': title,
+                    'message': message
+                }
+                log_klass.objects.create(**data)
     else:
-        title = f"Lead provider is created on: {timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n"
+        title = f"Created on: {timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n"
         data = {
-            field_name: instance,
+            klas_field_name: instance,
             "title": title
         }
         log_klass.objects.create(**data)

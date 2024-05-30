@@ -8,3 +8,4 @@ class BaseLog(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ["-id"]

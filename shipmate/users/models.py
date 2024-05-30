@@ -53,21 +53,27 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"pk": self.id})
 
     def save(self, *args, **kwargs):
-        # Check if the instance is new
         if self.pk is not None:
-            old = self._meta.model.objects.get(pk=self.pk)
-            if not self.picture or self.last_name != old.last_name or self.first_name != old.first_name:
-                initials = self.get_initials()
+            old_instance = User.objects.filter(pk=self.pk).first()
+            if old_instance:
+                old_first_name = old_instance.first_name
+                old_last_name = old_instance.last_name
+            else:
+                old_first_name = None
+                old_last_name = None
+            old_initials = self.get_initials(old_first_name, old_last_name)
+            initials = self.get_initials(self.first_name, self.last_name)
+            # Check if the picture needs to be updated
+            if not self.picture or old_initials != initials:
                 avatar = self.generate_avatar(initials)
                 self.picture.save(f"{self.id}.png", ContentFile(avatar), save=False)
+
         super().save(*args, **kwargs)
 
-    def get_initials(self) -> str:
+    def get_initials(self, first_name, last_name) -> str:
         initials = ""
-        if self.first_name:
-            initials += self.first_name[0]
-        if self.last_name:
-            initials += self.last_name[0]
+        initials += first_name[0]
+        initials += last_name[0]
         return initials.upper()
 
     def generate_avatar(self, text: str, size=100):

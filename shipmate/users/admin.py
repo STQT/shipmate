@@ -32,6 +32,7 @@ class IncludedFeaturesInline(admin.TabularInline):
 class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
+    inlines = [UserLogInline]
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "picture", "access", "team")}),

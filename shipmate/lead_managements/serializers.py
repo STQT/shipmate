@@ -41,8 +41,15 @@ class UpdateDistributionSerializer(serializers.ModelSerializer):
         exclude = ("user",)
 
 
+class ListDistributionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Distribution
+        fields = "__all__"
+
+
 class DetailDistributionSerializer(serializers.ModelSerializer):
     logs = DistributionLogSerializer(many=True)
+
     # TODO: Add fields received_today and queue now
 
     class Meta:

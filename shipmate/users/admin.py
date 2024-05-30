@@ -3,6 +3,7 @@ from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from shipmate.contrib.models import UserLog
 from shipmate.users.forms import UserAdminChangeForm, UserAdminCreationForm
 from shipmate.users.models import Team, Role, Feature, OTPCode
 
@@ -14,6 +15,12 @@ class AccessUserInline(admin.TabularInline):
     extra = 1
     fields = ['first_name', 'last_name', 'email']
     fk_name = 'access'
+
+
+
+class UserLogInline(admin.TabularInline):
+    model = UserLog
+    extra = 0
 
 
 class IncludedFeaturesInline(admin.TabularInline):

@@ -12,7 +12,7 @@ DISTRIBUTION_TAG = "distribution"
 class ListDistributionAPIView(ListAPIView):  # noqa
     queryset = Distribution.objects.all()
     pagination_class = None
-    serializer_class = DistributionSmallDataSerializer
+    serializer_class = ListDistributionSerializer
     filterset_class = DistributionFilter
 
 

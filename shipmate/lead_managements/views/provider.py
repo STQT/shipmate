@@ -8,7 +8,7 @@ from shipmate.contrib.generics import UpdatePUTAPIView
 class ListProviderAPIView(ListAPIView):
     queryset = Provider.objects.all()
     pagination_class = None
-    serializer_class = ProviderSmallDataSerializer
+    serializer_class = ProviderSerializer
     filterset_class = ProviderFilter
 
 

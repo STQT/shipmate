@@ -38,7 +38,7 @@ class DistributionLogSerializer(serializers.ModelSerializer):
 class UpdateDistributionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Distribution
-        exclude = ("user",)
+        exclude = ("user", "updated_from")
 
 
 class ListDistributionSerializer(serializers.ModelSerializer):

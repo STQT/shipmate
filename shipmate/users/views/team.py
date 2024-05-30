@@ -36,6 +36,9 @@ class TeamUpdateAPIView(UpdatePUTAPIView):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 @extend_schema(tags=[TAG])
 class TeamDestroyAPIView(generics.DestroyAPIView):

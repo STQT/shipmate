@@ -77,6 +77,9 @@ class UserUpdateViewSet(UpdatePUTAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateUserSerializer
 
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class UserDetailViewSet(generics.RetrieveAPIView):
     queryset = User.objects.prefetch_related("logs")

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from shipmate.contrib.models import UserLog
 from shipmate.users.forms import UserAdminChangeForm, UserAdminCreationForm
-from shipmate.users.models import Team, Role, Feature, OTPCode
+from shipmate.users.models import Team, Role, Feature, OTPCode, FeatureLog, TeamLog, RoleLog
 
 User = get_user_model()
 
@@ -17,9 +17,23 @@ class AccessUserInline(admin.TabularInline):
     fk_name = 'access'
 
 
-
 class UserLogInline(admin.TabularInline):
     model = UserLog
+    extra = 0
+
+
+class FeatureLogInline(admin.TabularInline):
+    model = FeatureLog
+    extra = 0
+
+
+class TeamLogInline(admin.TabularInline):
+    model = TeamLog
+    extra = 0
+
+
+class RoleLogInline(admin.TabularInline):
+    model = RoleLog
     extra = 0
 
 
@@ -67,17 +81,17 @@ class UserAdmin(auth_admin.UserAdmin):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    ...
+    inlines = [TeamLogInline]
 
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
-    inlines = [AccessUserInline]
+    inlines = [AccessUserInline, RoleLogInline]
 
 
 @admin.register(Feature)
 class FeatureAdmin(admin.ModelAdmin):
-    ...
+    inlines = [FeatureLogInline]
 
 
 @admin.register(OTPCode)

@@ -11,7 +11,7 @@ from shipmate.users.serializers import (
 TAG = "users/role/"
 
 
-@extend_schema(tags=[TAG]) # noqa
+@extend_schema(tags=[TAG])  # noqa
 class RoleCreateAPIView(generics.CreateAPIView):  # noqa
     queryset = Role.objects.all()
     serializer_class = CreateRoleSerializer
@@ -36,8 +36,11 @@ class RoleUpdateAPIView(UpdatePUTAPIView):
     queryset = Role.objects.all()
     serializer_class = UpdateRoleSerializer
 
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
-@extend_schema(tags=[TAG])
+
+@extend_schema(tags=[TAG])  # noqa
 class RoleDestroyAPIView(generics.DestroyAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer

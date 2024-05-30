@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
+from shipmate.utils.models import BaseLog
+
 User = get_user_model()
 
 
@@ -132,15 +134,6 @@ class Attachments(models.Model):
     #     ModelC.objects.filter(pk=self.link).delete()
     #     # Continue with the deletion of ModelB instance
     #     super().delete(*args, **kwargs)
-
-
-class BaseLog(models.Model):
-    timestamp = models.DateTimeField(auto_now_add=True)
-    title = models.TextField()
-    message = models.TextField(blank=True, null=True)
-
-    class Meta:
-        abstract = True
 
 
 class UserLog(BaseLog):

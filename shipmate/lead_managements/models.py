@@ -3,7 +3,7 @@ import datetime
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from shipmate.contrib.models import BaseLog
+from shipmate.utils.models import BaseLog
 
 User = get_user_model()
 
@@ -35,6 +35,9 @@ class Provider(models.Model):
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="provider_updates",
                                      null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class ProviderLog(BaseLog):
     provider = models.ForeignKey("Provider", on_delete=models.CASCADE, related_name="logs")
@@ -64,6 +67,9 @@ class Distribution(models.Model):
                               default=DistributionStatusChoices.INACTIVE)
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="distribution_updates",
                                      null=True, blank=True)
+
+    def __str__(self):
+        return self.user
 
 
 class DistributionLog(BaseLog):

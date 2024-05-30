@@ -8,6 +8,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from shipmate.utils.models import BaseLog
 from shipmate.users.managers import UserManager
 
 
@@ -38,6 +39,9 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    updated_from = models.ForeignKey("User", on_delete=models.SET_NULL, related_name="user_updates",
+                                     null=True, blank=True)
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.
@@ -97,9 +101,15 @@ class Feature(models.Model):
     for_all_data = models.BooleanField(default=False)  # TODO: remove this
     endpoint = models.CharField(max_length=32)
     method = models.CharField(max_length=10, choices=MethodChoices.choices, default=MethodChoices.VIEW)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="feature_updates",
+                                     null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+
+class FeatureLog(BaseLog):
+    feature = models.ForeignKey("Feature", on_delete=models.CASCADE, related_name="logs")
 
 
 class Role(models.Model):
@@ -111,9 +121,15 @@ class Role(models.Model):
     access_status = models.CharField(max_length=10, choices=RoleAccessStatusChoices.choices,
                                      default=RoleAccessStatusChoices.ACTIVE)
     included_features = models.ManyToManyField('Feature', related_name='roles', blank=True)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="role_updates",
+                                     null=True, blank=True)
 
     def __str__(self):
         return self.access_name
+
+
+class RoleLog(BaseLog):
+    role = models.ForeignKey("Role", on_delete=models.CASCADE, related_name="logs")
 
 
 class Team(models.Model):
@@ -124,9 +140,15 @@ class Team(models.Model):
     name = CharField(max_length=255)
     status = CharField(max_length=10, choices=TeamStatusChoices.choices)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="team_updates",
+                                     null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+
+class TeamLog(BaseLog):
+    team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="logs")
 
 
 class OTPCode(models.Model):

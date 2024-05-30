@@ -10,4 +10,5 @@ User = get_user_model()
 
 @receiver(post_save, sender=User)
 def log_user_update(sender, instance, created, **kwargs):
+    print("HERE")
     log_update(sender, instance, created, UserLog, "user", **kwargs)

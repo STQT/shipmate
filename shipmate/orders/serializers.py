@@ -84,11 +84,21 @@ class OrderDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "date_est_ship",
             "date_est_pu",
             "date_est_del",
             "date_dispatched",
             "date_picked_up",
             "date_delivered",
+        ]
+
+
+class OrderPaymentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            "payment_total_tariff", "payment_reservation", "payment_paid_reservation", "payment_carrier_pay",
+            "payment_cod_to_carrier", "payment_paid_to_carrier",
         ]
 
 
@@ -155,6 +165,7 @@ class RetrieveOrderSerializer(ListOrderSerializer):
     source = ProviderSmallDataSerializer(many=False)
     dispatch_data = DispatchingOrderSerializer(source="*", allow_null=True, required=False)
     dates = OrderDatesSerializer(many=False, source="*")
+    payments = OrderPaymentsSerializer(many=False, source="*")
 
     class Meta:
         model = Order
@@ -162,6 +173,8 @@ class RetrieveOrderSerializer(ListOrderSerializer):
             "dispatch_paid_by", "dispatch_payment_term", "dispatch_term_begins", "dispatch_cod_method",
             "dispatch_payment_type", "carrier",
             "date_est_pu", "date_est_del", "date_dispatched", "date_picked_up", "date_delivered",
+            "payment_total_tariff", "payment_reservation", "payment_paid_reservation", "payment_carrier_pay",
+            "payment_cod_to_carrier", "payment_paid_to_carrier",
         ]
 
 

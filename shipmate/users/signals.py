@@ -20,30 +20,30 @@ def log_user_update(sender, instance, created, **kwargs):
 
 
 @receiver(pre_save, sender=Team)
-def log_store_user_data(sender, instance, **kwargs):
+def log_store_team_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
 @receiver(post_save, sender=Team)
-def log_user_update(sender, instance, created, **kwargs):
+def log_team_update(sender, instance, created, **kwargs):
     log_update(sender, instance, created, TeamLog, "team", **kwargs)
 
 
 @receiver(pre_save, sender=Role)
-def log_store_user_data(sender, instance, **kwargs):
+def log_store_role_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
 @receiver(post_save, sender=Role)
-def log_user_update(sender, instance, created, **kwargs):
+def log_role_update(sender, instance, created, **kwargs):
     log_update(sender, instance, created, RoleLog, "role", **kwargs)
 
 
 @receiver(pre_save, sender=Feature)
-def log_store_user_data(sender, instance, **kwargs):
+def log_store_feature_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
 @receiver(post_save, sender=Feature)
-def log_user_update(sender, instance, created, **kwargs):
+def log_feature_update(sender, instance, created, **kwargs):
     log_update(sender, instance, created, FeatureLog, "feature", **kwargs)

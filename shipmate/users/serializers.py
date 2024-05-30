@@ -31,7 +31,8 @@ class RetrieveRoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
-        fields = ('id', 'access_name', 'access_status', 'included_features', 'access_users', 'available_features')
+        fields = ('id', 'access_name', 'access_status', 'included_features', 'access_users', 'available_features',
+                  'logs')
 
     def get_available_features(self, obj):
         # Retrieve all features from the database

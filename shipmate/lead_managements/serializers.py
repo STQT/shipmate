@@ -1,6 +1,10 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from shipmate.lead_managements.models import Distribution, DistributionLog, Provider, ProviderLog
+from shipmate.users.serializers import UserSerializer
+
+User = get_user_model()
 
 
 class ProviderLogSerializer(serializers.ModelSerializer):
@@ -20,10 +24,17 @@ class ProviderSerializer(serializers.ModelSerializer):
 class DetailProviderSerializer(serializers.ModelSerializer):
     logs = ProviderLogSerializer(many=True)
     updated_from_email = serializers.StringRelatedField(source="updated_from.email", read_only=True)
+    exclusive_users = UserSerializer(many=True, read_only=True)
+    available_exclusive_users = serializers.SerializerMethodField()
 
     class Meta:
         model = Provider
         fields = "__all__"
+
+    def get_available_exclusive_users(self, obj) -> UserSerializer(many=True): # noqa
+        exclusive_users = obj.exclusive_users.all()
+        features = User.objects.exclude(id__in=exclusive_users.values_list('id', flat=True))
+        return UserSerializer(features, many=True).data
 
 
 class ProviderSmallDataSerializer(serializers.ModelSerializer):

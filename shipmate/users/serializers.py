@@ -34,11 +34,9 @@ class RetrieveRoleSerializer(serializers.ModelSerializer):
         fields = ('id', 'access_name', 'access_status', 'included_features', 'access_users', 'available_features',
                   'logs')
 
-    def get_available_features(self, obj):
-        # Retrieve all features from the database
+    def get_available_features(self, obj) -> FeatureSerializer(many=True):
         included_features = obj.included_features.all()
         features = Feature.objects.exclude(id__in=included_features.values_list('id', flat=True))
-        # Serialize the features
         return FeatureSerializer(features, many=True).data
 
 

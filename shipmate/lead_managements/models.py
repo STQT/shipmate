@@ -31,6 +31,8 @@ class Provider(models.Model):
     effective_users_count = models.PositiveSmallIntegerField(null=True, blank=True)
     email = models.EmailField()
     subject = models.CharField(max_length=320)
+    value = models.FloatField(null=True, blank=True)
+    default_deposit = models.FloatField(null=True, blank=True)
     is_external = models.BooleanField(default=True)
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="provider_updates",
                                      null=True, blank=True)

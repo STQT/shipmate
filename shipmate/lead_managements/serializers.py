@@ -10,7 +10,7 @@ class ProviderLogSerializer(serializers.ModelSerializer):
 
 
 class ProviderSerializer(serializers.ModelSerializer):
-    updated_from_email = serializers.StringRelatedField(source="updated_from.email")
+    updated_from_email = serializers.StringRelatedField(source="updated_from.email", read_only=True)
 
     class Meta:
         model = Provider
@@ -19,6 +19,7 @@ class ProviderSerializer(serializers.ModelSerializer):
 
 class DetailProviderSerializer(serializers.ModelSerializer):
     logs = ProviderLogSerializer(many=True)
+    updated_from_email = serializers.StringRelatedField(source="updated_from.email", read_only=True)
 
     class Meta:
         model = Provider
@@ -46,8 +47,8 @@ class UpdateDistributionSerializer(serializers.ModelSerializer):
 class ListDistributionSerializer(serializers.ModelSerializer):
     user_email = serializers.StringRelatedField(source="user.email")
     updated_from_email = serializers.StringRelatedField(source="updated_from.email")
-    received_today = serializers.IntegerField(default=1, allow_null=True, read_only=True)
     # TODO: update to dynamic
+    received_today = serializers.IntegerField(default=1, allow_null=True, read_only=True)
     queue_now = serializers.IntegerField(default=1, allow_null=True, read_only=True)
 
     class Meta:
@@ -55,7 +56,7 @@ class ListDistributionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class DetailDistributionSerializer(serializers.ModelSerializer):
+class DetailDistributionSerializer(ListDistributionSerializer):
     logs = DistributionLogSerializer(many=True)
 
     # TODO: Add fields received_today and queue now

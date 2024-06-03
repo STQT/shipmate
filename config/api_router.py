@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.urls import path, include
+
+from shipmate.contract.views import GroundViewSet, HawaiiViewSet, InternationalViewSet
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 if settings.DEBUG:
@@ -8,6 +10,11 @@ else:
     router = SimpleRouter()
 
 app_name = "api"
+
+router.register(r'contracts/grounds', GroundViewSet)
+router.register(r'contracts/hawaii', HawaiiViewSet)
+router.register(r'contracts/internationals', InternationalViewSet)
+
 urlpatterns = router.urls
 
 urlpatterns += [

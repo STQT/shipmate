@@ -27,6 +27,7 @@ class Provider(models.Model):
                               default=ProviderStatusChoices.INACTIVE)
     type = models.CharField(max_length=9, choices=ProviderTypeChoices.choices)
     effective = models.CharField(max_length=3, choices=ProviderEffectiveChoices.choices)
+    leads_in_queue = models.PositiveSmallIntegerField(null=True, blank=True)
     exclusive_users = models.ManyToManyField(User, related_name='providers', blank=True)
     effective_users_count = models.PositiveSmallIntegerField(null=True, blank=True)
     email = models.EmailField()

@@ -30,22 +30,19 @@ class BaseContract(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.validate_single_default()
+        if self.is_default:
+            type(self).objects.filter(is_default=True).update(is_default=False)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        if self.is_default and not type(self).objects.filter(is_default=True).exclude(id=self.id).exists():
-            raise ValidationError('There must be at least one default ground.')
+        last_created = type(self).objects.exclude(id=self.id).order_by('-created_at').first()
+        if last_created:
+            last_created.is_default = True
+            last_created.save()
         super().delete(*args, **kwargs)
 
     def validate_single_default(self):
-        if self.is_default:
-            default_contract = type(self).objects.filter(is_default=True).exclude(id=self.id).first()
-            if default_contract:
-                raise ValidationError('There can only be one default ground.')
-        else:
-            if not type(self).objects.filter(is_default=True).exclude(id=self.id).exists():
-                raise ValidationError('There must be at least one default ground.')
+        pass
 
 
 class Ground(BaseContract):

@@ -5,7 +5,7 @@ from .models import Ground, Hawaii, International
 class GroundSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ground
-        fields = '__all__'
+        exclude = ("updated_from",)
 
     def validate(self, data):
         instance = self.instance or Ground(**data)
@@ -16,7 +16,7 @@ class GroundSerializer(serializers.ModelSerializer):
 class HawaiiSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hawaii
-        fields = '__all__'
+        exclude = ("updated_from",)
 
     def validate(self, data):
         instance = self.instance or Hawaii(**data)
@@ -27,7 +27,7 @@ class HawaiiSerializer(serializers.ModelSerializer):
 class InternationalSerializer(serializers.ModelSerializer):
     class Meta:
         model = International
-        fields = '__all__'
+        exclude = ("updated_from",)
 
     def validate(self, data):
         instance = self.instance or International(**data)

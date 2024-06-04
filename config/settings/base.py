@@ -92,6 +92,7 @@ LOCAL_APPS = [
     "shipmate.attachments",
     "shipmate.carriers",
     "shipmate.contract",
+    "shipmate.company_management",
     "shipmate.contrib",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from shipmate.utils.models import BaseLog
+
+User = get_user_model()
 
 
 class CompanyInfo(models.Model):
@@ -15,6 +18,9 @@ class CompanyInfo(models.Model):
     mon_fri = models.CharField(max_length=50)
     saturday = models.CharField(max_length=50)
     sunday = models.CharField(max_length=50)
+
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -51,6 +57,9 @@ class Merchant(models.Model):
 
     paypal_secret_key = models.CharField(max_length=50, null=True, blank=True)
 
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
+
     def __str__(self):
         return self.name
 
@@ -75,6 +84,9 @@ class VoIP(models.Model):
     status = models.CharField(choices=VoIPStatusChoices.choices, max_length=8)
     voip_type = models.CharField(choices=VoIPTypeChoices.choices, max_length=20)
     api = models.CharField(max_length=255)
+
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
 
 
 class VoIPLog(BaseLog):

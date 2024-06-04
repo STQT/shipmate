@@ -35,7 +35,7 @@ class Provider(models.Model):
     value = models.FloatField(null=True, blank=True)
     default_deposit = models.FloatField(null=True, blank=True)
     is_external = models.BooleanField(default=True)
-    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="provider_updates",
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
 
     def __str__(self):
@@ -68,7 +68,7 @@ class Distribution(models.Model):
     status = models.CharField(max_length=8,
                               choices=DistributionStatusChoices.choices,
                               default=DistributionStatusChoices.INACTIVE)
-    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="distribution_updates",
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
 
     def __str__(self):

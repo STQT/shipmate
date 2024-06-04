@@ -40,7 +40,7 @@ class User(AbstractUser):
 
     objects = UserManager()
 
-    updated_from = models.ForeignKey("User", on_delete=models.SET_NULL, related_name="user_updates",
+    updated_from = models.ForeignKey("User", on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
 
     def get_absolute_url(self) -> str:
@@ -107,7 +107,7 @@ class Feature(models.Model):
     for_all_data = models.BooleanField(default=False)  # TODO: remove this
     endpoint = models.CharField(max_length=32)
     method = models.CharField(max_length=10, choices=MethodChoices.choices, default=MethodChoices.VIEW)
-    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="feature_updates",
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
 
     def __str__(self):
@@ -127,7 +127,7 @@ class Role(models.Model):
     access_status = models.CharField(max_length=10, choices=RoleAccessStatusChoices.choices,
                                      default=RoleAccessStatusChoices.ACTIVE)
     included_features = models.ManyToManyField('Feature', related_name='roles', blank=True)
-    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="role_updates",
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
 
     def __str__(self):
@@ -146,7 +146,7 @@ class Team(models.Model):
     name = CharField(max_length=255)
     status = CharField(max_length=10, choices=TeamStatusChoices.choices)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="team_updates",
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
 
     def __str__(self):

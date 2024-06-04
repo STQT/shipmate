@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.urls import path, include
 
+from shipmate.company_management.views import MerchantViewSet, VoIPViewSet
 from shipmate.contract.views import GroundViewSet, HawaiiViewSet, InternationalViewSet
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
@@ -14,6 +15,8 @@ app_name = "api"
 router.register(r'contracts/grounds', GroundViewSet)
 router.register(r'contracts/hawaii', HawaiiViewSet)
 router.register(r'contracts/internationals', InternationalViewSet)
+router.register(r'merchant', MerchantViewSet)
+router.register(r'voip', VoIPViewSet)
 
 urlpatterns = router.urls
 

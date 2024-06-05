@@ -91,3 +91,29 @@ class VoIP(models.Model):
 
 class VoIPLog(BaseLog):
     voip = models.ForeignKey("VoIP", on_delete=models.CASCADE, related_name="logs")
+
+
+class TemplateStatusChoices(models.TextChoices):
+    ACTIVE = "active", "Active"
+    INACTIVE = "inactive", "Inactive"
+
+
+class TemplateTypeChoices(models.TextChoices):
+    SMS = "sms", "SMS"
+    EMAIL = "email", "Email"
+
+
+class Template(models.Model):
+    name = models.CharField(max_length=100)
+    body = models.TextField()
+    status = models.CharField(max_length=8, choices=TemplateStatusChoices.choices)
+    template_type = models.CharField(max_length=5, choices=TemplateTypeChoices.choices)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class TemplateLog(BaseLog):
+    template = models.ForeignKey("Template", on_delete=models.CASCADE, related_name="logs")

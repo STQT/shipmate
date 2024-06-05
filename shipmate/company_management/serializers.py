@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CompanyInfo, CompanyInfoLog, MerchantLog, VoIPLog, VoIP
+from .models import CompanyInfo, CompanyInfoLog, MerchantLog, VoIPLog, VoIP, Template, Merchant, TemplateLog
 
 
 class CompanyInfoLogSerializer(serializers.ModelSerializer):
@@ -20,6 +20,12 @@ class VoIPLogSerializer(serializers.ModelSerializer):
         fields = ("title", "message")
 
 
+class TemplateLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TemplateLog
+        fields = ("title", "message")
+
+
 class CompanyInfoSerializer(serializers.ModelSerializer):
     logs = CompanyInfoLogSerializer(many=True, read_only=True)
 
@@ -32,7 +38,7 @@ class MerchantSerializer(serializers.ModelSerializer):
     logs = MerchantLogSerializer(many=True, read_only=True)
 
     class Meta:
-        model = MerchantLog
+        model = Merchant
         fields = "__all__"
 
 
@@ -41,4 +47,13 @@ class VoIPSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VoIP
+        fields = "__all__"
+
+
+class TemplateSerializer(serializers.ModelSerializer):
+    updated_from_email = serializers.StringRelatedField(source='updated_from.email', read_only=True)
+    logs = TemplateLogSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Template
         fields = "__all__"

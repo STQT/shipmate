@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from shipmate.company_management.models import CompanyInfo, Merchant, VoIP
+from shipmate.company_management.models import CompanyInfo, Merchant, VoIP, Template
 
 
 @admin.register(CompanyInfo)
@@ -16,3 +16,8 @@ class MerchantAdmin(admin.ModelAdmin):
 @admin.register(VoIP)
 class VoIPAdmin(admin.ModelAdmin):
     list_display = ['name', 'status', 'voip_type']
+
+
+@admin.register(Template)
+class TemplateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'status', 'template_type']

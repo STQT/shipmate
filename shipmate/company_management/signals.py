@@ -8,27 +8,27 @@ User = get_user_model()
 
 
 @receiver(pre_save, sender=Merchant)
-def log_store_user_data(sender, instance, **kwargs):
+def log_merchant_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
 @receiver(post_save, sender=Merchant)
-def log_provider_update(sender, instance, created, **kwargs):
+def log_merchant_update(sender, instance, created, **kwargs):
     log_update(sender, instance, created, MerchantLog, "merchant", **kwargs)
 
 
 @receiver(pre_save, sender=CompanyInfo)
-def log_store_user_data(sender, instance, **kwargs):
+def log_company_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
 @receiver(post_save, sender=CompanyInfo)
-def log_distribution_update(sender, instance, created, **kwargs):
+def log_company_info_update(sender, instance, created, **kwargs):
     log_update(sender, instance, created, CompanyInfoLog, "company_info", **kwargs)
 
 
 @receiver(pre_save, sender=VoIP)
-def log_store_user_data(sender, instance, **kwargs):
+def log_voip_user_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
@@ -38,10 +38,10 @@ def log_distribution_update(sender, instance, created, **kwargs):
 
 
 @receiver(pre_save, sender=Template)
-def log_store_user_data(sender, instance, **kwargs):
+def log_template_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 
 @receiver(post_save, sender=Template)
-def log_distribution_update(sender, instance, created, **kwargs):
+def log_template_update(sender, instance, created, **kwargs):
     log_update(sender, instance, created, TemplateLog, "template", **kwargs)

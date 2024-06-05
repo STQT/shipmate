@@ -1,5 +1,6 @@
 import django_filters
-from .models import VoIPStatusChoices, VoIP, Merchant, MerchantStatusChoices, TemplateTypeChoices, Template
+from .models import VoIPStatusChoices, VoIP, Merchant, MerchantStatusChoices, TemplateTypeChoices, Template, \
+    MerchantTypeChoices
 
 
 class VoIPFilter(django_filters.FilterSet):
@@ -12,10 +13,11 @@ class VoIPFilter(django_filters.FilterSet):
 
 class MerchantFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=MerchantStatusChoices.choices)
+    merchant_type = django_filters.ChoiceFilter(choices=MerchantTypeChoices.choices)
 
     class Meta:
         model = Merchant
-        fields = ['status']
+        fields = ['status', 'merchant_type']
 
 
 class TemplateFilter(django_filters.FilterSet):

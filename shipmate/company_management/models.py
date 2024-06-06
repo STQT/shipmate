@@ -59,6 +59,7 @@ class Merchant(models.Model):
 
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
+    created_on = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", editable=False)
 
     def __str__(self):
         return self.name
@@ -87,6 +88,8 @@ class VoIP(models.Model):
 
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_on = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", editable=False)
 
 
 class VoIPLog(BaseLog):

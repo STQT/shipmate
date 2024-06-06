@@ -23,7 +23,10 @@ class MerchantViewSet(viewsets.ModelViewSet):
     filterset_class = MerchantFilter
 
     def perform_create(self, serializer):
-        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(
+            updated_from=user, created_on=user
+        )
 
     def perform_update(self, serializer):
         serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
@@ -36,7 +39,10 @@ class VoIPViewSet(viewsets.ModelViewSet):
     filterset_class = VoIPFilter
 
     def perform_create(self, serializer):
-        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(
+            updated_from=user, created_on=user
+        )
 
     def perform_update(self, serializer):
         serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)

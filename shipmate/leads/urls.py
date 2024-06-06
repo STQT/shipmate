@@ -9,7 +9,7 @@ from .views import (
     LeadsAttachmentListView,
     CreateVehicleLeadsAPIView,
     RetrieveUpdateDestroyVehicleLeadsAPIView,
-    AttachmentDeleteAPIView, ProviderLeadListAPIView,
+    AttachmentDeleteAPIView, ProviderLeadListAPIView, ListLeadLogAPIView,
 )
 
 urlpatterns = [
@@ -28,5 +28,6 @@ urlpatterns = [
     path('detail/<str:guid>/', DetailLeadsAPIView.as_view(), name='leads-detail'),
     path('delete/<str:guid>/', DeleteLeadsAPIView.as_view(), name='leads-delete'),
     path('convert/<str:guid>/', ConvertLeadToQuoteAPIView.as_view(), name='leads-to-quote'),
+    path('logs/<int:lead>/', ListLeadLogAPIView.as_view(), name='lead-log-list'),
 
 ]

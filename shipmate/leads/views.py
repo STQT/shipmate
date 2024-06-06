@@ -15,16 +15,17 @@ from rest_framework.views import APIView
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from shipmate.contrib.models import LeadsStatusChoices
+from shipmate.contrib.pagination import CustomPagination
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
-from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
+from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
     CreateLeadsSerializer,
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer,
     LeadsAttachmentSerializer,
-    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer
+    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, LogSerializer
 )
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
@@ -200,3 +201,12 @@ class ProviderLeadListAPIView(ListAPIView):
     queryset = Provider.objects.filter(status=Provider.ProviderStatusChoices.ACTIVE)
     pagination_class = None
     serializer_class = ProviderLeadListSerializer
+
+
+class ListLeadLogAPIView(ListAPIView):
+    serializer_class = LogSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        lead_id = self.kwargs['lead']
+        return LeadsLog.objects.filter(lead_id=lead_id)

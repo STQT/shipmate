@@ -3,6 +3,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from shipmate.contrib.models import LeadsAbstract, Attachments, VehicleAbstract
+from shipmate.utils.models import BaseLog
 
 User = get_user_model()
 
@@ -14,6 +15,8 @@ class Leads(LeadsAbstract):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leads_user')
     extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='leads_extra_user')
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
 
     def clean(self):
         super().clean()
@@ -38,3 +41,7 @@ class LeadVehicles(VehicleAbstract):
 
     class Meta:
         default_related_name = "lead_vehicles"
+
+
+class LeadsLog(BaseLog):
+    lead = models.ForeignKey("Leads", on_delete=models.CASCADE, related_name="logs")

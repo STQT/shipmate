@@ -11,8 +11,10 @@ from .filters import OrderFilter, OrderAttachmentFilter
 from shipmate.orders.serializers import *
 from shipmate.contrib.models import OrderStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
-from .models import Order, OrderAttachment
+from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
+from ..contrib.pagination import CustomPagination
+from ..leads.serializers import LogSerializer
 
 VEHICLE_TAG = "orders/vehicle/"
 ATTACHMENTS_TAG = "orders/attachments/"
@@ -179,3 +181,12 @@ class DispatchingOrderCreateAPIView(UpdatePUTAPIView):
 
     def perform_update(self, serializer):
         serializer.save(status=OrderStatusChoices.DISPATCHED)
+
+
+class ListOrderLogAPIView(ListAPIView):
+    serializer_class = LogSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        order_id = self.kwargs['order']
+        return OrderLog.objects.filter(order_id=order_id)

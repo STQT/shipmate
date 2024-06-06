@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from shipmate.contrib.models import Attachments, OrderAbstract, VehicleAbstract
+from shipmate.utils.models import BaseLog
 
 User = get_user_model()
 
@@ -103,6 +104,9 @@ class Order(OrderAbstract):
     cd_note = models.CharField(max_length=255, null=True, blank=True)
     cm_note = models.CharField(max_length=255, null=True, blank=True)
 
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
+
     class Meta:
         verbose_name = "Order"
         verbose_name_plural = "Orders"
@@ -124,3 +128,7 @@ class OrderVehicles(VehicleAbstract):
 
     class Meta:
         default_related_name = "order_vehicles"
+
+
+class OrderLog(BaseLog):
+    order = models.ForeignKey("Order", on_delete=models.CASCADE, related_name="logs")

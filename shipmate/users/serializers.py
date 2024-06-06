@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from shipmate.users.models import Feature, Role, Team, RoleLog
-from shipmate.contrib.models import UserLog
+from shipmate.users.models import Feature, Role, Team
 
 User = get_user_model()
 

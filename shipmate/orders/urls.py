@@ -8,7 +8,7 @@ from .views import (
     ArchiveListOrderAPIView,
     CreateVehicleOrderAPIView,
     RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView, OrderAttachmentDeleteAPIView,
-    OrderAttachmentListView, DispatchingOrderCreateAPIView
+    OrderAttachmentListView, DispatchingOrderCreateAPIView, ListOrderLogAPIView
 )
 
 urlpatterns = [
@@ -27,4 +27,5 @@ urlpatterns = [
     path('update/<str:guid>/', UpdateOrderAPIView.as_view(), name='order-update'),
     path('detail/<str:guid>/', DetailOrderAPIView.as_view(), name='order-detail'),
     path('delete/<str:guid>/', DeleteOrderAPIView.as_view(), name='order-delete'),
+    path('logs/<int:order>/', ListOrderLogAPIView.as_view(), name='order-log-list'),
 ]

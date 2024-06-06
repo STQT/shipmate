@@ -11,9 +11,11 @@ from .filters import QuoteFilter, QuoteAttachmentFilter
 from shipmate.quotes.serializers import *
 from shipmate.contrib.models import QuoteStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
-from .models import QuoteAttachment
+from .models import QuoteAttachment, QuoteLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
+from ..contrib.pagination import CustomPagination
 from ..lead_managements.models import Provider
+from ..leads.serializers import LogSerializer
 
 VEHICLE_TAG = "quote/vehicle/"
 ATTACHMENTS_TAG = "quote/attachments/"
@@ -171,3 +173,12 @@ class ProviderQuoteListAPIView(ListAPIView):
     queryset = Provider.objects.filter(status=Provider.ProviderStatusChoices.ACTIVE)
     pagination_class = None
     serializer_class = ProviderQuoteListSerializer
+
+
+class ListQuoteLogAPIView(ListAPIView):
+    serializer_class = LogSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        quote_id = self.kwargs['quote']
+        return QuoteLog.objects.filter(quote_id=quote_id)

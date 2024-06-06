@@ -8,7 +8,7 @@ from .views import (
     ArchiveListQuoteAPIView,
     CreateVehicleQuoteAPIView,
     RetrieveUpdateDestroyVehicleQuoteAPIView, ProviderQuoteListAPIView, QuoteAttachmentDeleteAPIView,
-    QuoteAttachmentListView
+    QuoteAttachmentListView, ListQuoteLogAPIView
 )
 
 urlpatterns = [
@@ -27,4 +27,5 @@ urlpatterns = [
     path('update/<str:guid>/', UpdateQuoteAPIView.as_view(), name='quote-update'),
     path('detail/<str:guid>/', DetailQuoteAPIView.as_view(), name='quote-detail'),
     path('delete/<str:guid>/', DeleteQuoteAPIView.as_view(), name='quote-delete'),
+    path('logs/<int:quote>/', ListQuoteLogAPIView.as_view(), name='quote-log-list'),
 ]

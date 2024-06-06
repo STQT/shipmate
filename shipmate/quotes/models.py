@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from shipmate.contrib.models import QuoteAbstract, Attachments, VehicleAbstract
+from shipmate.utils.models import BaseLog
 
 User = get_user_model()
 
@@ -13,6 +14,8 @@ class Quote(QuoteAbstract):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quote_user')
     extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='quote_extra_user')
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
 
     class Meta:
         verbose_name = "Quote"
@@ -31,3 +34,7 @@ class QuoteVehicles(VehicleAbstract):
 
     class Meta:
         default_related_name = "quote_vehicles"
+
+
+class QuoteLog(BaseLog):
+    quote = models.ForeignKey("Quote", on_delete=models.CASCADE, related_name="logs")

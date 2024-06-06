@@ -155,3 +155,8 @@ class ProviderLeadListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Provider
         fields = ['id', 'name', 'lead_count']
+
+
+class LogSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    message = serializers.CharField(allow_null=True)

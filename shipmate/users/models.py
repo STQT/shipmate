@@ -72,8 +72,8 @@ class User(AbstractUser):
 
     def get_initials(self, first_name, last_name) -> str:
         initials = ""
-        initials += first_name[0]
-        initials += last_name[0]
+        initials += first_name[0] if first_name else "A"
+        initials += last_name[0] if last_name else "A"
         return initials.upper()
 
     def generate_avatar(self, text: str, size=100):

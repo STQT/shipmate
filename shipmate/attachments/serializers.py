@@ -97,20 +97,25 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
         exclude = ('user',)
 
     def create(self, validated_data):
-        # Extract to_email and other fields from validated_data
+        # Extract necessary fields from validated_data
         to_emails = validated_data.get('to_email', [])
-        if not to_emails:
-            raise ValidationError({"to_email": "Not null toEmail field"})
-        from_email = validated_data.get('from_email')  # noqa: attach
+        # from_email = validated_data.get('from_email')
+        from_email = "gayratbek.sultonov@gmail.com" if settings.DEBUG else "leads@matelogisticss.com"
         subject = validated_data.get('subject')
         text = validated_data.get('text')
-        email_attachment = super().create(validated_data)
 
-        if to_emails:
-            send_email("gayratbek.sultonov@gmail.com" if settings.DEBUG else "leads@matelogisticss.com",
-                       subject, to_emails,
-                       html_content=text,
-                       attachment=None)
+        # Validate required fields
+        if not to_emails:
+            raise ValidationError({"to_email": "At least one recipient email is required."})
+
+        # Create the EmailAttachment instance
+        email_attachment = EmailAttachment.objects.create(**validated_data)
+
+        # Send the email
+        send_email(subject=subject,
+                   to_emails=to_emails,
+                   from_email=from_email,
+                   text_content=text)
 
         return email_attachment
 

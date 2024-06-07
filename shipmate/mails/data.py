@@ -104,7 +104,7 @@ static_dict = [
                         "key": "Accounting email",
                         "value": "{user.first_name}"
                     },
-                ]
+                ],
             },
             {
                 "blockName": "Contact information",

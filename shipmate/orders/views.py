@@ -97,6 +97,9 @@ class UpdateOrderAPIView(UpdatePUTAPIView):
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class DeleteOrderAPIView(DestroyAPIView):
     queryset = Order.objects.all()
@@ -181,6 +184,18 @@ class DispatchingOrderCreateAPIView(UpdatePUTAPIView):
 
     def perform_update(self, serializer):
         serializer.save(status=OrderStatusChoices.DISPATCHED)
+
+
+class DirectDispatchOrderCreateAPIView(UpdatePUTAPIView):
+    queryset = Order.objects.all()
+    serializer_class = DirectDispatchOrderSerializer
+    lookup_field = "guid"
+
+    def perform_update(self, serializer):
+        serializer.save(
+            status=OrderStatusChoices.DISPATCHED,
+            updated_from=self.request.user if self.request.user.is_authenticated else None
+        )
 
 
 class ListOrderLogAPIView(ListAPIView):

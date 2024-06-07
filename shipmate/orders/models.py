@@ -56,7 +56,7 @@ class Order(OrderAbstract):
     location_type = models.CharField(max_length=3,
                                      choices=OrderLocationTypeChoices.choices)
 
-    carrier = models.ForeignKey("carriers.Carrier", on_delete=models.CASCADE, related_name="orders",
+    carrier = models.ForeignKey("carriers.Carrier", on_delete=models.SET_NULL, related_name="orders",
                                 null=True, blank=True)
     dispatch_paid_by = models.CharField(max_length=10, null=True, blank=True, choices=DispatchPaidByChoices.choices)
     dispatch_payment_term = models.CharField(max_length=11, null=True, blank=True,

@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment
+from ..addresses.models import City
 from ..addresses.serializers import CitySerializer
+from ..carriers.models import Carrier
 from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
@@ -78,6 +80,41 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
             "dispatch_payment_type": {"required": True},
             "carrier": {"required": True}
         }
+
+
+#
+# class CreateDispatchCarrierSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Carrier
+#         exclude = ("location",)
+
+
+class DirectDispatchOrderSerializer(serializers.ModelSerializer):
+    carrier_data = CreateCarrierSerializer(many=False, write_only=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            "dispatch_paid_by", "carrier_data",
+            "dispatch_payment_term", "dispatch_term_begins", "dispatch_cod_method", "dispatch_payment_type",
+            "date_est_pu", "date_est_del", "date_est_ship"
+        ]
+        extra_kwargs = {
+            "dispatch_paid_by": {"required": True},
+            "dispatch_payment_term": {"required": True},
+            "dispatch_term_begins": {"required": True},
+            "dispatch_cod_method": {"required": True},
+            "dispatch_payment_type": {"required": True},
+            "carrier_data": {"required": True},
+        }
+
+    def update(self, instance, validated_data):
+        carrier_data = validated_data.pop('carrier_data', None)
+
+        carrier = Carrier.objects.create(**carrier_data)
+        instance.carrier = carrier
+        instance.save()
+        return instance
 
 
 class OrderDatesSerializer(serializers.ModelSerializer):

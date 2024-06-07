@@ -98,6 +98,9 @@ class UpdateQuoteAPIView(UpdatePUTAPIView):
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class DeleteQuoteAPIView(DestroyAPIView):
     queryset = Quote.objects.all()

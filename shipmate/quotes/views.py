@@ -122,8 +122,8 @@ class QuoteAttachmentListView(ListAPIView):
     filterset_class = QuoteAttachmentFilter
 
     def get_queryset(self):
-        lead_id = self.kwargs.get('quoteId')  # Retrieve the lead_id from URL kwargs
-        return QuoteAttachment.objects.filter(quote_id=lead_id).order_by("-id")
+        quote_id = self.kwargs.get('quoteId')  # Retrieve the lead_id from URL kwargs
+        return QuoteAttachment.objects.filter(quote_id=quote_id).order_by("-id")
 
 
 @extend_schema(tags=[ATTACHMENTS_TAG])

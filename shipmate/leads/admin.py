@@ -14,14 +14,16 @@ class LeadsAdmin(admin.ModelAdmin):
     ordering = ["-id"]
     list_display = ["customer", "status", "price"]
     inlines = [LeadsLogInline]
+    search_fields = ['id', ]
 
 
 @admin.register(LeadsAttachment)
 class LeadsAttachmentAdmin(admin.ModelAdmin):
-    ...
+    list_display = ['title', 'lead']
+    autocomplete_fields = ['lead']
 
 
 @admin.register(LeadVehicles)
 class LeadVehiclesAdmin(admin.ModelAdmin):
     list_display = ['vehicle', 'vehicle_year', 'lead']
-    autocomplete_fields = ['vehicle']
+    autocomplete_fields = ['vehicle', 'lead']

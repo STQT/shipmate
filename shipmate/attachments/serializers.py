@@ -10,19 +10,26 @@ from shipmate.attachments.models import (
     NoteAttachment
 )
 from enum import Enum
+from django.utils.html import strip_tags
 
 from shipmate.contrib.email import send_email
 from shipmate.contrib.models import Attachments
 from shipmate.leads.models import LeadsAttachment
 from shipmate.orders.models import OrderAttachment
 from shipmate.quotes.models import QuoteAttachment
-from django.core.mail import EmailMessage
 
 
 class AttachmentType(Enum):
     QUOTE = "quote"
     LEAD = "lead"
     ORDER = "order"
+
+
+ATTACHMENT_CLASS_MAP = {
+    AttachmentType.QUOTE.value: QuoteAttachment,
+    AttachmentType.LEAD.value: LeadsAttachment,
+    AttachmentType.ORDER.value: OrderAttachment
+}
 
 
 class BaseAttachmentSerializer(serializers.ModelSerializer):
@@ -33,6 +40,30 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskAttachment
         fields = "__all__"
+
+    def create(self, validated_data):
+        rel = validated_data.pop('rel', None)
+        text = validated_data.get('text')
+        endpoint_type = validated_data.pop('endpoint_type', None)
+        created_data = super().create(validated_data)
+        if endpoint_type is None:  # noqa
+            raise ValidationError({"endpoint_type": "endpointType is required"})
+        if isinstance(created_data, NoteAttachment):
+            _type = Attachments.TypesChoices.NOTE
+        elif isinstance(created_data, FileAttachment):
+            _type = Attachments.TypesChoices.FILE
+        else:
+            _type = Attachments.TypesChoices.TASK
+        Class = ATTACHMENT_CLASS_MAP[endpoint_type]  # noqa
+        field_name = Class.__name__[:5].lower()
+        attachment_class_data = {
+            "type": _type,
+            "link": created_data.pk,
+            "title": strip_tags(text)[:499],
+            field_name + "_id": rel
+        }
+        Class.objects.create(**attachment_class_data)
+        return created_data
 
 
 class UpdateBaseAttachmentSerializer(serializers.ModelSerializer):
@@ -45,19 +76,15 @@ class UpdateBaseAttachmentSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         endpoint_type = validated_data.pop('endpoint_type', None)
-        if endpoint_type:
-            attachment_class_map = {
-                AttachmentType.QUOTE.value: QuoteAttachment,
-                AttachmentType.LEAD.value: LeadsAttachment,
-                AttachmentType.ORDER.value: OrderAttachment
-            }
+        if endpoint_type is None:  # noqa
+            raise ValidationError({"endpoint_type": "endpointType is required"})
         if isinstance(instance, NoteAttachment):
             _type = Attachments.TypesChoices.NOTE
         elif isinstance(instance, FileAttachment):
             _type = Attachments.TypesChoices.FILE
         else:
             _type = Attachments.TypesChoices.TASK
-        Class = attachment_class_map[endpoint_type]  # noqa
+        Class = ATTACHMENT_CLASS_MAP[endpoint_type]  # noqa
         attachment = Class.objects.filter(type=_type, link=instance.pk).first()
         if attachment:
             text = validated_data.get('text')
@@ -109,7 +136,7 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
             raise ValidationError({"to_email": "At least one recipient email is required."})
 
         # Create the EmailAttachment instance
-        email_attachment = EmailAttachment.objects.create(**validated_data)
+        email_attachment = super().create(validated_data)
 
         # Send the email
         send_email(subject=subject,

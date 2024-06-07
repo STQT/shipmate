@@ -14,6 +14,7 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderAttachment)
 class OrderAttachmentAdmin(admin.ModelAdmin):
     autocomplete_fields = ['order']
+    list_display = ['title', 'order']
 
 
 @admin.register(OrderVehicles)

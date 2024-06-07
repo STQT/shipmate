@@ -14,14 +14,16 @@ class QuoteAdmin(admin.ModelAdmin):
     list_display = ['id', 'status']
     list_filter = ['status']
     inlines = [QuoteLogInline]
-
+    search_fields = ['id', ]
 
 
 @admin.register(QuoteAttachment)
 class QuoteAttachmentAdmin(admin.ModelAdmin):
-    ...
+    list_display = ['title', 'quote']
+    autocomplete_fields = ['quote']
 
 
 @admin.register(QuoteVehicles)
 class QuoteVehiclesAdmin(admin.ModelAdmin):
-    ...
+    list_display = ['vehicle', 'vehicle_year', 'quote']
+    autocomplete_fields = ['vehicle', 'quote']

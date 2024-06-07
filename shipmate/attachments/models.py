@@ -56,8 +56,8 @@ class PhoneAttachment(BaseModel):
 
 
 class EmailAttachment(BaseModel):
-    from_email = models.CharField()
-    to_email = ArrayField(models.CharField(max_length=20), blank=True)
+    from_email = models.EmailField()
+    to_email = ArrayField(models.EmailField(max_length=20), blank=True)
     subject = models.CharField(max_length=320)
 
     class Meta:

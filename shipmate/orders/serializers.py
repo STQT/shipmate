@@ -72,6 +72,7 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
             "dispatch_cod_method",
             "dispatch_payment_type",
             "carrier_data",
+            "is_dispatch",
         ]
         extra_kwargs = {
             "dispatch_paid_by": {"required": True},
@@ -98,9 +99,9 @@ class DirectDispatchOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            "dispatch_paid_by", "carrier_data",
+            "dispatch_paid_by", "carrier_data", "is_dispatch",
             "dispatch_payment_term", "dispatch_term_begins", "dispatch_cod_method", "dispatch_payment_type",
-            "date_est_pu", "date_est_del", "date_est_ship"
+            "date_est_pu", "date_est_del", "date_est_ship",
         ]
         extra_kwargs = {
             "dispatch_paid_by": {"required": True},

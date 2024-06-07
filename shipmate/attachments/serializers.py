@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -10,6 +11,7 @@ from shipmate.attachments.models import (
 )
 from enum import Enum
 
+from shipmate.contrib.email import send_email
 from shipmate.contrib.models import Attachments
 from shipmate.leads.models import LeadsAttachment
 from shipmate.orders.models import OrderAttachment
@@ -99,19 +101,16 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
         to_emails = validated_data.get('to_email', [])
         if not to_emails:
             raise ValidationError({"to_email": "Not null toEmail field"})
-        from_email = validated_data.get('from_email')
+        from_email = validated_data.get('from_email')  # noqa: attach
         subject = validated_data.get('subject')
         text = validated_data.get('text')
         email_attachment = super().create(validated_data)
 
         if to_emails:
-            email = EmailMessage(
-                subject=subject,
-                body=text,
-                from_email=from_email,
-                to=to_emails,
-            )
-            email.send()
+            send_email("gayratbek.sultonov@gmail.com" if settings.DEBUG else "leads@matelogisticss.com",
+                       subject, to_emails,
+                       html_content=text,
+                       attachment=None)
 
         return email_attachment
 

@@ -5,6 +5,9 @@ from email.header import decode_header
 from dataclasses import dataclass
 from typing import List
 
+from django.core.mail import EmailMultiAlternatives
+import os
+
 
 @dataclass
 class EmailMessage:
@@ -64,3 +67,28 @@ def fetch_emails(username, password, imap_server="imap.example.com", port=993) -
         imap.logout()
 
     return emails
+
+
+def send_email(from_email, subject, to_emails, text_content=None, html_content=None, attachment=None):
+    email = EmailMultiAlternatives(subject, text_content, from_email, to_emails)
+
+    if html_content:
+        email.attach_alternative(html_content, "text/html")
+
+    if attachment and os.path.exists(attachment):
+        with open(attachment, 'rb') as f:
+            file_data = f.read()
+        email.attach(os.path.basename(attachment), file_data)
+
+    email.send()
+
+# Example usage:
+# subject = "Subject of the email"
+# to_email = "leads@example.com"
+# text_content = "Plain text content of the email"
+# html_content = "<p>HTML content of the email</p>"
+# attachment_path = "/path/to/your/attachment/file.pdf"
+
+# send_email("gayratbek.sultonov@gmail.com",
+#            subject, to_email,
+#            text_content=text_content, html_content=html_content, attachment=attachment_path)

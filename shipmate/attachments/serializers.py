@@ -14,6 +14,7 @@ from django.utils.html import strip_tags
 
 from shipmate.contrib.email import send_email
 from shipmate.contrib.models import Attachments
+from shipmate.contrib.sms import send_sms
 from shipmate.leads.models import LeadsAttachment
 from shipmate.orders.models import OrderAttachment
 from shipmate.quotes.models import QuoteAttachment
@@ -122,6 +123,20 @@ class PhoneAttachmentSerializer(BaseAttachmentSerializer):
         model = PhoneAttachment
         fields = "__all__"
 
+    def create(self, validated_data):
+        to_phone = validated_data.get('to_phone', [])
+        # from_phone = validated_data.get('from_phone')
+        # from_phone = "+19294061515"
+        # text = validated_data.get('text')
+
+        if not to_phone:
+            raise ValidationError({"to_phone": "At least one recipient email is required."})
+
+        email_attachment = super().create(validated_data)
+        # send_sms(from_phone, to_phone, text)
+
+        return email_attachment
+
 
 class EmailAttachmentSerializer(BaseAttachmentSerializer):
     class Meta:
@@ -129,21 +144,17 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
         exclude = ('user',)
 
     def create(self, validated_data):
-        # Extract necessary fields from validated_data
         to_emails = validated_data.get('to_email', [])
         # from_email = validated_data.get('from_email')
         from_email = "gayratbek.sultonov@gmail.com" if settings.DEBUG else "leads@matelogisticss.com"
         subject = validated_data.get('subject')
         text = validated_data.get('text')
 
-        # Validate required fields
         if not to_emails:
             raise ValidationError({"to_email": "At least one recipient email is required."})
 
-        # Create the EmailAttachment instance
         email_attachment = super().create(validated_data)
 
-        # Send the email
         send_email(subject=subject,
                    to_emails=to_emails,
                    from_email=from_email,

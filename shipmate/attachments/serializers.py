@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from shipmate.attachments.models import (
     TaskAttachment,
@@ -13,6 +14,7 @@ from shipmate.contrib.models import Attachments
 from shipmate.leads.models import LeadsAttachment
 from shipmate.orders.models import OrderAttachment
 from shipmate.quotes.models import QuoteAttachment
+from django.core.mail import EmailMessage
 
 
 class AttachmentType(Enum):
@@ -91,6 +93,27 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
     class Meta:
         model = EmailAttachment
         fields = "__all__"
+
+    def create(self, validated_data):
+        # Extract to_email and other fields from validated_data
+        to_emails = validated_data.get('to_email', [])
+        if not to_emails:
+            raise ValidationError({"to_email": "Not null toEmail field"})
+        from_email = validated_data.get('from_email')
+        subject = validated_data.get('subject')
+        text = validated_data.get('text')
+        email_attachment = super().create(validated_data)
+
+        if to_emails:
+            email = EmailMessage(
+                subject=subject,
+                body=text,
+                from_email=from_email,
+                to=to_emails,
+            )
+            email.send()
+
+        return email_attachment
 
 
 class FileAttachmentSerializer(BaseAttachmentSerializer):  # noqa

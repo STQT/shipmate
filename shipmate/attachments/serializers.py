@@ -115,7 +115,7 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
         send_email(subject=subject,
                    to_emails=to_emails,
                    from_email=from_email,
-                   text_content=text)
+                   html_content=text)
 
         return email_attachment
 

@@ -56,11 +56,16 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
             _type = Attachments.TypesChoices.TASK
         Class = ATTACHMENT_CLASS_MAP[endpoint_type]  # noqa
         field_name = Class.__name__[:5].lower()
+        converter_field_name = {
+            "leads": "lead_id",
+            "quote": "quote_id",
+            "order": "order_id"
+        }
         attachment_class_data = {
             "type": _type,
             "link": created_data.pk,
             "title": strip_tags(text)[:499],
-            field_name + "_id": rel
+            converter_field_name[field_name]: rel
         }
         Class.objects.create(**attachment_class_data)
         return created_data

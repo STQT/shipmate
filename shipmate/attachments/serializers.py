@@ -94,7 +94,7 @@ class PhoneAttachmentSerializer(BaseAttachmentSerializer):
 class EmailAttachmentSerializer(BaseAttachmentSerializer):
     class Meta:
         model = EmailAttachment
-        fields = "__all__"
+        exclude = ('user',)
 
     def create(self, validated_data):
         # Extract to_email and other fields from validated_data

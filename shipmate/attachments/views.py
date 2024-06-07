@@ -1,5 +1,5 @@
+from django.contrib.auth import get_user_model
 from django.db import transaction
-from rest_framework import generics
 from rest_framework.generics import CreateAPIView
 
 from shipmate.contrib.models import Attachments
@@ -21,6 +21,8 @@ from ..leads.models import LeadsAttachment, Leads
 from ..orders.models import OrderAttachment, Order
 from ..quotes.models import QuoteAttachment, Quote
 from rest_framework.exceptions import ValidationError
+
+User = get_user_model()
 
 
 class BaseAttachmentAPIView(CreateAPIView):
@@ -85,6 +87,10 @@ class CreatePhoneAttachmentAPIView(BaseAttachmentAPIView):
 class CreateEmailAttachmentAPIView(BaseAttachmentAPIView):
     serializer_class = EmailAttachmentSerializer
     attachment_type = Attachments.TypesChoices.EMAIL
+
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user if self.request.user.is_authenticated else User.objects.first())
 
 
 class CreateFileAttachmentAPIView(BaseAttachmentAPIView):

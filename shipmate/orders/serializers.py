@@ -61,6 +61,7 @@ class OrderVehicleLeadsSerializer(serializers.ModelSerializer):
 
 class DispatchingOrderSerializer(serializers.ModelSerializer):
     carrier_data = CreateCarrierSerializer(source="carrier", many=False, allow_null=True, read_only=True)
+    is_dispatch = serializers.BooleanField(required=True, write_only=True)
 
     class Meta:
         model = Order
@@ -81,16 +82,18 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
             "carrier": {"required": True}
         }
 
-
-#
-# class CreateDispatchCarrierSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Carrier
-#         exclude = ("location",)
+    def update(self, instance, validated_data):
+        is_dispatch = validated_data.pop('is_dispatch', None)
+        if is_dispatch:
+            # TODO: Paste here dispatching request
+            pass
+        instance.save()
+        return instance
 
 
 class DirectDispatchOrderSerializer(serializers.ModelSerializer):
     carrier_data = CreateCarrierSerializer(many=False, write_only=True)
+    is_dispatch = serializers.BooleanField(required=True, write_only=True)
 
     class Meta:
         model = Order
@@ -110,9 +113,13 @@ class DirectDispatchOrderSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         carrier_data = validated_data.pop('carrier_data', None)
+        is_dispatch = validated_data.pop('is_dispatch', None)
 
         carrier = Carrier.objects.create(**carrier_data)
         instance.carrier = carrier
+        if is_dispatch:
+            # TODO: Paste here dispatching request
+            pass
         instance.save()
         return instance
 

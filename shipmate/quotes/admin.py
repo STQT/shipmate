@@ -11,7 +11,7 @@ class QuoteLogInline(admin.TabularInline):
 @admin.register(Quote)
 class QuoteAdmin(admin.ModelAdmin):
     autocomplete_fields = ["customer", "origin", "destination"]
-    list_display = ['id', 'status']
+    list_display = ['id', 'status', 'guid']
     list_filter = ['status']
     inlines = [QuoteLogInline]
     search_fields = ['id', ]

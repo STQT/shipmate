@@ -6,7 +6,7 @@ from shipmate.orders.models import Order, OrderAttachment, OrderVehicles
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ["customer", "origin", "destination"]
-    list_display = ['id', 'status']
+    list_display = ['id', 'status', 'guid']
     list_filter = ['status']
     search_fields = ['id', ]
 

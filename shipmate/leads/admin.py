@@ -12,7 +12,7 @@ class LeadsLogInline(admin.TabularInline):
 class LeadsAdmin(admin.ModelAdmin):
     autocomplete_fields = ["origin", "destination", "customer", ]
     ordering = ["-id"]
-    list_display = ["customer", "status", "price"]
+    list_display = ["customer", "status", "price", 'guid']
     inlines = [LeadsLogInline]
     search_fields = ['id', ]
 

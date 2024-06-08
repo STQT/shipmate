@@ -140,6 +140,7 @@ class LeadConvertSerializer(serializers.Serializer):
     price = serializers.IntegerField(write_only=True)
     reservation_price = serializers.IntegerField(write_only=True)
     quote = serializers.BooleanField()
+    # TODO: if quote True send to quote email
 
 
 class ProviderLeadListSerializer(serializers.ModelSerializer):

@@ -15,6 +15,7 @@ from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contrib.pagination import CustomPagination
 from ..leads.serializers import LogSerializer
+from ..quotes.models import Quote
 
 VEHICLE_TAG = "orders/vehicle/"
 ATTACHMENTS_TAG = "orders/attachments/"
@@ -205,3 +206,15 @@ class ListOrderLogAPIView(ListAPIView):
     def get_queryset(self):
         order_id = self.kwargs['order']
         return OrderLog.objects.filter(order_id=order_id)
+
+
+class ConvertQuoteToOrderAPIView(CreateAPIView):
+    serializer_class = CreateOrderSerializer
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        quote_id = self.kwargs.get('quote')
+        quote = get_object_or_404(Quote, id=quote_id)
+        order = serializer.save()
+        # After the order is created, delete the quote object
+        quote.delete()

@@ -16,6 +16,7 @@ from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contrib.pagination import CustomPagination
 from ..leads.serializers import LogSerializer
 from ..quotes.models import Quote
+from ..quotes.serializers import CreateQuoteSerializer
 
 VEHICLE_TAG = "orders/vehicle/"
 ATTACHMENTS_TAG = "orders/attachments/"
@@ -215,6 +216,39 @@ class ConvertQuoteToOrderAPIView(CreateAPIView):
     def perform_create(self, serializer):
         quote_id = self.kwargs.get('quote')
         quote = get_object_or_404(Quote, id=quote_id)
-        order = serializer.save()
-        # After the order is created, delete the quote object
+        serializer.save()
         quote.delete()
+
+
+class BackToQuoteOrderAPIView(CreateAPIView):
+    serializer_class = None
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer_class = CreateQuoteSerializer
+        order_id = self.kwargs.get('order')
+        order = get_object_or_404(Order, id=order_id)
+        quote_data = {
+            'origin': order.origin.pk,
+            'destination': order.destination.pk,
+            'user': order.user.pk,
+            'extra_user': order.extra_user.pk if order.extra_user else None,
+            'updated_from': request.user.pk if request.user.is_authenticated else None,
+            'source': order.source.pk if order.source else None,
+            'customer': order.customer.pk if order.customer else None
+        }
+        order_data = order.__dict__
+        order_data['vehicles'] = []
+        for order_vehicle in order.order_vehicles.all():  # noqa
+            order_data['vehicles'].append(
+                {"vehicle": order_vehicle.vehicle.pk, "vehicle_year": order_vehicle.vehicle_year}
+            )
+        order_data['status'] = 'quote'
+        order_data.update(quote_data)
+        quote_serializer = serializer_class(data=order_data)
+        quote_serializer.is_valid(raise_exception=True)
+        quote_serializer.save()
+
+        order.delete()
+
+        return Response(quote_serializer.data, status=status.HTTP_201_CREATED)

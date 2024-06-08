@@ -252,3 +252,17 @@ class BackToQuoteOrderAPIView(CreateAPIView):
         order.delete()
 
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class DispatchOrderAPIView(UpdatePUTAPIView):
+    queryset = Order.objects.all()
+    serializer_class = DispatchOrderSerializer
+    lookup_field = "guid"
+
+    def update(self, request, *args, **kwargs):
+        order = self.get_object()
+        data = {'status': 'dispatched'}
+        serializer = self.get_serializer(order, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)

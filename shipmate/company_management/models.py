@@ -120,3 +120,32 @@ class Template(models.Model):
 
 class TemplateLog(BaseLog):
     template = models.ForeignKey("Template", on_delete=models.CASCADE, related_name="logs")
+
+
+class PaymentAppStatusChoices(models.TextChoices):
+    ACTIVE = "active", "Active"
+    INACTIVE = "inactive", "Inactive"
+
+
+class PaymentAppTypeChoices(models.TextChoices):
+    ZELLE = "zelle", "Zelle"
+    PAYPAL = "paypal", "PayPal"
+
+
+class PaymentApp(models.Model):
+    name = models.CharField(max_length=100)
+    status = models.CharField(max_length=8, choices=PaymentAppStatusChoices.choices)
+    payment_type = models.CharField(max_length=10, choices=PaymentAppTypeChoices.choices)
+    account_name = models.CharField(max_length=255)
+    account_username = models.CharField(max_length=255)
+    link = models.URLField(max_length=255, blank=True, null=True)
+    qr_code = models.ImageField(upload_to="payments", blank=True, null=True)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class PaymentAppLog(BaseLog):
+    payment = models.ForeignKey("PaymentApp", on_delete=models.CASCADE, related_name="logs")

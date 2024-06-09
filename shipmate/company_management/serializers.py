@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import CompanyInfo, CompanyInfoLog, MerchantLog, VoIPLog, VoIP, Template, Merchant, TemplateLog
+from .models import CompanyInfo, CompanyInfoLog, MerchantLog, VoIPLog, VoIP, Template, Merchant, TemplateLog, \
+    PaymentAppLog, PaymentApp
 
 
 class CompanyInfoLogSerializer(serializers.ModelSerializer):
@@ -23,6 +24,12 @@ class VoIPLogSerializer(serializers.ModelSerializer):
 class TemplateLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = TemplateLog
+        fields = ("title", "message")
+
+
+class PaymentAppLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentAppLog
         fields = ("title", "message")
 
 
@@ -56,4 +63,13 @@ class TemplateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Template
+        fields = "__all__"
+
+
+class PaymentAppSerializer(serializers.ModelSerializer):
+    updated_from_email = serializers.StringRelatedField(source='updated_from.email', read_only=True)
+    logs = PaymentAppLogSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PaymentApp
         fields = "__all__"

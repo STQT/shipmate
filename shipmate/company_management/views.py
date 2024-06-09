@@ -1,8 +1,9 @@
 from rest_framework import generics, viewsets
 
-from .filters import VoIPFilter, MerchantFilter, TemplateFilter
-from .models import CompanyInfo, Merchant, VoIP, Template
-from .serializers import CompanyInfoSerializer, MerchantSerializer, VoIPSerializer, TemplateSerializer
+from .filters import VoIPFilter, MerchantFilter, TemplateFilter, PaymentAppFilter
+from .models import CompanyInfo, Merchant, VoIP, Template, PaymentApp
+from .serializers import CompanyInfoSerializer, MerchantSerializer, VoIPSerializer, TemplateSerializer, \
+    PaymentAppSerializer
 
 
 class CompanyInfoDetail(generics.RetrieveUpdateAPIView):
@@ -53,6 +54,19 @@ class TemplateViewSet(viewsets.ModelViewSet):
     serializer_class = TemplateSerializer
     pagination_class = None
     filterset_class = TemplateFilter
+
+    def perform_create(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
+
+class PaymentAppViewSet(viewsets.ModelViewSet):
+    queryset = PaymentApp.objects.all()  # noqa
+    serializer_class = PaymentAppSerializer
+    pagination_class = None
+    filterset_class = PaymentAppFilter
 
     def perform_create(self, serializer):
         serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)

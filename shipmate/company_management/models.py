@@ -130,6 +130,8 @@ class PaymentAppStatusChoices(models.TextChoices):
 class PaymentAppTypeChoices(models.TextChoices):
     ZELLE = "zelle", "Zelle"
     PAYPAL = "paypal", "PayPal"
+    CASHAPP = "cashapp", "CashApp"
+    VENMO = "venmo", "Venmo"
 
 
 class PaymentApp(models.Model):

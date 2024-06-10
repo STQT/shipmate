@@ -105,3 +105,9 @@ class LeadParsingGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeadParsingGroup
         fields = ['id', 'name', 'items']
+
+
+class CreateLeadParsingValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadParsingValue
+        fields = "__all__"

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     CompanyInfoDetail, LeadParsingGroupAllListView, LeadParsingValuePUTView, CreateLeadParsingValueView,
-    LeadParsingGroupListView, LeadParsingItemListView
+    LeadParsingGroupListView, LeadParsingItemListView, LeadParsingValueDeleteView
 )
 
 urlpatterns = [
@@ -10,5 +10,6 @@ urlpatterns = [
     path('parsing-group/list/', LeadParsingGroupListView.as_view(), name='lead-parsing-group'),
     path('parsing-item/list/', LeadParsingItemListView.as_view(), name='lead-parsing-item'),
     path('parsing-value/create/', CreateLeadParsingValueView.as_view(), name='parsing-value-create'),
+    path('parsing-value/delete/<int:pk>/', LeadParsingValueDeleteView.as_view(), name='parsing-value-delete'),
     path('parsing-value/update/<int:pk>/', LeadParsingValuePUTView.as_view(), name='parsing-value-edit'),
 ]

@@ -7,8 +7,8 @@ from .models import CompanyInfo, Merchant, VoIP, Template, PaymentApp, LeadParsi
     LeadParsingItem
 from .serializers import (
     CompanyInfoSerializer, MerchantSerializer, VoIPSerializer, TemplateSerializer,
-    PaymentAppSerializer, LeadParsingGroupSerializer, LeadParsingValueSerializer, LeadParsingItemSerializer,
-    LeadParsingSmallSerializer
+    PaymentAppSerializer, LeadParsingGroupSerializer, LeadParsingValueSerializer,
+    LeadParsingSmallSerializer, CreateLeadParsingValueSerializer
 )
 from ..contrib.generics import UpdatePUTAPIView
 
@@ -93,12 +93,14 @@ class LeadParsingGroupAllListView(APIView):
 
 class LeadParsingGroupListView(generics.ListAPIView):
     serializer_class = LeadParsingGroupSerializer
+    pagination_class = None
     queryset = LeadParsingGroup.objects.all()
 
 
 class LeadParsingItemListView(generics.ListAPIView):
     serializer_class = LeadParsingSmallSerializer
     queryset = LeadParsingItem.objects.all()
+    pagination_class = None
     filterset_class = LeadParsingItemFilter
 
 
@@ -107,6 +109,11 @@ class LeadParsingValuePUTView(UpdatePUTAPIView):
     queryset = LeadParsingValue.objects.all()
 
 
-class CreateLeadParsingValueView(generics.CreateAPIView):
+class LeadParsingValueDeleteView(generics.DestroyAPIView):
     serializer_class = LeadParsingValueSerializer
+    queryset = LeadParsingValue.objects.all()
+
+
+class CreateLeadParsingValueView(generics.CreateAPIView):
+    serializer_class = CreateLeadParsingValueSerializer
     queryset = LeadParsingValue.objects.all()

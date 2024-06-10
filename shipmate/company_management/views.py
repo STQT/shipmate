@@ -1,9 +1,14 @@
 from rest_framework import generics, viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filters import VoIPFilter, MerchantFilter, TemplateFilter, PaymentAppFilter
-from .models import CompanyInfo, Merchant, VoIP, Template, PaymentApp
-from .serializers import CompanyInfoSerializer, MerchantSerializer, VoIPSerializer, TemplateSerializer, \
-    PaymentAppSerializer
+from .models import CompanyInfo, Merchant, VoIP, Template, PaymentApp, LeadParsingGroup, LeadParsingValue
+from .serializers import (
+    CompanyInfoSerializer, MerchantSerializer, VoIPSerializer, TemplateSerializer,
+    PaymentAppSerializer, LeadParsingGroupSerializer, LeadParsingValueSerializer
+)
+from ..contrib.generics import UpdatePUTAPIView
 
 
 class CompanyInfoDetail(generics.RetrieveUpdateAPIView):
@@ -73,3 +78,22 @@ class PaymentAppViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
+
+class LeadParsingGroupListView(APIView):
+    serializer_class = LeadParsingGroupSerializer(many=True)
+
+    def get(self, request, *args, **kwargs):
+        groups = LeadParsingGroup.objects.all().order_by("-id")
+        serializer = LeadParsingGroupSerializer(groups, many=True)
+        return Response(serializer.data)
+
+
+class LeadParsingValuePUTView(UpdatePUTAPIView):
+    serializer_class = LeadParsingValueSerializer
+    queryset = LeadParsingValue.objects.all()
+
+
+class CreateLeadParsingValueView(generics.CreateAPIView):
+    serializer_class = LeadParsingValueSerializer
+    queryset = LeadParsingValue.objects.all()

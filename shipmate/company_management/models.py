@@ -151,3 +151,26 @@ class PaymentApp(models.Model):
 
 class PaymentAppLog(BaseLog):
     payment = models.ForeignKey("PaymentApp", on_delete=models.CASCADE, related_name="logs")
+
+
+class LeadParsingGroup(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class LeadParsingItem(models.Model):
+    name = models.CharField(max_length=255)
+    group = models.ForeignKey(LeadParsingGroup, on_delete=models.CASCADE, related_name='values')
+
+    def __str__(self):
+        return self.name
+
+
+class LeadParsingValue(models.Model):
+    item = models.ForeignKey(LeadParsingItem, on_delete=models.CASCADE, related_name='values')
+    value = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.value

@@ -1,6 +1,10 @@
 from rest_framework import serializers
-from .models import CompanyInfo, CompanyInfoLog, MerchantLog, VoIPLog, VoIP, Template, Merchant, TemplateLog, \
-    PaymentAppLog, PaymentApp
+from .models import (
+    CompanyInfo, CompanyInfoLog, MerchantLog,
+    VoIPLog, VoIP, Template, Merchant, TemplateLog,
+    PaymentAppLog, PaymentApp, LeadParsingGroup,
+    LeadParsingItem, LeadParsingValue
+)
 
 
 class CompanyInfoLogSerializer(serializers.ModelSerializer):
@@ -73,3 +77,25 @@ class PaymentAppSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentApp
         fields = "__all__"
+
+
+class LeadParsingValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadParsingValue
+        fields = ['id', 'value']
+
+
+class LeadParsingItemSerializer(serializers.ModelSerializer):
+    values = LeadParsingValueSerializer(many=True)
+
+    class Meta:
+        model = LeadParsingItem
+        fields = ['name', 'values']
+
+
+class LeadParsingGroupSerializer(serializers.ModelSerializer):
+    items = LeadParsingItemSerializer(many=True, source='values')
+
+    class Meta:
+        model = LeadParsingGroup
+        fields = ['name', 'items']

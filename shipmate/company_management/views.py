@@ -2,11 +2,13 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .filters import VoIPFilter, MerchantFilter, TemplateFilter, PaymentAppFilter
-from .models import CompanyInfo, Merchant, VoIP, Template, PaymentApp, LeadParsingGroup, LeadParsingValue
+from .filters import VoIPFilter, MerchantFilter, TemplateFilter, PaymentAppFilter, LeadParsingItemFilter
+from .models import CompanyInfo, Merchant, VoIP, Template, PaymentApp, LeadParsingGroup, LeadParsingValue, \
+    LeadParsingItem
 from .serializers import (
     CompanyInfoSerializer, MerchantSerializer, VoIPSerializer, TemplateSerializer,
-    PaymentAppSerializer, LeadParsingGroupSerializer, LeadParsingValueSerializer
+    PaymentAppSerializer, LeadParsingGroupSerializer, LeadParsingValueSerializer, LeadParsingItemSerializer,
+    LeadParsingSmallSerializer
 )
 from ..contrib.generics import UpdatePUTAPIView
 
@@ -80,13 +82,24 @@ class PaymentAppViewSet(viewsets.ModelViewSet):
         serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
 
-class LeadParsingGroupListView(APIView):
+class LeadParsingGroupAllListView(APIView):
     serializer_class = LeadParsingGroupSerializer(many=True)
 
     def get(self, request, *args, **kwargs):
         groups = LeadParsingGroup.objects.all().order_by("-id")
         serializer = LeadParsingGroupSerializer(groups, many=True)
         return Response(serializer.data)
+
+
+class LeadParsingGroupListView(generics.ListAPIView):
+    serializer_class = LeadParsingGroupSerializer
+    queryset = LeadParsingGroup.objects.all()
+
+
+class LeadParsingItemListView(generics.ListAPIView):
+    serializer_class = LeadParsingSmallSerializer
+    queryset = LeadParsingItem.objects.all()
+    filterset_class = LeadParsingItemFilter
 
 
 class LeadParsingValuePUTView(UpdatePUTAPIView):

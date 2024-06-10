@@ -90,7 +90,13 @@ class LeadParsingItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LeadParsingItem
-        fields = ['name', 'values']
+        fields = ['id', 'name', 'values']
+
+
+class LeadParsingSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeadParsingItem
+        fields = ['id', 'name', ]
 
 
 class LeadParsingGroupSerializer(serializers.ModelSerializer):
@@ -98,4 +104,4 @@ class LeadParsingGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LeadParsingGroup
-        fields = ['name', 'items']
+        fields = ['id', 'name', 'items']

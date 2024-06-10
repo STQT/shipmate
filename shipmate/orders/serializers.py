@@ -163,6 +163,7 @@ class ListOrderSerializer(serializers.ModelSerializer):
             "customer_name", "customer_phone", "origin_name",
             "destination_name", "order_vehicles", "user", "extra_user",
             "price", "date_est_ship", "condition", "trailer_type", "notes",
+            "status",
         ]
 
     @classmethod
@@ -254,9 +255,3 @@ class OrderAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderAttachment
         fields = "__all__"
-
-
-class DispatchOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['status']

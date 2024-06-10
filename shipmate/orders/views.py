@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filters import OrderFilter, OrderAttachmentFilter
 from shipmate.orders.serializers import *
@@ -254,15 +255,16 @@ class BackToQuoteOrderAPIView(CreateAPIView):
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)
 
 
-class DispatchOrderAPIView(UpdatePUTAPIView):
-    queryset = Order.objects.all()
-    serializer_class = DispatchOrderSerializer
-    lookup_field = "guid"
+@extend_schema(responses={200: RetrieveOrderSerializer})
+class PostToCDAPIView(CreateAPIView):
+    serializer_class = None
 
-    def update(self, request, *args, **kwargs):
-        order = self.get_object()
-        data = {'status': 'dispatched'}
-        serializer = self.get_serializer(order, data=data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+        order_id = self.kwargs.get('guid')
+        order = get_object_or_404(Order, guid=order_id)
+        serializer_class = RetrieveOrderSerializer(order, data={'status': OrderStatusChoices.DISPATCHED}, partial=True)
+        serializer_class.is_valid(raise_exception=True)
+        serializer_class.save()
+        # TODO: add dispatching request to CD
+
+        return Response(serializer_class.data, status=status.HTTP_200_OK)

@@ -86,7 +86,7 @@ class LeadParsingGroupAllListView(APIView):
     serializer_class = LeadParsingGroupSerializer(many=True)
 
     def get(self, request, *args, **kwargs):
-        groups = LeadParsingGroup.objects.all().order_by("-id")
+        groups = LeadParsingGroup.objects.all()
         serializer = LeadParsingGroupSerializer(groups, many=True)
         return Response(serializer.data)
 

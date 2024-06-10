@@ -11,7 +11,6 @@ from .views import (
     RetrieveUpdateDestroyVehicleLeadsAPIView,
     AttachmentDeleteAPIView, ProviderLeadListAPIView, ListLeadLogAPIView,
 )
-from ..orders.views import DispatchOrderAPIView
 
 urlpatterns = [
     path('', ListLeadsAPIView.as_view(), name='leads-list'),
@@ -28,7 +27,6 @@ urlpatterns = [
     path('update/<str:guid>/', UpdateLeadsAPIView.as_view(), name='leads-update'),
     path('detail/<str:guid>/', DetailLeadsAPIView.as_view(), name='leads-detail'),
     path('delete/<str:guid>/', DeleteLeadsAPIView.as_view(), name='leads-delete'),
-    path('order/dispatch/<str:guid>/', DispatchOrderAPIView.as_view(), name='order-dispatch'),
     path('convert/<str:guid>/', ConvertLeadToQuoteAPIView.as_view(), name='leads-to-quote'),
     path('logs/<int:lead>/', ListLeadLogAPIView.as_view(), name='lead-log-list'),
 

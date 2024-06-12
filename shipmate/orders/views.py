@@ -21,6 +21,7 @@ from ..quotes.serializers import CreateQuoteSerializer
 
 VEHICLE_TAG = "orders/vehicle/"
 ATTACHMENTS_TAG = "orders/attachments/"
+CONTRACTS_TAG = "orders/contracts/"
 
 
 class OrderPagination(LimitOffsetPagination):
@@ -113,7 +114,6 @@ class DeleteOrderAPIView(DestroyAPIView):
 class DetailOrderAPIView(RetrieveAPIView):
     queryset = Order.objects.prefetch_related(
         Prefetch('order_vehicles', queryset=OrderVehicles.objects.order_by('id')),
-        "contracts"
     )
     serializer_class = RetrieveOrderSerializer
     lookup_field = 'guid'
@@ -164,9 +164,24 @@ class CreateVehicleOrderAPIView(CreateAPIView):  # noqa
     serializer_class = VehicleOrderSerializer
 
 
+@extend_schema(tags=[CONTRACTS_TAG])
 class CreateOrderContractAPIView(CreateAPIView):  # noqa
     queryset = OrderContract.objects.all()
     serializer_class = OrderContractSerializer
+
+
+@extend_schema(tags=[CONTRACTS_TAG])
+class ListOrderContractView(ListAPIView):  # noqa
+    queryset = OrderContract.objects.all()
+    serializer_class = OrderContractSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = self.queryset
+        order_guid = self.request.query_params.get('order')
+        if order_guid:
+            queryset = queryset.filter(order__guid=order_guid)
+        return queryset
 
 
 @extend_schema(tags=[VEHICLE_TAG])

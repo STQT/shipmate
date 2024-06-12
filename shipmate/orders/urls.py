@@ -9,7 +9,8 @@ from .views import (
     CreateVehicleOrderAPIView,
     RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView, OrderAttachmentDeleteAPIView,
     OrderAttachmentListView, DispatchingOrderCreateAPIView, ListOrderLogAPIView, DirectDispatchOrderCreateAPIView,
-    ConvertQuoteToOrderAPIView, BackToQuoteOrderAPIView, PostToCDAPIView, CreateOrderContractAPIView
+    ConvertQuoteToOrderAPIView, BackToQuoteOrderAPIView, PostToCDAPIView, CreateOrderContractAPIView,
+    ListOrderContractView
 )
 
 urlpatterns = [
@@ -25,7 +26,9 @@ urlpatterns = [
     path('vehicle/add/', CreateVehicleOrderAPIView.as_view(), name='order-add-vehicle'),
     path('vehicle/<int:pk>/', RetrieveUpdateDestroyVehicleOrderAPIView.as_view(),
          name='order-add-vehicle'),
-    path('contract/add/', CreateOrderContractAPIView.as_view(), name='order-add-contract'),
+    path('contracts/<uuid:order>/', ListOrderContractView.as_view(),
+         name='order-add-vehicle'),
+    path('contracts/add/', CreateOrderContractAPIView.as_view(), name='order-add-contract'),
 
     path("attachments/<int:ordersId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
     path('attachments/delete/<int:id>/', OrderAttachmentDeleteAPIView.as_view(), name='order-attachment-delete'),

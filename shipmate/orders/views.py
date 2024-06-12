@@ -15,6 +15,7 @@ from shipmate.contrib.models import OrderStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
+from ..contract.models import Hawaii, Ground, International
 from ..contrib.pagination import CustomPagination
 from ..leads.serializers import LogSerializer
 from ..quotes.models import Quote
@@ -177,12 +178,11 @@ class ListOrderContractView(ListAPIView):  # noqa
     serializer_class = OrderContractSerializer
     pagination_class = None
 
-    def get_queryset(self):
-        queryset = self.queryset
-        order_guid = self.request.query_params.get('order')
-        if order_guid:
-            queryset = queryset.filter(order__guid=order_guid)
-        return queryset
+    def list(self, request, *args, **kwargs):
+        order_guid = self.kwargs.get('order')
+        queryset = self.filter_queryset(self.get_queryset().filter(order__guid=order_guid))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema(tags=[CONTRACTS_TAG])
@@ -211,6 +211,11 @@ class DetailOrderContractView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, order, contract):
+        pdf_obj_mapper = {
+            OrderContract.TypeChoices.HAWAII: Hawaii,
+            OrderContract.TypeChoices.GROUND: Ground,
+            OrderContract.TypeChoices.INTERNATIONAL: International
+        }
         try:
             contract_obj = OrderContract.objects.get(id=contract)
         except OrderContract.DoesNotExist:
@@ -219,11 +224,16 @@ class DetailOrderContractView(APIView):
         if order_obj.guid != order:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         company_obj = CompanyInfo.objects.first()
+        pdf_obj = pdf_obj_mapper[contract_obj.contract_type].objects.all().order_by('-is_default')
+        pdf_obj = pdf_obj.first()
+        if not pdf_obj:
+            return Response({"error": f'Default contract not exists for {contract_obj.contract_type}'})
 
         data = {
             'order': order_obj,
             'contract': contract_obj,
-            'company': company_obj
+            'company': company_obj,
+            'pdf': pdf_obj
         }
 
         serializer = DetailContractSerializer(data)

@@ -26,7 +26,7 @@ urlpatterns = [
     path('vehicle/add/', CreateVehicleOrderAPIView.as_view(), name='order-add-vehicle'),
     path('vehicle/<int:pk>/', RetrieveUpdateDestroyVehicleOrderAPIView.as_view(),
          name='order-add-vehicle'),
-    path('contracts/detail/<uuid:order>/', ListOrderContractView.as_view(),
+    path('contracts/list/<uuid:order>/', ListOrderContractView.as_view(),
          name='order-contract-list'),
     path('contracts/add/', CreateOrderContractAPIView.as_view(), name='order-add-contract'),
     path('contracts/sign/<uuid:order>/<int:contract>/', SignOrderContractView.as_view(),

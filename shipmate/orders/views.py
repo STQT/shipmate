@@ -186,6 +186,26 @@ class ListOrderContractView(ListAPIView):  # noqa
 
 
 @extend_schema(tags=[CONTRACTS_TAG])
+class SignOrderContractView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, order, contract):
+        try:
+            contract_obj = OrderContract.objects.get(id=contract)
+        except OrderContract.DoesNotExist:
+            return Response({'error': 'OrderContract not found'}, status=status.HTTP_404_NOT_FOUND)
+        order_obj: Order = contract_obj.order
+        if order_obj.guid != order:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        contract_obj.signed = True
+        contract_obj.save()
+        if order_obj.status == OrderStatusChoices.ORDERS:
+            order_obj.status = OrderStatusChoices.BOOKED
+            order_obj.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=[CONTRACTS_TAG])
 class DetailOrderContractView(APIView):
     serializer_class = DetailContractSerializer(many=False)
     permission_classes = [AllowAny]

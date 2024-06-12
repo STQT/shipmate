@@ -10,7 +10,7 @@ from .views import (
     RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView, OrderAttachmentDeleteAPIView,
     OrderAttachmentListView, DispatchingOrderCreateAPIView, ListOrderLogAPIView, DirectDispatchOrderCreateAPIView,
     ConvertQuoteToOrderAPIView, BackToQuoteOrderAPIView, PostToCDAPIView, CreateOrderContractAPIView,
-    ListOrderContractView, DetailOrderContractView
+    ListOrderContractView, DetailOrderContractView, SignOrderContractView
 )
 
 urlpatterns = [
@@ -29,9 +29,10 @@ urlpatterns = [
     path('contracts/detail/<uuid:order>/', ListOrderContractView.as_view(),
          name='order-contract-list'),
     path('contracts/add/', CreateOrderContractAPIView.as_view(), name='order-add-contract'),
+    path('contracts/sign/<uuid:order>/<int:contract>/', SignOrderContractView.as_view(),
+         name='order-contract-sign'),
     path('contracts/<uuid:order>/<int:contract>/', DetailOrderContractView.as_view(),
          name='order-contract-detail'),
-
 
     path("attachments/<int:ordersId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
     path('attachments/delete/<int:id>/', OrderAttachmentDeleteAPIView.as_view(), name='order-attachment-delete'),

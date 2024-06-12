@@ -205,9 +205,17 @@ class ListOrderSerializer(serializers.ModelSerializer):
 
 
 class OrderContractSerializer(serializers.ModelSerializer):
+    executed_on = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderContract
         fields = "__all__"
+
+    @classmethod
+    def get_executed_on(cls, obj) -> str:
+        if obj.created_at:
+            return obj.created_at.strftime("%m/%d/%Y")
+        return "NaN"
 
 
 class RetrieveOrderSerializer(ListOrderSerializer):

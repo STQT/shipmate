@@ -132,3 +132,18 @@ class OrderVehicles(VehicleAbstract):
 
 class OrderLog(BaseLog):
     order = models.ForeignKey("Order", on_delete=models.CASCADE, related_name="logs")
+
+
+class OrderContract(models.Model):
+    class TypeChoices(models.TextChoices):
+        HAWAII = "hawaii", "Hawaii"
+        GROUND = "ground", "Ground"
+        INTERNATIONAL = "international", "International"
+
+    order = models.ForeignKey("Order", to_field="guid", on_delete=models.CASCADE, related_name="contracts")
+    created_at = models.DateTimeField(auto_now_add=True)
+    signed = models.BooleanField(default=False)
+    contract_type = models.CharField(max_length=13, choices=TypeChoices.choices)
+
+    def __str__(self):
+        return self.contract_type

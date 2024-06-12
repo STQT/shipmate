@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Order, OrderVehicles, OrderAttachment
+from .models import Order, OrderVehicles, OrderAttachment, OrderContract
 from ..addresses.models import City
 from ..addresses.serializers import CitySerializer
 from ..carriers.models import Carrier
@@ -203,6 +203,14 @@ class ListOrderSerializer(serializers.ModelSerializer):
         return f"{city_name}, {state_code} {city_zip}"
 
 
+class OrderContractSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderContract
+        fields = "__all__"
+
+    # TODO: add to logic for sending contract to email
+
+
 class RetrieveOrderSerializer(ListOrderSerializer):
     customer = CustomerSerializer(many=False)  # noqa
     origin = CitySerializer(many=False)
@@ -212,6 +220,7 @@ class RetrieveOrderSerializer(ListOrderSerializer):
     dispatch_data = DispatchingOrderSerializer(source="*", allow_null=True, required=False)
     dates = OrderDatesSerializer(many=False, source="*")
     payments = OrderPaymentsSerializer(many=False, source="*")
+    contracts = OrderContractSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order

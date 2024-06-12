@@ -112,7 +112,8 @@ class DeleteOrderAPIView(DestroyAPIView):
 
 class DetailOrderAPIView(RetrieveAPIView):
     queryset = Order.objects.prefetch_related(
-        Prefetch('order_vehicles', queryset=OrderVehicles.objects.order_by('id'))
+        Prefetch('order_vehicles', queryset=OrderVehicles.objects.order_by('id')),
+        "contracts"
     )
     serializer_class = RetrieveOrderSerializer
     lookup_field = 'guid'
@@ -161,6 +162,11 @@ class OrderAttachmentDeleteAPIView(DestroyAPIView):
 class CreateVehicleOrderAPIView(CreateAPIView):  # noqa
     queryset = OrderVehicles.objects.all()
     serializer_class = VehicleOrderSerializer
+
+
+class CreateOrderContractAPIView(CreateAPIView):  # noqa
+    queryset = OrderContract.objects.all()
+    serializer_class = OrderContractSerializer
 
 
 @extend_schema(tags=[VEHICLE_TAG])

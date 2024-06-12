@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
-from ..addresses.models import City
 from ..addresses.serializers import CitySerializer
 from ..carriers.models import Carrier
 from ..carriers.serializers import CreateCarrierSerializer

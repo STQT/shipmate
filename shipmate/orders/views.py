@@ -201,11 +201,10 @@ class DetailOrderContractView(APIView):
         company_obj = CompanyInfo.objects.first()
 
         data = {
-            'order': RetrieveOrderSerializer(order_obj),
-            'contract': OrderContractSerializer(contract_obj),
-            'company': CompanyDetailInfoSerializer(company_obj)
+            'order': order_obj,
+            'contract': contract_obj,
+            'company': company_obj
         }
-        print(data)
 
         serializer = DetailContractSerializer(data)
         return Response(serializer.data)

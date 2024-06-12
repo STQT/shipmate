@@ -220,7 +220,6 @@ class RetrieveOrderSerializer(ListOrderSerializer):
     dispatch_data = DispatchingOrderSerializer(source="*", allow_null=True, required=False)
     dates = OrderDatesSerializer(many=False, source="*")
     payments = OrderPaymentsSerializer(many=False, source="*")
-    contracts = OrderContractSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order

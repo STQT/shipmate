@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -184,6 +185,32 @@ class ListOrderContractView(ListAPIView):  # noqa
         return queryset
 
 
+@extend_schema(tags=[CONTRACTS_TAG])
+class DetailOrderContractView(APIView):
+    serializer_class = DetailContractSerializer(many=False)
+    permission_classes = [AllowAny]
+
+    def get(self, request, order, contract):
+        try:
+            contract_obj = OrderContract.objects.get(id=contract)
+        except OrderContract.DoesNotExist:
+            return Response({'error': 'OrderContract not found'}, status=status.HTTP_404_NOT_FOUND)
+        order_obj = contract_obj.order
+        if order_obj.guid != order:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        company_obj = CompanyInfo.objects.first()
+
+        data = {
+            'order': RetrieveOrderSerializer(order_obj),
+            'contract': OrderContractSerializer(contract_obj),
+            'company': CompanyDetailInfoSerializer(company_obj)
+        }
+        print(data)
+
+        serializer = DetailContractSerializer(data)
+        return Response(serializer.data)
+
+
 @extend_schema(tags=[VEHICLE_TAG])
 class RetrieveUpdateDestroyVehicleOrderAPIView(RetrieveUpdatePUTDestroyAPIView):  # noqa
     queryset = OrderVehicles.objects.all()
@@ -283,7 +310,7 @@ class PostToCDAPIView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         order_id = self.kwargs.get('guid')
         order = get_object_or_404(Order, guid=order_id)
-        serializer_class = RetrieveOrderSerializer(order, data={'status': OrderStatusChoices.DISPATCHED}, partial=True)
+        serializer_class = RetrieveOrderSerializer(order, data={'status': OrderStatusChoices.POSTED}, partial=True)
         serializer_class.is_valid(raise_exception=True)
         serializer_class.save()
         # TODO: add dispatching request to CD

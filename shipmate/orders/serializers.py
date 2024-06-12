@@ -6,6 +6,7 @@ from ..addresses.serializers import CitySerializer
 from ..carriers.models import Carrier
 from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
+from ..company_management.models import CompanyInfo
 from ..customers.serializers import CustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
@@ -208,8 +209,6 @@ class OrderContractSerializer(serializers.ModelSerializer):
         model = OrderContract
         fields = "__all__"
 
-    # TODO: add to logic for sending contract to email
-
 
 class RetrieveOrderSerializer(ListOrderSerializer):
     customer = CustomerSerializer(many=False)  # noqa
@@ -263,3 +262,16 @@ class OrderAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderAttachment
         fields = "__all__"
+
+
+class CompanyDetailInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CompanyInfo
+        fields = "__all__"
+
+
+class DetailContractSerializer(serializers.Serializer):
+    order = RetrieveOrderSerializer(read_only=True)
+    contract = OrderContractSerializer(read_only=True)
+    company = CompanyDetailInfoSerializer(read_only=True)

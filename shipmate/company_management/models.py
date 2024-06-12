@@ -18,6 +18,7 @@ class CompanyInfo(models.Model):
     mon_fri = models.CharField(max_length=50)
     saturday = models.CharField(max_length=50)
     sunday = models.CharField(max_length=50)
+    logo = models.ImageField(upload_to="logos")
 
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)

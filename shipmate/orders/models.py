@@ -87,6 +87,7 @@ class Order(OrderAbstract):
     destination_contact_person = models.CharField(max_length=255, null=True, blank=True)
     destination_phone = models.CharField(max_length=50, null=True, blank=True)
     destination_second_phone = models.CharField(max_length=50, null=True, blank=True)
+    destination_buyer_number = models.CharField(max_length=50, null=True, blank=True)
 
     # Payments
     payment_total_tariff = models.PositiveIntegerField(default=0)

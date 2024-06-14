@@ -2,6 +2,7 @@ import logging
 import zipfile
 from io import BytesIO
 
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -225,6 +226,7 @@ class SignOrderContractView(APIView):
             terms = serializer.validated_data['terms']
             email = EmailMessage(
                 subject='Signed Contract and Terms',
+                from_email=settings.DEFAULT_FROM_EMAIL,
                 body='Dear Customer, please find attached the signed contract and terms.',
                 to=[customer_email],
             )

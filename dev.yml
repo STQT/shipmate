@@ -1,8 +1,8 @@
 version: '3'
 
 volumes:
-  production_postgres_data: {}
-  production_postgres_data_backups: {}
+  production_dev_data: {}
+  production_dev_data_backups: {}
 
 services:
   django: &django
@@ -10,10 +10,10 @@ services:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
 
-    image: shipmate_production_django
+    image: shipmate_dev_django
     volumes:
-      - /var/www/api.shipmate.com/media:/app/shipmate/media
-      - /var/www/api.shipmate.com/static:/app/shipmate/static
+      - /var/www/api.ocean.connectacrm.com/media:/app/shipmate/media
+      - /var/www/api.ocean.connectacrm.com/static:/app/shipmate/static
 
     depends_on:
       - postgres
@@ -29,10 +29,10 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: shipmate_production_postgres
+    image: shipmate_dev_postgres
     volumes:
-      - production_postgres_data:/var/lib/postgresql/data
-      - production_postgres_data_backups:/backups
+      - production_dev_data:/var/lib/postgresql/data
+      - production_dev_data_backups:/backups
     env_file:
       - ./.envs/.production/.postgres
 
@@ -41,12 +41,19 @@ services:
 
   celeryworker:
     <<: *django
-    image: shipmate_production_celeryworker
+    image: shipmate_dev_celeryworker
     command: /start-celeryworker
     ports: [ ]
 
   celerybeat:
     <<: *django
-    image: shipmate_production_celerybeat
+    image: shipmate_dev_celerybeat
     command: /start-celerybeat
     ports: [ ]
+
+  flower:
+    <<: *django
+    image: shipmate_dev_flower
+    command: /start-flower
+    ports: ["5555:5555"]
+

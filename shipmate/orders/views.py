@@ -238,6 +238,7 @@ class SignOrderContractView(APIView):
                 logger.info(f"Email sent successfully to {customer_email}")
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
+                logger.error(f"From email: {settings.DEFAULT_FROM_EMAIL}")
                 return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(status=status.HTTP_200_OK)

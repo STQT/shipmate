@@ -1,6 +1,11 @@
+import logging
+import zipfile
+from io import BytesIO
+
 from django.db import models, transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
@@ -185,24 +190,58 @@ class ListOrderContractView(ListAPIView):  # noqa
         return Response(serializer.data)
 
 
+logger = logging.getLogger(__name__)
+
+
 @extend_schema(tags=[CONTRACTS_TAG])
 class SignOrderContractView(APIView):
     permission_classes = [AllowAny]
+    serializer_class = SigningContractSerializer
 
     def post(self, request, order, contract):
-        try:
-            contract_obj = OrderContract.objects.get(id=contract)
-        except OrderContract.DoesNotExist:
-            return Response({'error': 'OrderContract not found'}, status=status.HTTP_404_NOT_FOUND)
-        order_obj: Order = contract_obj.order
-        if order_obj.guid != order:
-            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
-        contract_obj.signed = True
-        contract_obj.save()
-        if order_obj.status == OrderStatusChoices.ORDERS:
-            order_obj.status = OrderStatusChoices.BOOKED
-            order_obj.save()
-        return Response(status=status.HTTP_200_OK)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            try:
+                contract_obj = OrderContract.objects.get(id=contract)
+            except OrderContract.DoesNotExist:
+                logger.error(f"OrderContract with id {contract} not found")
+                return Response({'error': 'OrderContract not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            order_obj: Order = contract_obj.order
+            if order_obj.guid != order:
+                logger.error(f"Order with guid {order} not found")
+                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            contract_obj.signed = True
+            contract_obj.save()
+
+            if order_obj.status == OrderStatusChoices.ORDERS:
+                order_obj.status = OrderStatusChoices.BOOKED
+                order_obj.save()
+
+            # Send email with ZIP attachment
+            customer_email = order_obj.customer.email
+            agreement = serializer.validated_data['agreement']
+            terms = serializer.validated_data['terms']
+            email = EmailMessage(
+                subject='Signed Contract and Terms',
+                body='Dear Customer, please find attached the signed contract and terms.',
+                to=[customer_email],
+            )
+            email.attach(agreement.name, agreement.read(), agreement.content_type)
+            email.attach(terms.name, terms.read(), terms.content_type)
+
+            try:
+                email.send()
+                logger.info(f"Email sent successfully to {customer_email}")
+            except Exception as e:
+                logger.error(f"Error sending email: {e}")
+                return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response(status=status.HTTP_200_OK)
+
+        logger.error(f"Invalid data: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=[CONTRACTS_TAG])

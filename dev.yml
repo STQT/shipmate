@@ -13,7 +13,7 @@ services:
     image: shipmate_dev_django
     volumes:
       - /var/www/api.ocean.connectacrm.com/media:/app/shipmate/media
-      - /var/www/api.ocean.connectacrm.com/static:/app/shipmate/static
+      - /var/www/api.ocean.connectacrm.com/static:/app/staticfiles
 
     depends_on:
       - postgres

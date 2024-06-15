@@ -25,7 +25,7 @@ class ArchiveView(APIView):
             try:
                 obj = self.base_class.objects.get(guid=guid)
             except self.base_class.DoesNotExist:
-                return Response({'error': 'Quote not found'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': ['Quote not found']}, status=status.HTTP_404_NOT_FOUND)
             reason = serializer.validated_data['reason']  # noqa
             obj.status = LeadsStatusChoices.ARCHIVED
             obj.save()
@@ -55,12 +55,13 @@ class ReAssignView(APIView):
             try:
                 obj = self.base_class.objects.get(guid=guid)
             except self.base_class.DoesNotExist:
-                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'guid': [f'{self.base_fk_field.capitalize()} not found']},
+                                status=status.HTTP_404_NOT_FOUND)
             extra_user = serializer.validated_data['user']
             extra_user_obj = User.objects.get(pk=extra_user)
             reason = serializer.validated_data['reason']
-            if extra_user == serializer.validated_data['user']:
-                return Response({"error": "Reasoning user equal to owner"}, status=status.HTTP_400_BAD_REQUEST)
+            if obj.user == extra_user_obj:
+                return Response({"user": ["Reasoning user equal to owner"]}, status=status.HTTP_400_BAD_REQUEST)
             obj.extra_user = extra_user_obj
             obj.save()
             data = {

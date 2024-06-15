@@ -22,6 +22,8 @@ from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contract.models import Hawaii, Ground, International
 from ..contrib.pagination import CustomPagination
+from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
+from ..contrib.views import ArchiveView, ReAssignView
 from ..leads.serializers import LogSerializer
 from ..quotes.models import Quote
 from ..quotes.serializers import CreateQuoteSerializer
@@ -392,58 +394,15 @@ class PostToCDAPIView(CreateAPIView):
 
 
 @extend_schema(tags=[REASON_TAG])
-class ReAssignOrderView(APIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = ReassignSerializer
-
-    def post(self, request, order):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            try:
-                order_obj = Order.objects.get(guid=order)
-            except Order.DoesNotExist:
-                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
-            extra_user = serializer.validated_data['user']
-            extra_user_obj = User.objects.get(pk=extra_user)
-            reason = serializer.validated_data['reason']
-            if extra_user == serializer.validated_data['user']:
-                return Response({"error": "Reasoning user equal to owner"}, status=status.HTTP_400_BAD_REQUEST)
-            order_obj.extra_user = extra_user_obj
-            order_obj.save()
-            OrderAttachment.objects.create(
-                order=order_obj,
-                title=f'Reassigned to {extra_user_obj.first_name} {extra_user_obj.last_name}',
-                user=request.user,
-                second_title=f'Reason: {reason}',
-                type=Attachments.TypesChoices.ACTIVITY,
-                link=0)
-            return Response(status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ReAssignOrderView(ReAssignView):
+    base_class = Order
+    base_attachment_class = OrderAttachment
+    base_fk_field = "order"
 
 
 @extend_schema(tags=[REASON_TAG])
-class ArchiveOrderView(APIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = OrderArchiveSerializer
-
-    def post(self, request, order):
-        print("HELLO", order)
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            try:
-                order_obj = Order.objects.get(guid=order)
-                print(order_obj)
-            except Order.DoesNotExist:
-                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
-            reason = serializer.validated_data['reason']
-            order_obj.status = OrderStatusChoices.ARCHIVED
-            order_obj.save()
-            OrderAttachment.objects.create(
-                order=order_obj,
-                title='Archived',
-                user=request.user,
-                second_title=f'Reason: {reason}',
-                type=Attachments.TypesChoices.ACTIVITY,
-                link=0)
-            return Response(status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ArchiveOrderView(ArchiveView):
+    base_class = Order
+    status_choice_class = OrderStatusChoices
+    base_attachment_class = OrderAttachment
+    base_fk_field = "order"

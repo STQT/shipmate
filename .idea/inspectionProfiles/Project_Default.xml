@@ -64,6 +64,8 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="test.signup_user.__func__" />
+          <option value="shipmate.contrib.serializers.ArchiveSerializer.is_valid" />
+          <option value="shipmate.contrib.serializers.ReassignSerializer.is_valid" />
         </list>
       </option>
     </inspection_tool>

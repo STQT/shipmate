@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -5,20 +6,27 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filters import QuoteFilter, QuoteAttachmentFilter
 from shipmate.quotes.serializers import *
-from shipmate.contrib.models import QuoteStatusChoices
+from shipmate.contrib.models import QuoteStatusChoices, Attachments
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from .models import QuoteAttachment, QuoteLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contrib.pagination import CustomPagination
+from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
+from ..contrib.views import ArchiveView, ReAssignView
 from ..lead_managements.models import Provider
 from ..leads.serializers import LogSerializer
 
 VEHICLE_TAG = "quote/vehicle/"
 ATTACHMENTS_TAG = "quote/attachments/"
+REASON_TAG = "quote/reason/"
+
+User = get_user_model()
 
 
 class QuotePagination(LimitOffsetPagination):
@@ -185,3 +193,18 @@ class ListQuoteLogAPIView(ListAPIView):
     def get_queryset(self):
         quote_id = self.kwargs['quote']
         return QuoteLog.objects.filter(quote_id=quote_id)
+
+
+@extend_schema(tags=[REASON_TAG])
+class ReAssignQuoteView(ReAssignView):
+    base_class = Quote
+    base_attachment_class = QuoteAttachment
+    base_fk_field = "quote"
+
+
+@extend_schema(tags=[REASON_TAG])
+class ArchiveQuoteView(ArchiveView):
+    base_class = Quote
+    status_choice_class = QuoteStatusChoices
+    base_attachment_class = QuoteAttachment
+    base_fk_field = "quote"

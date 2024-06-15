@@ -9,7 +9,7 @@ from .views import (
     LeadsAttachmentListView,
     CreateVehicleLeadsAPIView,
     RetrieveUpdateDestroyVehicleLeadsAPIView,
-    AttachmentDeleteAPIView, ProviderLeadListAPIView, ListLeadLogAPIView,
+    AttachmentDeleteAPIView, ProviderLeadListAPIView, ListLeadLogAPIView, ReAssignLeadView, ArchiveLeadView,
 )
 
 urlpatterns = [
@@ -23,6 +23,9 @@ urlpatterns = [
 
     path("attachments/<int:leadId>/", LeadsAttachmentListView.as_view(), name="leads-attachments"),
     path('attachments/delete/<int:id>/', AttachmentDeleteAPIView.as_view(), name='attachment-delete'),
+
+    path('reason/reassign/<uuid:guid>/', ReAssignLeadView.as_view(), name='reason-reassign'),
+    path('reason/archive/<uuid:guid>/', ArchiveLeadView.as_view(), name='reason-archive'),
 
     path('update/<str:guid>/', UpdateLeadsAPIView.as_view(), name='leads-update'),
     path('detail/<str:guid>/', DetailLeadsAPIView.as_view(), name='leads-detail'),

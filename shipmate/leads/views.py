@@ -16,6 +16,7 @@ from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAtta
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from shipmate.contrib.models import LeadsStatusChoices
 from shipmate.contrib.pagination import CustomPagination
+from shipmate.contrib.views import ArchiveView, ReAssignView
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog
@@ -32,6 +33,7 @@ from shipmate.quotes.serializers import CreateQuoteSerializer
 
 VEHICLE_TAG = "leads/vehicle/"
 ATTACHMENTS_TAG = "leads/attachments/"
+REASON_TAG = "leads/reason/"
 
 
 class LeadsPagination(LimitOffsetPagination):
@@ -213,3 +215,13 @@ class ListLeadLogAPIView(ListAPIView):
     def get_queryset(self):
         lead_id = self.kwargs['lead']
         return LeadsLog.objects.filter(lead_id=lead_id)
+
+
+@extend_schema(tags=[REASON_TAG])
+class ReAssignLeadView(ReAssignView):
+    pass
+
+
+@extend_schema(tags=[REASON_TAG])
+class ArchiveLeadView(ArchiveView):
+    pass

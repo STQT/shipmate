@@ -37,8 +37,8 @@ urlpatterns = [
     path("attachments/<int:ordersId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
     path('attachments/delete/<int:id>/', OrderAttachmentDeleteAPIView.as_view(), name='order-attachment-delete'),
 
-    path('reason/reassign/', ReAssignOrderView.as_view(), name='reason-reassign'),
-    path('reason/archive/', ArchiveOrderView.as_view(), name='reason-archive'),
+    path('reason/reassign/<uuid:order>/', ReAssignOrderView.as_view(), name='reason-reassign'),
+    path('reason/archive/<uuid:order>/', ArchiveOrderView.as_view(), name='reason-archive'),
 
     path('update/<str:guid>/', UpdateOrderAPIView.as_view(), name='order-update'),
     path('detail/<str:guid>/', DetailOrderAPIView.as_view(), name='order-detail'),

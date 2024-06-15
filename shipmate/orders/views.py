@@ -400,7 +400,7 @@ class ReAssignOrderView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
-                order_obj = Order.objects.get(id=order)
+                order_obj = Order.objects.get(guid=order)
             except Order.DoesNotExist:
                 return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
             extra_user = serializer.validated_data['user']
@@ -419,19 +419,25 @@ class ReAssignOrderView(APIView):
                 link=0)
             return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @extend_schema(tags=[REASON_TAG])
 class ArchiveOrderView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = OrderArchiveSerializer
 
     def post(self, request, order):
+        print("HELLO", order)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
-                order_obj = Order.objects.get(id=order)
+                order_obj = Order.objects.get(guid=order)
+                print(order_obj)
             except Order.DoesNotExist:
                 return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
             reason = serializer.validated_data['reason']
+            order_obj.status = OrderStatusChoices.ARCHIVED
+            order_obj.save()
             OrderAttachment.objects.create(
                 order=order_obj,
                 title='Archived',

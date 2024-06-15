@@ -1,8 +1,7 @@
 import logging
-import zipfile
-from io import BytesIO
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -11,13 +10,13 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import OrderFilter, OrderAttachmentFilter
 from shipmate.orders.serializers import *
-from shipmate.contrib.models import OrderStatusChoices
+from shipmate.contrib.models import OrderStatusChoices, Attachments
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
@@ -30,6 +29,9 @@ from ..quotes.serializers import CreateQuoteSerializer
 VEHICLE_TAG = "orders/vehicle/"
 ATTACHMENTS_TAG = "orders/attachments/"
 CONTRACTS_TAG = "orders/contracts/"
+REASON_TAG = "orders/reason/"
+
+User = get_user_model()
 
 
 class OrderPagination(LimitOffsetPagination):
@@ -387,3 +389,55 @@ class PostToCDAPIView(CreateAPIView):
         # TODO: add dispatching request to CD
 
         return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=[REASON_TAG])
+class ReAssignOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReassignSerializer
+
+    def post(self, request, order):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            try:
+                order_obj = Order.objects.get(id=order)
+            except Order.DoesNotExist:
+                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+            extra_user = serializer.validated_data['user']
+            extra_user_obj = User.objects.get(pk=extra_user)
+            reason = serializer.validated_data['reason']
+            if extra_user == serializer.validated_data['user']:
+                return Response({"error": "Reasoning user equal to owner"}, status=status.HTTP_400_BAD_REQUEST)
+            order_obj.extra_user = extra_user_obj
+            order_obj.save()
+            OrderAttachment.objects.create(
+                order=order_obj,
+                title=f'Reassigned to {extra_user_obj.first_name} {extra_user_obj.last_name}',
+                user=request.user,
+                second_title=f'Reason: {reason}',
+                type=Attachments.TypesChoices.ACTIVITY,
+                link=0)
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@extend_schema(tags=[REASON_TAG])
+class ArchiveOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderArchiveSerializer
+
+    def post(self, request, order):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            try:
+                order_obj = Order.objects.get(id=order)
+            except Order.DoesNotExist:
+                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+            reason = serializer.validated_data['reason']
+            OrderAttachment.objects.create(
+                order=order_obj,
+                title='Archived',
+                user=request.user,
+                second_title=f'Reason: {reason}',
+                type=Attachments.TypesChoices.ACTIVITY,
+                link=0)
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

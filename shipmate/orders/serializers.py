@@ -288,3 +288,12 @@ class DetailContractSerializer(serializers.Serializer):
 class SigningContractSerializer(serializers.Serializer):
     agreement = serializers.FileField()
     terms = serializers.FileField()
+
+
+class ReassignSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+    reason = serializers.CharField()
+
+
+class OrderArchiveSerializer(serializers.Serializer):
+    reason = serializers.CharField()

@@ -21,6 +21,8 @@ from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
 from ..contrib.views import ArchiveView, ReAssignView
 from ..lead_managements.models import Provider
 from ..leads.serializers import LogSerializer
+from ..leads.views import ListTeamLeadAPIView
+from ..users.models import Team
 
 VEHICLE_TAG = "quote/vehicle/"
 ATTACHMENTS_TAG = "quote/attachments/"
@@ -208,3 +210,7 @@ class ArchiveQuoteView(ArchiveView):
     status_choice_class = QuoteStatusChoices
     base_attachment_class = QuoteAttachment
     base_fk_field = "quote"
+
+
+class ListTeamQuoteAPIView(ListTeamLeadAPIView):
+    serializer_class = ListQuoteTeamSerializer

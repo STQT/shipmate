@@ -10,6 +10,7 @@ from ..contract.serializers import BaseContractSerializer
 from ..customers.serializers import CustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
+from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
 from ..users.serializers import ListUserSerializer
 
 
@@ -288,3 +289,14 @@ class DetailContractSerializer(serializers.Serializer):
 class SigningContractSerializer(serializers.Serializer):
     agreement = serializers.FileField()
     terms = serializers.FileField()
+
+
+class ListOrdersUserSerializer(ListLeadUserSerializer):
+    count = serializers.SerializerMethodField()
+
+    def get_count(self, obj) -> int:
+        return Order.objects.filter(user=obj).count()
+
+
+class ListOrdersTeamSerializer(ListLeadTeamSerializer):
+    users = ListOrdersUserSerializer(many=True)

@@ -25,6 +25,7 @@ from ..contrib.pagination import CustomPagination
 from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
 from ..contrib.views import ArchiveView, ReAssignView
 from ..leads.serializers import LogSerializer
+from ..leads.views import ListTeamLeadAPIView
 from ..quotes.models import Quote
 from ..quotes.serializers import CreateQuoteSerializer
 
@@ -406,3 +407,7 @@ class ArchiveOrderView(ArchiveView):
     status_choice_class = OrderStatusChoices
     base_attachment_class = OrderAttachment
     base_fk_field = "order"
+
+
+class ListTeamOrdersAPIView(ListTeamLeadAPIView):
+    serializer_class = ListOrdersTeamSerializer

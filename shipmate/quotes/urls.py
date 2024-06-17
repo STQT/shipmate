@@ -8,12 +8,13 @@ from .views import (
     ArchiveListQuoteAPIView,
     CreateVehicleQuoteAPIView,
     RetrieveUpdateDestroyVehicleQuoteAPIView, ProviderQuoteListAPIView, QuoteAttachmentDeleteAPIView,
-    QuoteAttachmentListView, ListQuoteLogAPIView, ArchiveQuoteView, ReAssignQuoteView
+    QuoteAttachmentListView, ListQuoteLogAPIView, ArchiveQuoteView, ReAssignQuoteView, ListTeamQuoteAPIView
 )
 
 urlpatterns = [
     path('', ListQuoteAPIView.as_view(), name='quote-list'),
     path('providers/', ProviderQuoteListAPIView.as_view(), name='quote-provider-list'),
+    path('teams/', ListTeamQuoteAPIView.as_view(), name='quote-team-list'),
     path('archive/list/', ArchiveListQuoteAPIView.as_view(), name='quote-archive-list'),
     path('create/', CreateQuoteAPIView.as_view(), name='quote-create'),
 

@@ -10,12 +10,14 @@ from .views import (
     RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView, OrderAttachmentDeleteAPIView,
     OrderAttachmentListView, DispatchingOrderCreateAPIView, ListOrderLogAPIView, DirectDispatchOrderCreateAPIView,
     ConvertQuoteToOrderAPIView, BackToQuoteOrderAPIView, PostToCDAPIView, CreateOrderContractAPIView,
-    ListOrderContractView, DetailOrderContractView, SignOrderContractView, ReAssignOrderView, ArchiveOrderView
+    ListOrderContractView, DetailOrderContractView, SignOrderContractView, ReAssignOrderView, ArchiveOrderView,
+    ListTeamOrdersAPIView
 )
 
 urlpatterns = [
     path('', ListOrderAPIView.as_view(), name='order-list'),
     path('providers/', ProviderOrderListAPIView.as_view(), name='order-provider-list'),
+    path('teams/', ListTeamOrdersAPIView.as_view(), name='order-team-list'),
     path('archive/list/', ArchiveListOrderAPIView.as_view(), name='order-archive-list'),
     path('create/', CreateOrderAPIView.as_view(), name='order-create'),
     path('dispatch/<str:guid>/', DispatchingOrderCreateAPIView.as_view(), name='order-dispatch'),

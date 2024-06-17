@@ -6,6 +6,7 @@ from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
+from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
 from ..users.serializers import ListUserSerializer
 
 
@@ -149,3 +150,14 @@ class QuoteAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuoteAttachment
         fields = "__all__"
+
+
+class ListQuoteUserSerializer(ListLeadUserSerializer):
+    count = serializers.SerializerMethodField()
+
+    def get_count(self, obj) -> int:
+        return Quote.objects.filter(user=obj).count()
+
+
+class ListQuoteTeamSerializer(ListLeadTeamSerializer):
+    users = ListQuoteUserSerializer(many=True)

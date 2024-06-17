@@ -14,3 +14,16 @@ class BlockListSerializer(serializers.Serializer):
 class ModulesListSerializer(serializers.Serializer):
     title = serializers.CharField()
     block = BlockListSerializer(many=True)
+
+
+class StringListField(serializers.ListField):
+    child = serializers.CharField()
+
+
+class CDPriceSerializer(serializers.Serializer):
+    cargo = StringListField()
+    route = StringListField()
+    price = StringListField()
+    accepted = StringListField()
+    comparable = StringListField()
+    title = serializers.CharField()

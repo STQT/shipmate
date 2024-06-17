@@ -113,7 +113,7 @@ class MyTokenVerifyView(TokenVerifyView):
     def post(self, request, *args, **kwargs):
         token = request.data.get('token')
         if not token:
-            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'token': ['Token is required']}, status=status.HTTP_400_BAD_REQUEST)
         response = super().post(request, *args, **kwargs)
         # Check if token is in cache
         if cache.get(token):
@@ -181,11 +181,12 @@ class ConfirmOTPAPIView(APIView):
                     "refresh": str(refresh),
                     "access": str(access)
                 }, status=status.HTTP_200_OK)
-            return Response({"error": "OTP code is invalid"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"code": ["OTP code is invalid"]}, status=status.HTTP_400_BAD_REQUEST)
 
         # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
 
-        return Response({"message": "An OTP code has been sent to your email address."}, status=status.HTTP_200_OK)
+        return Response({"message": ["An OTP code has been sent to your email address."]},
+                        status=status.HTTP_200_OK)
 
 
 class ChangePasswordAPIView(APIView):
@@ -200,4 +201,4 @@ class ChangePasswordAPIView(APIView):
 
         # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
 
-        return Response({"message": "Password has changed"}, status=status.HTTP_200_OK)
+        return Response({"message": ["Password has changed"]}, status=status.HTTP_200_OK)

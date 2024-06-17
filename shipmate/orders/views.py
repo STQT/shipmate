@@ -1,8 +1,7 @@
 import logging
-import zipfile
-from io import BytesIO
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -11,18 +10,20 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import OrderFilter, OrderAttachmentFilter
 from shipmate.orders.serializers import *
-from shipmate.contrib.models import OrderStatusChoices
+from shipmate.contrib.models import OrderStatusChoices, Attachments
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contract.models import Hawaii, Ground, International
 from ..contrib.pagination import CustomPagination
+from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
+from ..contrib.views import ArchiveView, ReAssignView
 from ..leads.serializers import LogSerializer
 from ..quotes.models import Quote
 from ..quotes.serializers import CreateQuoteSerializer
@@ -30,6 +31,9 @@ from ..quotes.serializers import CreateQuoteSerializer
 VEHICLE_TAG = "orders/vehicle/"
 ATTACHMENTS_TAG = "orders/attachments/"
 CONTRACTS_TAG = "orders/contracts/"
+REASON_TAG = "orders/reason/"
+
+User = get_user_model()
 
 
 class OrderPagination(LimitOffsetPagination):
@@ -238,6 +242,7 @@ class SignOrderContractView(APIView):
                 logger.info(f"Email sent successfully to {customer_email}")
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
+                logger.error(f"From email: {settings.DEFAULT_FROM_EMAIL}")
                 return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(status=status.HTTP_200_OK)
@@ -386,3 +391,18 @@ class PostToCDAPIView(CreateAPIView):
         # TODO: add dispatching request to CD
 
         return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=[REASON_TAG])
+class ReAssignOrderView(ReAssignView):
+    base_class = Order
+    base_attachment_class = OrderAttachment
+    base_fk_field = "order"
+
+
+@extend_schema(tags=[REASON_TAG])
+class ArchiveOrderView(ArchiveView):
+    base_class = Order
+    status_choice_class = OrderStatusChoices
+    base_attachment_class = OrderAttachment
+    base_fk_field = "order"

@@ -8,7 +8,7 @@ from .views import (
     ArchiveListQuoteAPIView,
     CreateVehicleQuoteAPIView,
     RetrieveUpdateDestroyVehicleQuoteAPIView, ProviderQuoteListAPIView, QuoteAttachmentDeleteAPIView,
-    QuoteAttachmentListView, ListQuoteLogAPIView
+    QuoteAttachmentListView, ListQuoteLogAPIView, ArchiveQuoteView, ReAssignQuoteView
 )
 
 urlpatterns = [
@@ -20,6 +20,9 @@ urlpatterns = [
     path('vehicle/add/', CreateVehicleQuoteAPIView.as_view(), name='quote-add-vehicle'),
     path('vehicle/<int:pk>/', RetrieveUpdateDestroyVehicleQuoteAPIView.as_view(),
          name='quote-add-vehicle'),
+
+    path('reason/reassign/<uuid:guid>/', ReAssignQuoteView.as_view(), name='reason-reassign'),
+    path('reason/archive/<uuid:guid>/', ArchiveQuoteView.as_view(), name='reason-archive'),
 
     path("attachments/<int:quoteId>/", QuoteAttachmentListView.as_view(), name="quote-attachments"),
     path('attachments/delete/<int:id>/', QuoteAttachmentDeleteAPIView.as_view(), name='quote-attachment-delete'),

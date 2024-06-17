@@ -10,7 +10,7 @@ from .views import (
     RetrieveUpdateDestroyVehicleOrderAPIView, ProviderOrderListAPIView, OrderAttachmentDeleteAPIView,
     OrderAttachmentListView, DispatchingOrderCreateAPIView, ListOrderLogAPIView, DirectDispatchOrderCreateAPIView,
     ConvertQuoteToOrderAPIView, BackToQuoteOrderAPIView, PostToCDAPIView, CreateOrderContractAPIView,
-    ListOrderContractView, DetailOrderContractView, SignOrderContractView
+    ListOrderContractView, DetailOrderContractView, SignOrderContractView, ReAssignOrderView, ArchiveOrderView
 )
 
 urlpatterns = [
@@ -36,6 +36,9 @@ urlpatterns = [
 
     path("attachments/<int:ordersId>/", OrderAttachmentListView.as_view(), name="order-attachments"),
     path('attachments/delete/<int:id>/', OrderAttachmentDeleteAPIView.as_view(), name='order-attachment-delete'),
+
+    path('reason/reassign/<uuid:guid>/', ReAssignOrderView.as_view(), name='reason-reassign'),
+    path('reason/archive/<uuid:guid>/', ArchiveOrderView.as_view(), name='reason-archive'),
 
     path('update/<str:guid>/', UpdateOrderAPIView.as_view(), name='order-update'),
     path('detail/<str:guid>/', DetailOrderAPIView.as_view(), name='order-detail'),

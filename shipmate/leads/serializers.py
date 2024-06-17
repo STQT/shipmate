@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from shipmate.lead_managements.models import Provider
@@ -6,7 +7,10 @@ from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
 from shipmate.customers.serializers import CustomerSerializer
+from shipmate.users.models import Team
 from shipmate.users.serializers import ListUserSerializer
+
+User = get_user_model()
 
 
 class VehicleLeadsSerializer(serializers.ModelSerializer):
@@ -16,7 +20,7 @@ class VehicleLeadsSerializer(serializers.ModelSerializer):
 
 
 class ListVehicleLeadsSerializer(serializers.ModelSerializer):
-    vehicle_name = serializers.SerializerMethodField(read_only=True)
+    vehicle_name = serializers.SerializerMethodField(read_only=True)  # noqa
 
     class Meta:
         model = LeadVehicles
@@ -161,3 +165,22 @@ class ProviderLeadListSerializer(serializers.ModelSerializer):
 class LogSerializer(serializers.Serializer):
     title = serializers.CharField()
     message = serializers.CharField(allow_null=True)
+
+
+class ListLeadUserSerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "picture", "first_name", "last_name", "count"]
+
+    def get_count(self, obj) -> int:
+        return Leads.objects.filter(user=obj).count()
+
+
+class ListLeadTeamSerializer(serializers.ModelSerializer):
+    users = ListLeadUserSerializer(many=True)
+
+    class Meta:
+        model = Team
+        fields = ["name", "users"]

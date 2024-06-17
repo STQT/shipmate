@@ -50,10 +50,3 @@ services:
     image: shipmate_production_celerybeat
     command: /start-celerybeat
     ports: [ ]
-
-  flower:
-    <<: *django
-    image: shipmate_production_flower
-    command: /start-flower
-    ports: ["5555:5555"]
-

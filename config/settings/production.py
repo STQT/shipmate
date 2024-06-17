@@ -165,15 +165,17 @@ REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] = ("rest_framework.permissions.IsAu
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
-    {"url": "https://crmapi01xz.matelogisticss.com", "description": "Production server"},
+    {"url": "https://crmapi01xz.matelogisticss.com", "description": "Development server"},
+    {"url": "https://api.ocean.connectacrm.com", "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
-CSRF_TRUSTED_ORIGINS = ["https://crmapi01xz.matelogisticss.com"]
+CSRF_TRUSTED_ORIGINS = ["https://crmapi01xz.matelogisticss.com", "https://api.ocean.connectacrm.com"]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://crm01xz.matelogisticss.com'
+    'https://crm01xz.matelogisticss.com',
+    'https://oceanblue.connectacrm.com'
 ]
 SIMPLE_JWT['SIGNING_KEY'] = SECRET_KEY

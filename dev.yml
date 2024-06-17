@@ -1,0 +1,59 @@
+version: '3'
+
+volumes:
+  production_dev_data: {}
+  production_dev_data_backups: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+
+    image: shipmate_dev_django
+    volumes:
+      - /var/www/api.ocean.connectacrm.com/media:/app/shipmate/media
+      - /var/www/api.ocean.connectacrm.com/static:/app/staticfiles
+
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "6000:5000"
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: shipmate_dev_postgres
+    volumes:
+      - production_dev_data:/var/lib/postgresql/data
+      - production_dev_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+
+  redis:
+    image: docker.io/redis:6
+
+  celeryworker:
+    <<: *django
+    image: shipmate_dev_celeryworker
+    command: /start-celeryworker
+    ports: [ ]
+
+  celerybeat:
+    <<: *django
+    image: shipmate_dev_celerybeat
+    command: /start-celerybeat
+    ports: [ ]
+
+  flower:
+    <<: *django
+    image: shipmate_dev_flower
+    command: /start-flower
+    ports: ["5555:5555"]
+

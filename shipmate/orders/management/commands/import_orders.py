@@ -17,7 +17,7 @@ from shipmate.lead_managements.models import Provider
 
 User = get_user_model()
 
-DEFAULT_ESTIMATED_SHIP_DATE = "27/05/2024"
+DEFAULT_ESTIMATED_SHIP_DATE = "27-05-2024"
 
 
 def read_csv(filename):
@@ -25,25 +25,37 @@ def read_csv(filename):
         csvreader = csv.reader(csvfile, quotechar='"', delimiter=',')
         # Read the header
         header = next(csvreader)
-        # Read the rest of the data
-        data = [row for row in csvreader]
+        # Get the expected number of fields based on the header
+        expected_num_fields = len(header)
+        # Read the rest of the data, skipping rows with double delimiters
+        data = []
+        for row in csvreader:
+            # Check if the row contains the expected number of fields
+            if len(row) == expected_num_fields:
+                data.append(row)
+            else:
+                print(f"Skipping row due to incorrect number of fields: {row}")
     return header, data
 
-
 username_mapper = {
-    'Ronald.matelog': 'Ronald@gmail.com',
-    'Scott.matelog': 'scott@matelogisticss.com',
-    'developer': 'brian@matelogisticss.com',
-    'James.matelog': 'brian@matelogisticss.com',
-    '\\N': 'brian@matelogisticss.com',
-    'Daniel.matelog': 'daniel@matelogisticss.com',
-    'Tony.matelog': 'brian@matelogisticss.com',
-    'Rachael.matelog': 'brian@matelogisticss.com',
-    'Richard.matelog': 'brian@matelogisticss.com',
-    'Ali.matelog': 'brian@matelogisticss.com',
-    'Patrick.matelog': 'brian@matelogisticss.com',
-    'Sean.matelog': 'brian@matelogisticss.com',
-    'Ben.matelog': 'brian@matelogisticss.com'
+    'Addison.oblog': 'info@oceanbluego.com',
+    'Grace.oblog': 'grace@oceanbluego.com',
+    'John.oblog': 'john@oceanbluego.com',
+    'Michael.oblog': 'info@oceanbluego.com',
+    'Dina.oblog': 'info@oceanbluego.com',
+    '\\N': 'info@oceanbluego.com',
+    '': 'info@oceanbluego.com',
+    'Albert.mob': 'info@oceanbluego.com',
+    'Anne.oblog': 'info@oceanbluego.com',
+    'Mike.oblog': 'info@oceanbluego.com',
+    'Steve': 'info@oceanbluego.com',
+    'Sam': 'info@oceanbluego.com',
+    'developer': 'info@oceanbluego.com',
+    'Frank.oblog': 'info@oceanbluego.com',
+    'Jane.oblog': 'info@oceanbluego.com',
+    'Kevin.oblog': 'info@oceanbluego.com',
+    'Leo.oblog': 'info@oceanbluego.com',
+    'Lucas.oblog': 'info@oceanbluego.com'
 }
 
 QUOTE_MAPPER = {
@@ -88,8 +100,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         json_file_path = kwargs['csv_file']  # noqa
         header, data = read_csv(json_file_path)
-        for num, row in enumerate(data[2700:]):
-            date_entered: datetime = datetime.strptime(row[1], "%d/%m/%Y %H:%M")  # 19/06/2022 19:55
+        for num, row in enumerate(data):
+            date_entered: datetime = datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S")  # 19/06/2022 19:55
             phone: str = row[2]  # 2395608470
             email: str = row[3]  # amkania@yahoo.com
             if not email:
@@ -127,12 +139,25 @@ class Command(BaseCommand):
                     estimated_ship_date, "%d/%m/%Y").date()
             except ValueError:
                 estimated_ship_date_obj: datetime.date = datetime.strptime(
-                    DEFAULT_ESTIMATED_SHIP_DATE, "%d/%m/%Y").date()
-            ship_via_id: str = SHIP_VIA_ID[row[15]]  # 9
-            vehicle_runs: str = ConditionChoices.ROLLS if row[16] == "0"  else ConditionChoices.DRIVES # 9
-            provider_name: str = row[17]  # 9
-            lead_status: str = row[18]  # 9
-            user_name: str = row[20]
+                    DEFAULT_ESTIMATED_SHIP_DATE, "%d-%m-%Y").date()
+            print(row[7])
+            print(row[8])
+            lead_status: str = row[15]  # 9
+            ship_via_id: str = SHIP_VIA_ID[row[16]]
+            vehicle_runs: str = ConditionChoices.ROLLS if row[17] == "0" else ConditionChoices.DRIVES  # 9
+            provider_name: str = row[18]  # 9
+            provider_obj, _created = Provider.objects.get_or_create(
+                name=provider_name, defaults={
+                    "type": "standard",
+                    "effective": "no",
+                    "email": provider_name + "@email.com",
+                    "subject": provider_name + " " + provider_name
+                }
+            )
+            try:
+                user_name: str = row[20]
+            except IndexError:
+                user_name: str = "Addison.oblog"
             user_email_str: str = username_mapper[user_name]
             user, _created = User.objects.get_or_create(
                 email=user_email_str, defaults={
@@ -174,41 +199,56 @@ class Command(BaseCommand):
 
             if lead_status in quote_status_list:
                 # QUOTE
-                quote = Quote.objects.create(
-                    created_at=date_entered,
-                    status=QUOTE_MAPPER[lead_status],
-                    price=price_total_total,
-                    reservation_price=reservation_price,
-                    customer=customer,
-                    date_est_ship=estimated_ship_date_obj,
-                    source=...,
-                    user=user,
-                    origin=origin,
-                    destination=destination,
-                    trailer_type=ship_via_id,
-                    condition=vehicle_runs,
+                try:
+                    quote = Quote.objects.create(
+                        created_at=date_entered,
+                        status=QUOTE_MAPPER[lead_status],
+                        price=price_total_total,
+                        reservation_price=reservation_price,
+                        customer=customer,
+                        date_est_ship=estimated_ship_date_obj,
+                        source=provider_obj,
+                        user=user,
+                        origin=origin,
+                        destination=destination,
+                        trailer_type=ship_via_id,
+                        condition=vehicle_runs,
 
-                )
+                    )
+                except Exception as e:
+                    print(f"Exceptioned quote: {e} {e.args}", row)
+                    continue
                 self.add_vehicles(vehicles, QuoteVehicles, "quote", quote)
                 self.stdout.write(self.style.SUCCESS('Finished creating quote'))
             elif lead_status in order_status_list:
                 # ORDER
-                order = Order.objects.create(
-                    created_at=...,
-                    price=...,
-                    reservation_price=...,
-                    date_est_ship=...,
-                    customer=customer,
-                    user=user,
-                    origin=origin,
-                    destination=destination,
-                    status=ORDER_MAPPER[lead_status],
-                    # source=...,  # TODO: add this
-                )
+                try:
+                    order = Order.objects.create(
+                        created_at=date_entered,
+                        price=price_total_total,
+                        reservation_price=reservation_price,
+                        date_est_ship=estimated_ship_date_obj,
+                        customer=customer,
+                        user=user,
+                        origin=origin,
+                        destination=destination,
+                        status=ORDER_MAPPER[lead_status],
+                        trailer_type=ship_via_id,
+                        condition=vehicle_runs,
+                        source=provider_obj
+                    )
+                except Exception as e:
+                    print(f"Exceptioned order: {e} {e.args}", row)
+                    continue
+                self.add_vehicles(vehicles, OrderVehicles, "order", order)
+                self.stdout.write(self.style.SUCCESS('Finished creating order'))
             else:
                 print(row, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                print(lead_status)
+                print("lead_status: ", lead_status)
                 break
+            # except Exception as e:
+            #     print(f"Exceptioned: {e} {e.args}", row)
+            #     continue
 
         self.update_used_sequences()
         self.stdout.write(self.style.SUCCESS('Finished creating orders | quotes'))

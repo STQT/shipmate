@@ -56,7 +56,7 @@ class GetCDPriceAPIView(APIView):
                     continue
                 key = self.set_dict_key(i)
                 collected_data[key].append(data[i][j])
-        collected_data['title'] = i
+            collected_data['title'] = i
         serializer_data = self.serializer_class(collected_data)
         return Response(serializer_data.data, status=status.HTTP_200_OK)
 

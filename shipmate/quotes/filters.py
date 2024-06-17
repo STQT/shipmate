@@ -13,7 +13,7 @@ class QuoteFilter(django_filters.FilterSet):
     status = django_filters.ChoiceFilter(choices=QuoteStatusChoices.choices)
     source = django_filters.ModelMultipleChoiceFilter(field_name='source',
                                                       queryset=Provider.objects.all())
-    user = django_filters.ModelChoiceFilter(field_name='user', queryset=User.objects.all())
+    user = django_filters.ModelMultipleChoiceFilter(field_name='user', queryset=User.objects.all())
     extraUser = django_filters.ModelChoiceFilter(field_name='extra_user', queryset=User.objects.all())
     q = django_filters.CharFilter(method='custom_filter')
 

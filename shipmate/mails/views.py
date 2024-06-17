@@ -28,6 +28,11 @@ class GetCDPriceAPIView(APIView):
             "leads": Leads,
             "order": Order
         }
+        reverse_relation_mapper = {
+            "quote": "quote_vehicles",
+            "leads": "lead_vehicles",
+            "order": "order_vehicles"
+        }
         try:
             rel_obj: Leads = obj_mapper[obj].objects.get(guid=guid)
         except obj_mapper[obj].DoesNotExist:
@@ -35,13 +40,13 @@ class GetCDPriceAPIView(APIView):
         except KeyError:
             return Response({"obj": ["Select only from: quote, leads, order"]}, status=status.HTTP_400_BAD_REQUEST)
 
-        vehicles_list = rel_obj.lead_vehicles.all()
+        vehicles_list = getattr(rel_obj, reverse_relation_mapper[obj])
         data = get_central_dispatch_price(
             rel_obj.origin.zip,
             rel_obj.destination.zip,
             False if rel_obj.trailer_type == TrailerTypeChoices.OPEN else True,
-            vehicles_list[0].vehicle.vehicle_type if vehicles_list else 1,
-            rel_obj.lead_vehicles.count()
+            vehicles_list.all()[0].vehicle.vehicle_type if vehicles_list.all() else 1,
+            vehicles_list.count()
         )
         collected_data = {
             'cargo': [],

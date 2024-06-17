@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -26,14 +27,18 @@ from shipmate.leads.serializers import (
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer,
     LeadsAttachmentSerializer,
-    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, LogSerializer
+    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, LogSerializer,
+    ListLeadTeamSerializer
 )
 from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
+from shipmate.users.models import Team
 
 VEHICLE_TAG = "leads/vehicle/"
 ATTACHMENTS_TAG = "leads/attachments/"
 REASON_TAG = "leads/reason/"
+
+User = get_user_model()
 
 
 class LeadsPagination(LimitOffsetPagination):
@@ -215,6 +220,16 @@ class ListLeadLogAPIView(ListAPIView):
     def get_queryset(self):
         lead_id = self.kwargs['lead']
         return LeadsLog.objects.filter(lead_id=lead_id)
+
+
+class ListTeamLeadAPIView(ListAPIView):
+    serializer_class = ListLeadTeamSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return Team.objects.filter(status=Team.TeamStatusChoices.ACTIVE).prefetch_related(
+            Prefetch('users', queryset=User.objects.filter(is_active=True))
+        )
 
 
 @extend_schema(tags=[REASON_TAG])

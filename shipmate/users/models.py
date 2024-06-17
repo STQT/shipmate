@@ -140,8 +140,8 @@ class RoleLog(BaseLog):
 
 class Team(models.Model):
     class TeamStatusChoices(models.TextChoices):
-        active = "active", "Active"
-        inactive = "inactive", "Inactive"
+        ACTIVE = "active", "Active"
+        INACTIVE = "inactive", "Inactive"
 
     name = CharField(max_length=255)
     status = CharField(max_length=10, choices=TeamStatusChoices.choices)

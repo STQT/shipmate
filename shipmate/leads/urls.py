@@ -10,11 +10,13 @@ from .views import (
     CreateVehicleLeadsAPIView,
     RetrieveUpdateDestroyVehicleLeadsAPIView,
     AttachmentDeleteAPIView, ProviderLeadListAPIView, ListLeadLogAPIView, ReAssignLeadView, ArchiveLeadView,
+    ListTeamLeadAPIView,
 )
 
 urlpatterns = [
     path('', ListLeadsAPIView.as_view(), name='leads-list'),
     path('providers/', ProviderLeadListAPIView.as_view(), name='leads-provider-list'),
+    path('teams/', ListTeamLeadAPIView.as_view(), name='leads-team-list'),
     path('create/', CreateLeadsAPIView.as_view(), name='leads-create'),
 
     path('vehicle/add/', CreateVehicleLeadsAPIView.as_view(), name='leads-add-vehicle'),

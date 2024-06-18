@@ -35,10 +35,10 @@ class GetCDPriceAPIView(APIView):
         }
         try:
             rel_obj: Leads = obj_mapper[obj].objects.get(guid=guid)
-        except obj_mapper[obj].DoesNotExist:
-            return Response({"obj": ["Object does not exists from DB"]}, status=status.HTTP_404_NOT_FOUND)
         except KeyError:
             return Response({"obj": ["Select only from: quote, leads, order"]}, status=status.HTTP_400_BAD_REQUEST)
+        except obj_mapper[obj].DoesNotExist:
+            return Response({"obj": ["Object does not exists from DB"]}, status=status.HTTP_404_NOT_FOUND)
 
         vehicles_list = getattr(rel_obj, reverse_relation_mapper[obj])
         data = get_central_dispatch_price(

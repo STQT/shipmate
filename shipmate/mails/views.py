@@ -64,7 +64,7 @@ class GetCDPriceAPIView(APIView):
             collected_data['title'] = i
         if not collected_data:
             return Response({"nodata": ["CD Price doesnt return data"]}, status=status.HTTP_204_NO_CONTENT)
-        serializer_data = self.serializer_class(collected_data, allow_null=True, allow_empty=True)
+        serializer_data = self.serializer_class(collected_data)
         return Response(serializer_data.data, status=status.HTTP_200_OK)
 
     def set_dict_key(self, key):

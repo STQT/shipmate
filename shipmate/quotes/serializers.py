@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Quote, QuoteVehicles, QuoteAttachment
+from .models import Quote, QuoteVehicles, QuoteAttachment, QuoteDates
 from ..addresses.serializers import CitySerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
@@ -107,12 +107,19 @@ class ListQuoteSerializer(serializers.ModelSerializer):
         return f"{city_name}, {state_code} {city_zip}"
 
 
+class QuoteDatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuoteDates
+        fields = "__all__"
+
+
 class RetrieveQuoteSerializer(ListQuoteSerializer):
     customer = CustomerSerializer(many=False)  # noqa
     origin = CitySerializer(many=False)
     destination = CitySerializer(many=False)
     quote_vehicles = DetailVehicleQuoteSerializer(many=True)
     source = ProviderSmallDataSerializer(many=False)
+    quote_dates = QuoteDatesSerializer(many=False)
 
     class Meta:
         model = Quote

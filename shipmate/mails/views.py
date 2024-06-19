@@ -53,7 +53,8 @@ class GetCDPriceAPIView(APIView):
             'route': [],
             'price': [],
             'accepted': [],
-            'comparable': []
+            'comparable': [],
+            'title': ""
         }
         for i in data:
             for j in data[i]:

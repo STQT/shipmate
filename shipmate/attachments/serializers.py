@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -46,29 +47,38 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
         rel = validated_data.pop('rel', None)
         text = validated_data.get('text')
         endpoint_type = validated_data.pop('endpoint_type', None)
-        created_data = super().create(validated_data)
-        if endpoint_type is None:  # noqa
-            raise ValidationError({"endpoint_type": "endpointType is required"})
-        if isinstance(created_data, NoteAttachment):
-            _type = Attachments.TypesChoices.NOTE
-        elif isinstance(created_data, FileAttachment):
-            _type = Attachments.TypesChoices.FILE
-        else:
-            _type = Attachments.TypesChoices.TASK
-        Class = ATTACHMENT_CLASS_MAP[endpoint_type]  # noqa
-        field_name = Class.__name__[:5].lower()
-        converter_field_name = {
-            "leads": "lead_id",
-            "quote": "quote_id",
-            "order": "order_id"
-        }
-        attachment_class_data = {
-            "type": _type,
-            "link": created_data.pk,
-            "title": strip_tags(text)[:499],
-            converter_field_name[field_name]: rel
-        }
-        Class.objects.create(**attachment_class_data)
+        with transaction.atomic():
+            created_data = super().create(validated_data)
+            if endpoint_type is None:  # noqa
+                raise ValidationError({"endpoint_type": "endpointType is required"})
+            if isinstance(created_data, NoteAttachment):
+                _type = Attachments.TypesChoices.NOTE
+            elif isinstance(created_data, FileAttachment):
+                _type = Attachments.TypesChoices.FILE
+            else:
+                _type = Attachments.TypesChoices.TASK
+            Class = ATTACHMENT_CLASS_MAP[endpoint_type]  # noqa
+            field_name = Class.__name__[:5].lower()
+            converter_field_name = {
+                "leads": "lead_id",
+                "quote": "quote_id",
+                "order": "order_id"
+            }
+            attachment_class_data = {
+                "type": _type,
+                "link": created_data.pk,
+                "title": strip_tags(text)[:499],
+                converter_field_name[field_name]: rel
+            }
+            related_model = Class._meta.get_field(converter_field_name[field_name]).related_model
+            if not related_model.objects.filter(pk=rel).exists():
+                raise ValidationError(
+                    {
+                        converter_field_name[field_name]:
+                            f"{converter_field_name[field_name]} with id {rel} does not exist"
+                    }
+                )
+            Class.objects.create(**attachment_class_data)
         return created_data
 
 

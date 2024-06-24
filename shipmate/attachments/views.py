@@ -1,13 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.db import transaction
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 
 from shipmate.contrib.models import Attachments
 from shipmate.contrib.generics import RetrieveUpdatePUTAPIView
-from shipmate.attachments.methods import create_attachment
 from .models import TaskAttachment, FileAttachment, NoteAttachment
 from ..attachments.serializers import (
-    AttachmentType,
     TaskAttachmentSerializer,
     EmailAttachmentSerializer,
     PhoneAttachmentSerializer,
@@ -15,12 +12,9 @@ from ..attachments.serializers import (
     NoteAttachmentSerializer,
     UpdateTaskAttachmentSerializer,
     UpdateFileAttachmentSerializer,
-    UpdateNoteAttachmentSerializer
+    UpdateNoteAttachmentSerializer,
+    ListTaskAttachmentSerializer
 )
-from ..leads.models import LeadsAttachment, Leads
-from ..orders.models import OrderAttachment, Order
-from ..quotes.models import QuoteAttachment, Quote
-from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -68,6 +62,12 @@ class CreateFileAttachmentAPIView(BaseAttachmentAPIView):
 class TaskAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):  # noqa
     queryset = TaskAttachment.objects.all()
     serializer_class = UpdateTaskAttachmentSerializer
+
+
+class ListTaskAttachmentAPIView(ListAPIView):
+    queryset = TaskAttachment.objects.all()
+    serializer_class = ListTaskAttachmentSerializer
+    filterset_class = ...
 
 
 class FileAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):

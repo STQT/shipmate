@@ -54,6 +54,10 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
                     _type = Attachments.TypesChoices.NOTE
                 elif isinstance(created_data, FileAttachment):
                     _type = Attachments.TypesChoices.FILE
+                elif isinstance(created_data, PhoneAttachment):
+                    _type = Attachments.TypesChoices.PHONE
+                elif isinstance(created_data, EmailAttachment):
+                    _type = Attachments.TypesChoices.EMAIL
                 else:
                     _type = Attachments.TypesChoices.TASK
                 Class = ATTACHMENT_CLASS_MAP[endpoint_type]  # noqa

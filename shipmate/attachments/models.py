@@ -38,7 +38,18 @@ class TaskAttachment(BaseModel):
         DEADLINE = "deadline", "Deadline"
         PAYMENT = "payment", "Payment"
 
+    class PriorityChoices(models.TextChoices):
+        HIGH = "high", "High"
+        MEDIUM = "medium", "Medium"
+        LOW = "low", "Low"
+
+    class BusyChoices(models.TextChoices):
+        BUSY = "busy", "Busy"
+        FREE = "free", "Free"
+
     type = models.CharField(max_length=10, choices=TypeChoices.choices)
+    priority = models.CharField(max_length=10, choices=PriorityChoices.choices)
+    busy = models.CharField(max_length=10, choices=BusyChoices.choices)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)

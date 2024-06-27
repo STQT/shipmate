@@ -16,12 +16,12 @@ from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
-from shipmate.contrib.models import LeadsStatusChoices
+from shipmate.contrib.models import LeadsStatusChoices, QuoteStatusChoices
 from shipmate.contrib.pagination import CustomPagination
 from shipmate.contrib.views import ArchiveView, ReAssignView
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
-from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog
+from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog, LeadAttachmentComment
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
     CreateLeadsSerializer,
@@ -31,7 +31,7 @@ from shipmate.leads.serializers import (
     VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, LogSerializer,
     ListLeadTeamSerializer
 )
-from shipmate.quotes.models import Quote, QuoteVehicles
+from shipmate.quotes.models import Quote, QuoteVehicles, QuoteAttachment
 from shipmate.quotes.serializers import CreateQuoteSerializer
 from shipmate.users.models import Team
 
@@ -138,9 +138,26 @@ class ConvertLeadToQuoteAPIView(APIView):
             try:
                 lead = Leads.objects.prefetch_related("lead_vehicles").get(guid=guid)
                 lead_vehicles = lead.lead_vehicles.all()
+                # lead_attachments = LeadsAttachment.objects.filter(lead=lead)
             except Leads.DoesNotExist:
                 return Response({"error": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            # attachment_data = []
+            # for attachment in lead_attachments:
+            #     one_attachment_data = attachment.__dict__
+            #     one_attachment_data.pop('_state', None)
+            #     one_attachment_data.pop('id', None)
+            #     one_attachment_data.pop('_prefetched_objects_cache', None)
+            #     one_attachment = {
+            #         "attachment": one_attachment_data,
+            #         "comments": []
+            #     }
+            #     all_comments = LeadAttachmentComment.objects.filter(attachment=attachment)
+            #     print(type(all_comments))
+            #     for comment in all_comments:
+            #         one_attachment['comments'].append(comment.text)
+            #     # attachment_data.append(
+            #     #     one_attachment
+            #     # )
             lead_data: dict = lead.__dict__
             lead.delete()
             lead_data.pop('_state', None)
@@ -149,6 +166,7 @@ class ConvertLeadToQuoteAPIView(APIView):
             lead_data.pop('price', None)
             lead_data.pop('reservation_price', None)
             lead_data.pop('_prefetched_objects_cache', None)
+            lead_data['status'] = QuoteStatusChoices.QUOTES
 
             quote_instance = Quote(price=price, reservation_price=reservation_price, **lead_data)
             quote_instance.save()
@@ -169,6 +187,14 @@ class ConvertLeadToQuoteAPIView(APIView):
                     for lead_vehicle in lead_vehicles
                 ]
                 QuoteVehicles.objects.bulk_create(quote_vehicles)
+            # if lead_attachments:
+            #     quote_attachments = [
+            #         QuoteAttachment(
+            #             quote=quote_instance,
+            #
+            #         )
+            #         for lead_attachment in lead_attachments_data
+            #     ]
             quote_serializer = CreateQuoteSerializer(quote_instance)
             return Response(quote_serializer.data, status=status.HTTP_200_OK)
         else:
@@ -182,7 +208,8 @@ class LeadsAttachmentListView(ListAPIView):
 
     def get_queryset(self):
         lead_id = self.kwargs.get('leadId')  # Retrieve the lead_id from URL kwargs
-        return LeadsAttachment.objects.filter(lead_id=lead_id).order_by("-id")
+        return LeadsAttachment.objects.prefetch_related(
+            "lead_attachment_comments").filter(lead_id=lead_id).order_by("-id")
 
 
 @extend_schema(tags=[ATTACHMENTS_TAG])

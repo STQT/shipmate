@@ -8,7 +8,7 @@ from shipmate.attachments.models import (
     FileAttachment,
     EmailAttachment,
     PhoneAttachment,
-    NoteAttachment
+    NoteAttachment,
 )
 from enum import Enum
 from django.utils.html import strip_tags
@@ -16,9 +16,9 @@ from django.utils.html import strip_tags
 from shipmate.contrib.email import send_email
 from shipmate.contrib.models import Attachments
 from shipmate.contrib.sms import send_sms
-from shipmate.leads.models import LeadsAttachment
-from shipmate.orders.models import OrderAttachment
-from shipmate.quotes.models import QuoteAttachment
+from shipmate.leads.models import LeadsAttachment, LeadAttachmentComment
+from shipmate.orders.models import OrderAttachment, OrderAttachmentComment
+from shipmate.quotes.models import QuoteAttachment, QuoteAttachmentComment
 
 
 class AttachmentType(Enum):
@@ -125,10 +125,53 @@ class TaskAttachmentSerializer(BaseAttachmentSerializer):
         fields = "__all__"
 
 
+class AttachmentCommentSerializer(serializers.Serializer):
+    text = serializers.CharField()
+
+
 class ListTaskAttachmentSerializer(serializers.ModelSerializer):
+    comments = serializers.SerializerMethodField()
+
     class Meta:
         model = TaskAttachment
         fields = "__all__"
+
+    def get_comments(self, obj):
+        attachment = LeadsAttachment.objects.filter(link=obj.pk).first()
+        rel_name = "lead_attachment_comments"
+        if attachment is None:
+            attachment = QuoteAttachment.objects.filter(link=obj.pk).first()
+            rel_name = "quote_attachment_comments"
+            if attachment is None:
+                attachment = OrderAttachment.objects.filter(link=obj.pk).first()
+                rel_name = "order_attachment_comments"
+                if attachment is None:
+                    return AttachmentCommentSerializer([], many=True).data
+        comments_filter = getattr(attachment, rel_name).all()
+        return AttachmentCommentSerializer(comments_filter, many=True).data
+
+
+class CreateAttachmentCommentSerializer(serializers.Serializer):
+    task_id = serializers.IntegerField(write_only=True)
+    text = serializers.CharField()
+
+    def create(self, validated_data):
+        text = validated_data.get('text')
+        task_id = validated_data.pop('task_id', None)
+        attachment = LeadsAttachment.objects.filter(link=task_id).first()
+        if attachment:
+            comment_class = LeadAttachmentComment.objects.create(attachment=attachment, text=text)
+        else:
+            attachment = QuoteAttachment.objects.filter(link=task_id).first()
+            if attachment:
+                comment_class = QuoteAttachmentComment.objects.create(attachment=attachment, text=text)
+            else:
+                attachment = OrderAttachment.objects.filter(link=task_id).first()
+                if attachment:
+                    comment_class = OrderAttachmentComment.objects.create(attachment=attachment, text=text)
+                else:
+                    raise ValidationError({"taskId": "Not found Task with taskId"})
+        return AttachmentCommentSerializer(comment_class, many=False).data
 
 
 class PhoneAttachmentSerializer(BaseAttachmentSerializer):

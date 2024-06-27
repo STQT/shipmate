@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Quote, QuoteVehicles, QuoteAttachment, QuoteDates
 from ..addresses.serializers import CitySerializer
+from ..attachments.serializers import AttachmentCommentSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import CustomerSerializer
 from ..lead_managements.models import Provider
@@ -154,6 +155,8 @@ class ProviderQuoteListSerializer(serializers.ModelSerializer):
 
 
 class QuoteAttachmentSerializer(serializers.ModelSerializer):
+    quote_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
+
     class Meta:
         model = QuoteAttachment
         fields = "__all__"

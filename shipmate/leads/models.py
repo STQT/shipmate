@@ -36,6 +36,14 @@ class LeadsAttachment(Attachments):
         default_related_name = "lead_attachments"
 
 
+class LeadAttachmentComment(models.Model):
+    attachment = models.ForeignKey(LeadsAttachment, on_delete=models.CASCADE, related_name="lead_attachment_comments")
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.attachment} | {self.text}"
+
+
 class LeadVehicles(VehicleAbstract):
     lead = models.ForeignKey(Leads, on_delete=models.CASCADE)
 

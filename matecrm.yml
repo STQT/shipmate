@@ -1,0 +1,52 @@
+version: '3'
+
+volumes:
+  matecrm_postgres_data: {}
+  matecrm_postgres_data_backups: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+
+    image: shipmate_matecrm_django
+    volumes:
+      - /var/www/matelog.connectacrm.com/media:/app/shipmate/media
+      - /var/www/matelog.connectacrm.com/static:/app/shipmate/static
+
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "9000:5000"
+    env_file:
+      - ./.envs/.matecrm/.django
+      - ./.envs/.matecrm/.postgres
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: shipmate_matecrm_postgres
+    volumes:
+      - matecrm_postgres_data:/var/lib/postgresql/data
+      - matecrm_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+
+  redis:
+    image: docker.io/redis:6
+
+  celeryworker:
+    <<: *django
+    image: shipmate_matecrm_celeryworker
+    command: /start-celeryworker
+    ports: [ ]
+
+  celerybeat:
+    <<: *django
+    image: shipmate_matecrm_celerybeat
+    command: /start-celerybeat
+    ports: [ ]

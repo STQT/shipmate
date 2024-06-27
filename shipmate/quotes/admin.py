@@ -19,7 +19,7 @@ class QuoteAdmin(admin.ModelAdmin):
 
 @admin.register(QuoteAttachment)
 class QuoteAttachmentAdmin(admin.ModelAdmin):
-    list_display = ['title', 'quote']
+    list_display = ['title', 'quote', 'link']
     autocomplete_fields = ['quote']
 
 

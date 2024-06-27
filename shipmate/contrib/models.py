@@ -127,6 +127,9 @@ class Attachments(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return self.title
+
     # def delete(self, *args, **kwargs):
     #     rel_model_dict = {
     #

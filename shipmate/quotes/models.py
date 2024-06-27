@@ -62,6 +62,15 @@ class QuoteAttachment(Attachments):
         default_related_name = "quotes"
 
 
+class QuoteAttachmentComment(models.Model):
+    attachment = models.ForeignKey(QuoteAttachment,
+                                   on_delete=models.CASCADE, related_name="quote_attachment_comments")
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.attachment} | {self.text}"
+
+
 class QuoteVehicles(VehicleAbstract):
     quote = models.ForeignKey(Quote, on_delete=models.CASCADE)
 

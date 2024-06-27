@@ -3,6 +3,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 
 from shipmate.contrib.models import Attachments
 from shipmate.contrib.generics import RetrieveUpdatePUTAPIView
+from .filters import TaskAttachmentFilter
 from .models import TaskAttachment, FileAttachment, NoteAttachment
 from ..attachments.serializers import (
     TaskAttachmentSerializer,
@@ -13,7 +14,7 @@ from ..attachments.serializers import (
     UpdateTaskAttachmentSerializer,
     UpdateFileAttachmentSerializer,
     UpdateNoteAttachmentSerializer,
-    ListTaskAttachmentSerializer
+    ListTaskAttachmentSerializer, CreateAttachmentCommentSerializer
 )
 
 User = get_user_model()
@@ -52,22 +53,19 @@ class CreateFileAttachmentAPIView(BaseAttachmentAPIView):
     attachment_type = Attachments.TypesChoices.FILE
 
 
-# class TaskAttachmentListAPIView(generics.ListAPIView):
-#   TODO: create list view for lead|quote|order id and date filter
-#
-#     serializer_class = ListTaskAttachmentSerializer
-#     queryset = TaskAttachment.objects.all()
-
-
 class TaskAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):  # noqa
     queryset = TaskAttachment.objects.all()
     serializer_class = UpdateTaskAttachmentSerializer
 
 
-class ListTaskAttachmentAPIView(ListAPIView):
+class ListTaskAttachmentAPIView(ListAPIView):  # noqa
     queryset = TaskAttachment.objects.all()
     serializer_class = ListTaskAttachmentSerializer
-    filterset_class = ...
+    filterset_class = TaskAttachmentFilter
+
+
+class CreateTaskAttachmentCommentAPIView(CreateAPIView):  # noqa
+    serializer_class = CreateAttachmentCommentSerializer
 
 
 class FileAttachmentRetrieveUpdateDestroyAPIView(RetrieveUpdatePUTAPIView):

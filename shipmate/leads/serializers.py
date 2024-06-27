@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from shipmate.attachments.serializers import AttachmentCommentSerializer
 from shipmate.lead_managements.models import Provider
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
@@ -135,6 +136,8 @@ class UpdateLeadsSerializer(serializers.ModelSerializer):
 
 
 class LeadsAttachmentSerializer(serializers.ModelSerializer):
+    lead_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
+
     class Meta:
         model = LeadsAttachment
         fields = "__all__"

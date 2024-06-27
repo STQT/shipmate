@@ -1,10 +1,15 @@
 from django.contrib import admin
 
-from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog
+from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog, LeadAttachmentComment
 
 
 class LeadsLogInline(admin.TabularInline):
     model = LeadsLog
+    extra = 0
+
+
+class LeadsAttachmentCommentInline(admin.TabularInline):
+    model = LeadAttachmentComment
     extra = 0
 
 
@@ -19,8 +24,9 @@ class LeadsAdmin(admin.ModelAdmin):
 
 @admin.register(LeadsAttachment)
 class LeadsAttachmentAdmin(admin.ModelAdmin):
-    list_display = ['title', 'lead']
+    list_display = ['title', 'lead', 'link']
     autocomplete_fields = ['lead']
+    inlines = [LeadsAttachmentCommentInline]
 
 
 @admin.register(LeadVehicles)

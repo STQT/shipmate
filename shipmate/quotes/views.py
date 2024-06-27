@@ -133,7 +133,8 @@ class QuoteAttachmentListView(ListAPIView):
 
     def get_queryset(self):
         quote_id = self.kwargs.get('quoteId')  # Retrieve the lead_id from URL kwargs
-        return QuoteAttachment.objects.filter(quote_id=quote_id).order_by("-id")
+        return QuoteAttachment.objects.prefetch_related(
+            "quote_attachment_comments").filter(quote_id=quote_id).order_by("-id")
 
 
 @extend_schema(tags=[ATTACHMENTS_TAG])

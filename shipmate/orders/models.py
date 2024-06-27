@@ -122,6 +122,15 @@ class OrderAttachment(Attachments):
         default_related_name = "orders"
 
 
+class OrderAttachmentComment(models.Model):
+    attachment = models.ForeignKey(OrderAttachment,
+                                   on_delete=models.CASCADE, related_name="order_attachment_comments")
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.attachment} | {self.text}"
+
+
 class OrderVehicles(VehicleAbstract):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     lot = models.CharField(max_length=20, null=True, blank=True)

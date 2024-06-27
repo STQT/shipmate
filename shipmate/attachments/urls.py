@@ -7,6 +7,8 @@ urlpatterns = [
     path('create-email/', CreateEmailAttachmentAPIView.as_view(), name='create-email'),
     path('create-phone/', CreatePhoneAttachmentAPIView.as_view(), name='create-phone'),
     path('create-file/', CreateFileAttachmentAPIView.as_view(), name='create-file'),
+    path('task-list/', ListTaskAttachmentAPIView.as_view(), name='task-list'),
+    path('create-task-comment/', CreateTaskAttachmentCommentAPIView.as_view(), name='create-task-comment'),
     path('task/<int:pk>/', TaskAttachmentRetrieveUpdateDestroyAPIView.as_view(),
          name='task_attachment_detail'),
     path('file/<int:pk>/', FileAttachmentRetrieveUpdateDestroyAPIView.as_view(),

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
 from ..addresses.serializers import CitySerializer
+from ..attachments.serializers import AttachmentCommentSerializer
 from ..carriers.models import Carrier
 from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
@@ -268,6 +269,8 @@ class ProviderOrderListSerializer(serializers.ModelSerializer):
 
 
 class OrderAttachmentSerializer(serializers.ModelSerializer):
+    order_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
+
     class Meta:
         model = OrderAttachment
         fields = "__all__"

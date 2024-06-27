@@ -143,8 +143,9 @@ class OrderAttachmentListView(ListAPIView):
     filterset_class = OrderAttachmentFilter
 
     def get_queryset(self):
-        lead_id = self.kwargs.get('ordersId')  # Retrieve the lead_id from URL kwargs
-        return OrderAttachment.objects.filter(order_id=lead_id).order_by("-id")
+        order_id = self.kwargs.get('ordersId')  # Retrieve the lead_id from URL kwargs
+        return OrderAttachment.objects.prefetch_related(
+            "order_attachment_comments").filter(order_id=order_id).order_by("-id")
 
 
 @extend_schema(tags=[ATTACHMENTS_TAG])

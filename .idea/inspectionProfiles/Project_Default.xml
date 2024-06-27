@@ -5,7 +5,7 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="43">
+          <list size="46">
             <item index="0" class="java.lang.String" itemvalue="djangorestframework-camel-case" />
             <item index="1" class="java.lang.String" itemvalue="django-filter" />
             <item index="2" class="java.lang.String" itemvalue="geopy" />
@@ -49,6 +49,9 @@
             <item index="40" class="java.lang.String" itemvalue="argon2-cffi" />
             <item index="41" class="java.lang.String" itemvalue="pylint-celery" />
             <item index="42" class="java.lang.String" itemvalue="Pillow" />
+            <item index="43" class="java.lang.String" itemvalue="pandas" />
+            <item index="44" class="java.lang.String" itemvalue="beautifulsoup4" />
+            <item index="45" class="java.lang.String" itemvalue="lxml" />
           </list>
         </value>
       </option>

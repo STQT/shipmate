@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Prefetch
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
@@ -151,6 +152,12 @@ class ConvertLeadToQuoteAPIView(APIView):
 
             quote_instance = Quote(price=price, reservation_price=reservation_price, **lead_data)
             quote_instance.save()
+            quote_dates = quote_instance.quote_dates
+            quote_dates.received = lead_data['created_at']
+            quote_dates.created = timezone.now()
+            quote_dates.quoted = timezone.now()
+            quote_dates.converted = timezone.now()
+            quote_dates.save()
 
             if lead_vehicles:
                 quote_vehicles = [

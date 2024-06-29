@@ -24,7 +24,7 @@ from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contract.models import Hawaii, Ground, International
 from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
 from ..contrib.pagination import CustomPagination
-from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
+from ..contrib.sms import send_sms
 from ..contrib.views import ArchiveView, ReAssignView
 from ..leads.serializers import LogSerializer
 from ..leads.views import ListTeamLeadAPIView
@@ -210,6 +210,9 @@ class SignOrderContractView(APIView):
     def post(self, request, order, contract):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
+            agreement = serializer.validated_data.pop('agreement')
+            terms = serializer.validated_data.pop('terms')
+            print(serializer.validated_data)
             try:
                 contract_obj = OrderContract.objects.get(id=contract)
             except OrderContract.DoesNotExist:
@@ -220,8 +223,9 @@ class SignOrderContractView(APIView):
             if order_obj.guid != order:
                 logger.error(f"Order with guid {order} not found")
                 return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
-
             contract_obj.signed = True
+            contract_obj.signer_name = serializer.validated_data['signer_name']
+            contract_obj.signer_initials = serializer.validated_data['signer_initials']
             contract_obj.sign_ip_address = request.META.get('REMOTE_ADDR')
             contract_obj.signed_time = timezone.now()
             contract_obj.save()
@@ -232,8 +236,7 @@ class SignOrderContractView(APIView):
 
             # Send email with ZIP attachment
             customer_email = order_obj.customer.email
-            agreement = serializer.validated_data['agreement']
-            terms = serializer.validated_data['terms']
+
             email = EmailMessage(
                 subject='Signed Contract and Terms',
                 from_email=settings.DEFAULT_FROM_EMAIL,
@@ -250,12 +253,8 @@ class SignOrderContractView(APIView):
                 logger.error(f"Error sending email: {e}")
                 logger.error(f"From email: {settings.DEFAULT_FROM_EMAIL}")
                 return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            response_data = serializer.data
-            response_data['id'] = contract_obj.id
-            response_data['signed'] = contract_obj.signed
-            response_data['signIpAddress'] = contract_obj.sign_ip_address
-            response_data['signedTime'] = contract_obj.signed_time
-            return Response(response_data, status=status.HTTP_200_OK)
+
+            return Response(self.serializer_class(contract_obj).data, status=status.HTTP_200_OK)
 
         logger.error(f"Invalid data: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -431,3 +430,13 @@ class ArchiveOrderView(ArchiveView):
 
 class ListTeamOrdersAPIView(ListTeamLeadAPIView):
     serializer_class = ListOrdersTeamSerializer
+
+
+class SendSmsToContract(CreateAPIView):
+    serializer_class = None
+
+    def create(self, request, *args, **kwargs):
+        contract_id = self.kwargs.get('contract')
+        contract = get_object_or_404(OrderContract, id=contract_id)
+        text = "Test message"
+        send_sms(settings.FROM_PHONE, contract.order.customer.phone, text)

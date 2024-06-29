@@ -183,7 +183,7 @@ class CreateVehicleOrderAPIView(CreateAPIView):  # noqa
 @extend_schema(tags=[CONTRACTS_TAG])
 class CreateOrderContractAPIView(CreateAPIView):  # noqa
     queryset = OrderContract.objects.all()
-    serializer_class = OrderContractSerializer
+    serializer_class = CreateOrderContractSerializer
 
 
 @extend_schema(tags=[CONTRACTS_TAG])

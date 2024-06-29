@@ -228,6 +228,12 @@ class OrderContractSerializer(serializers.ModelSerializer):
         return "NaN"
 
 
+class CreateOrderContractSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderContract
+        fields = ("contract_type", "order")
+
+
 class RetrieveOrderSerializer(ListOrderSerializer):
     customer = CustomerSerializer(many=False)  # noqa
     origin = CitySerializer(many=False)

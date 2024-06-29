@@ -297,9 +297,13 @@ class DetailContractSerializer(serializers.Serializer):
     pdf = BaseContractSerializer(read_only=True)
 
 
-class SigningContractSerializer(serializers.Serializer):
-    agreement = serializers.FileField()
-    terms = serializers.FileField()
+class SigningContractSerializer(serializers.ModelSerializer):
+    agreement = serializers.FileField(write_only=True)
+    terms = serializers.FileField(write_only=True)
+
+    class Meta:
+        model = OrderContract
+        exclude = ("created_at", "order", "sign_ip_address", "signed_time")
 
 
 class ListOrdersUserSerializer(ListLeadUserSerializer):

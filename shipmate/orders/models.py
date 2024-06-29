@@ -156,6 +156,10 @@ class OrderContract(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     signed = models.BooleanField(default=False)
     contract_type = models.CharField(max_length=13, choices=TypeChoices.choices)
+    sign_ip_address = models.GenericIPAddressField(null=True, blank=True)
+    signer_name = models.CharField(null=True, blank=True)
+    signer_initials = models.CharField(null=True, blank=True)
+    signed_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.contract_type

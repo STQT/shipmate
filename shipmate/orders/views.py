@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Prefetch
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from django.core.mail import EmailMessage
 from rest_framework import status
@@ -221,6 +222,8 @@ class SignOrderContractView(APIView):
                 return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
 
             contract_obj.signed = True
+            contract_obj.sign_ip_address = request.META.get('REMOTE_ADDR')
+            contract_obj.signed_time = timezone.now()
             contract_obj.save()
 
             if order_obj.status == OrderStatusChoices.ORDERS:
@@ -394,9 +397,9 @@ class PostToCDAPIView(CreateAPIView):
             action = serializer.data['action']
             response_data = serializer.data
             response_data['status'] = OrderStatusChoices.POSTED
-            if action == CDActions.REPOST:
+            if action == CDActions.REPOST.value:
                 repost_cd(order)
-            elif action == CDActions.POST:
+            elif action == CDActions.POST.value:
                 post_cd(order)
             else:
                 delete_cd(order)

@@ -21,6 +21,7 @@ from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroy
 from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contract.models import Hawaii, Ground, International
+from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
 from ..contrib.pagination import CustomPagination
 from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
 from ..contrib.views import ArchiveView, ReAssignView
@@ -380,19 +381,30 @@ class BackToQuoteOrderAPIView(CreateAPIView):
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)
 
 
-@extend_schema(responses={200: RetrieveOrderSerializer})
 class PostToCDAPIView(CreateAPIView):
-    serializer_class = None
+    serializer_class = PostCDSerializer
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        order_id = self.kwargs.get('guid')
-        order = get_object_or_404(Order, guid=order_id)
-        serializer_class = RetrieveOrderSerializer(order, data={'status': OrderStatusChoices.POSTED}, partial=True)
-        serializer_class.is_valid(raise_exception=True)
-        serializer_class.save()
-        # TODO: add dispatching request to CD
-
-        return Response(serializer_class.data, status=status.HTTP_200_OK)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            order_id = self.kwargs.get('guid')
+            order = get_object_or_404(Order, guid=order_id)
+            order.status = OrderStatusChoices.POSTED
+            action = serializer.data['action']
+            response_data = serializer.data
+            response_data['status'] = OrderStatusChoices.POSTED
+            if action == CDActions.REPOST:
+                repost_cd(order)
+            elif action == CDActions.POST:
+                post_cd(order)
+            else:
+                delete_cd(order)
+                order.status = OrderStatusChoices.BOOKED
+                response_data['status'] = OrderStatusChoices.BOOKED
+            order.save()
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=[REASON_TAG])

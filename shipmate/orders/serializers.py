@@ -1,3 +1,5 @@
+from enum import Enum
+
 from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
@@ -13,6 +15,12 @@ from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
 from ..users.serializers import ListUserSerializer
+
+
+class CDActions(Enum):
+    POST = "post"
+    REPOST = "repost"
+    DELETE = "delete"
 
 
 class CreateVehicleOrderSerializer(serializers.ModelSerializer):
@@ -303,3 +311,8 @@ class ListOrdersUserSerializer(ListLeadUserSerializer):
 
 class ListOrdersTeamSerializer(ListLeadTeamSerializer):
     users = ListOrdersUserSerializer(many=True)
+
+
+class PostCDSerializer(serializers.Serializer):
+    status = serializers.CharField(read_only=True)
+    action = serializers.ChoiceField(choices=[(tag.value, tag.name.title()) for tag in CDActions], required=True)

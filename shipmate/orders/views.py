@@ -250,8 +250,12 @@ class SignOrderContractView(APIView):
                 logger.error(f"Error sending email: {e}")
                 logger.error(f"From email: {settings.DEFAULT_FROM_EMAIL}")
                 return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            return Response(status=status.HTTP_200_OK)
+            response_data = serializer.data
+            response_data['id'] = contract_obj.id
+            response_data['signed'] = contract_obj.signed
+            response_data['signIpAddress'] = contract_obj.sign_ip_address
+            response_data['signedTime'] = contract_obj.signed_time
+            return Response(response_data, status=status.HTTP_200_OK)
 
         logger.error(f"Invalid data: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

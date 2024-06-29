@@ -309,7 +309,8 @@ class SigningContractSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderContract
-        exclude = ("created_at", "order", "sign_ip_address", "signed_time", "contract_type", "signed")
+        exclude = ("created_at", "order", "contract_type")
+        read_only_fields = ["sign_ip_address", "signed_time", "signed"]
 
 
 class ListOrdersUserSerializer(ListLeadUserSerializer):

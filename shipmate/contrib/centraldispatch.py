@@ -150,9 +150,9 @@ def post_cd(order: Order):
         available_date=order.date_est_ship, last_date=order.date_est_ship, comment=order.cd_note,
         vehicles=order.order_vehicles.all(), is_cash=True
     )
-    x = send_mail(subject="", from_email="leads@oceanbluego.com",
+    x = send_mail(subject="", from_email=settings.CD_EMAIL,
                   message=text, recipient_list=["cdupd-v4@centraldispatch.com"],
-                  auth_user="leads@oceanbluego.com", auth_password="rdak wugc dgzj nosq"
+                  auth_user=settings.CD_EMAIL, auth_password=settings.CD_EMAIL_PASSWORD
                   )
     logging.info(f"Sended to CD: {order.pk} | {x}")
 

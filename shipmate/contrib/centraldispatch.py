@@ -1,14 +1,21 @@
 import enum
+import logging
 
 import requests
 import pandas as pd
 
 from dataclasses import dataclass
-from typing import Tuple, TypedDict
+from typing import Tuple, TypedDict, List
 from enum import Enum
 
 from bs4 import BeautifulSoup
 from django.conf import settings
+from django.core.mail import send_mail
+
+from shipmate.addresses.models import City
+from shipmate.contrib.models import ConditionChoices
+from shipmate.leads.models import LeadVehicles
+from shipmate.orders.models import Order
 
 URL = "https://site.centraldispatch.com/protected/cargo/sample-prices-lightbox"
 
@@ -113,3 +120,57 @@ def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum,
     )
 
     return CentralDispatch(URL).parse(form)
+
+
+def collect_cd_info(pk, origin: City, destination: City, carrier_pay: int,
+                    cod_to_carrier: int, trailer_type, condition,
+                    available_date, last_date, comment, vehicles: List[LeadVehicles],
+                    is_cash=True):
+    cash = "cash/certified funds" if is_cash else "check"
+    condition = "operable" if condition == ConditionChoices.DRIVES else "inop"
+    vehicles_str = ""
+    for num, vehicle in enumerate(vehicles):
+        if num > 1:
+            vehicles_str += ";"
+        vehicles_str += (f"{vehicle.vehicle_year}|{vehicle.vehicle.mark.name}|"
+                         f"{vehicle.vehicle.name}|{vehicle.vehicle.vehicle_type}")
+    text = (f"{pk},{origin.name},{origin.state.code},"
+            f"{origin.zip},{destination.name},{destination.state.code},{destination.zip},"
+            f"{carrier_pay:.2f},{cod_to_carrier:.2f},"
+            f"{cash},1,none,{trailer_type},{condition},"
+            f"{available_date.strftime('%Y-%m-%d')},{last_date.strftime('%Y-%m-%d')},{comment},{vehicles_str}*")
+    return text
+
+
+def post_cd(order: Order):
+    text = f"UID({settings.CD_UID})*\n"
+    text += collect_cd_info(
+        pk=order.pk, origin=order.origin, destination=order.destination, carrier_pay=order.payment_carrier_pay,
+        cod_to_carrier=order.payment_cod_to_carrier, trailer_type=order.trailer_type, condition=order.condition,
+        available_date=order.date_est_ship, last_date=order.date_est_ship, comment=order.cd_note,
+        vehicles=order.order_vehicles.all(), is_cash=True
+    )
+    x = send_mail(subject="", from_email=settings.CD_EMAIL,
+                  message=text, recipient_list=["cdupd-v4@centraldispatch.com"],
+                  auth_user=settings.CD_EMAIL, auth_password=settings.CD_EMAIL_PASSWORD
+                  )
+    logging.info(f"Sended to CD: {order.pk} | {x}")
+
+
+def repost_cd(order: Order):
+    text = f"UID({settings.CD_UID})*\n"
+    text += f"DELETE({order.pk})*\n"
+    text += collect_cd_info(
+        pk=order.pk, origin=order.origin, destination=order.destination, carrier_pay=order.payment_carrier_pay,
+        cod_to_carrier=order.payment_cod_to_carrier, trailer_type=order.trailer_type, condition=order.condition,
+        available_date=order.date_est_ship, last_date=order.date_est_ship, comment=order.cd_note,
+        vehicles=order.order_vehicles.all(), is_cash=True
+    )
+    logging.info(f"Reposted to CD: {order.pk} | {text}")
+
+
+def delete_cd(order: Order):
+    text = f"UID({settings.CD_UID})*\n"
+    text += f"DELETE({order.pk})*"
+    logging.info(f"Deleted to CD: {order.pk} | {text}")
+

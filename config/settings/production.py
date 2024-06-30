@@ -81,6 +81,12 @@ EMAIL_SUBJECT_PREFIX = env(
     "DJANGO_EMAIL_SUBJECT_PREFIX",
     default="[ShipMate] ",
 )
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = CD_EMAIL
+EMAIL_HOST_PASSWORD = CD_EMAIL_PASSWORD
+DEFAULT_FROM_EMAIL = CD_EMAIL
 
 # ADMIN
 # ------------------------------------------------------------------------------
@@ -94,7 +100,8 @@ INSTALLED_APPS += ["anymail"]  # noqa: F405
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 # https://anymail.readthedocs.io/en/stable/esps
-EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
 ANYMAIL = {
     "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
     "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),

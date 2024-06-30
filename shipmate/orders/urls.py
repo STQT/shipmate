@@ -11,7 +11,7 @@ from .views import (
     OrderAttachmentListView, DispatchingOrderCreateAPIView, ListOrderLogAPIView, DirectDispatchOrderCreateAPIView,
     ConvertQuoteToOrderAPIView, BackToQuoteOrderAPIView, PostToCDAPIView, CreateOrderContractAPIView,
     ListOrderContractView, DetailOrderContractView, SignOrderContractView, ReAssignOrderView, ArchiveOrderView,
-    ListTeamOrdersAPIView
+    ListTeamOrdersAPIView, SendSmsToContract
 )
 
 urlpatterns = [
@@ -31,6 +31,7 @@ urlpatterns = [
     path('contracts/list/<uuid:order>/', ListOrderContractView.as_view(),
          name='order-contract-list'),
     path('contracts/add/', CreateOrderContractAPIView.as_view(), name='order-add-contract'),
+    path('contracts/sms/<int:contract>/', SendSmsToContract.as_view(), name='order-send-contract-sms'),
     path('contracts/sign/<uuid:order>/<int:contract>/', SignOrderContractView.as_view(),
          name='order-contract-sign'),
     path('contracts/<uuid:order>/<int:contract>/', DetailOrderContractView.as_view(),

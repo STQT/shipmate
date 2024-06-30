@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models, transaction
 from django.db.models import Prefetch
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from django.core.mail import EmailMessage
 from rest_framework import status
@@ -21,8 +22,9 @@ from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroy
 from .models import Order, OrderAttachment, OrderLog
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contract.models import Hawaii, Ground, International
+from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
 from ..contrib.pagination import CustomPagination
-from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
+from ..contrib.sms import send_sms
 from ..contrib.views import ArchiveView, ReAssignView
 from ..leads.serializers import LogSerializer
 from ..leads.views import ListTeamLeadAPIView
@@ -181,7 +183,7 @@ class CreateVehicleOrderAPIView(CreateAPIView):  # noqa
 @extend_schema(tags=[CONTRACTS_TAG])
 class CreateOrderContractAPIView(CreateAPIView):  # noqa
     queryset = OrderContract.objects.all()
-    serializer_class = OrderContractSerializer
+    serializer_class = CreateOrderContractSerializer
 
 
 @extend_schema(tags=[CONTRACTS_TAG])
@@ -208,6 +210,9 @@ class SignOrderContractView(APIView):
     def post(self, request, order, contract):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
+            agreement = serializer.validated_data.pop('agreement')
+            terms = serializer.validated_data.pop('terms')
+            print(serializer.validated_data)
             try:
                 contract_obj = OrderContract.objects.get(id=contract)
             except OrderContract.DoesNotExist:
@@ -218,8 +223,11 @@ class SignOrderContractView(APIView):
             if order_obj.guid != order:
                 logger.error(f"Order with guid {order} not found")
                 return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
-
             contract_obj.signed = True
+            contract_obj.signer_name = serializer.validated_data['signer_name']
+            contract_obj.signer_initials = serializer.validated_data['signer_initials']
+            contract_obj.sign_ip_address = request.META.get('REMOTE_ADDR')
+            contract_obj.signed_time = timezone.now()
             contract_obj.save()
 
             if order_obj.status == OrderStatusChoices.ORDERS:
@@ -228,8 +236,7 @@ class SignOrderContractView(APIView):
 
             # Send email with ZIP attachment
             customer_email = order_obj.customer.email
-            agreement = serializer.validated_data['agreement']
-            terms = serializer.validated_data['terms']
+
             email = EmailMessage(
                 subject='Signed Contract and Terms',
                 from_email=settings.DEFAULT_FROM_EMAIL,
@@ -247,7 +254,7 @@ class SignOrderContractView(APIView):
                 logger.error(f"From email: {settings.DEFAULT_FROM_EMAIL}")
                 return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return Response(status=status.HTTP_200_OK)
+            return Response(self.serializer_class(contract_obj).data, status=status.HTTP_200_OK)
 
         logger.error(f"Invalid data: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -380,19 +387,30 @@ class BackToQuoteOrderAPIView(CreateAPIView):
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)
 
 
-@extend_schema(responses={200: RetrieveOrderSerializer})
 class PostToCDAPIView(CreateAPIView):
-    serializer_class = None
+    serializer_class = PostCDSerializer
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        order_id = self.kwargs.get('guid')
-        order = get_object_or_404(Order, guid=order_id)
-        serializer_class = RetrieveOrderSerializer(order, data={'status': OrderStatusChoices.POSTED}, partial=True)
-        serializer_class.is_valid(raise_exception=True)
-        serializer_class.save()
-        # TODO: add dispatching request to CD
-
-        return Response(serializer_class.data, status=status.HTTP_200_OK)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            order_id = self.kwargs.get('guid')
+            order = get_object_or_404(Order, guid=order_id)
+            order.status = OrderStatusChoices.POSTED
+            action = serializer.data['action']
+            response_data = serializer.data
+            response_data['status'] = OrderStatusChoices.POSTED
+            if action == CDActions.REPOST.value:
+                repost_cd(order)
+            elif action == CDActions.POST.value:
+                post_cd(order)
+            else:
+                delete_cd(order)
+                order.status = OrderStatusChoices.BOOKED
+                response_data['status'] = OrderStatusChoices.BOOKED
+            order.save()
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=[REASON_TAG])
@@ -412,3 +430,14 @@ class ArchiveOrderView(ArchiveView):
 
 class ListTeamOrdersAPIView(ListTeamLeadAPIView):
     serializer_class = ListOrdersTeamSerializer
+
+
+class SendSmsToContract(CreateAPIView):
+    serializer_class = None
+
+    def create(self, request, *args, **kwargs):
+        contract_id = self.kwargs.get('contract')
+        contract = get_object_or_404(OrderContract, id=contract_id)
+        text = "Test message"
+        # send_sms(settings.FROM_PHONE, contract.order.customer.phone, text)
+        return Response(status=status.HTTP_201_CREATED)

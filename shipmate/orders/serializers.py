@@ -1,3 +1,5 @@
+from enum import Enum
+
 from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
@@ -13,6 +15,12 @@ from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
 from ..users.serializers import ListUserSerializer
+
+
+class CDActions(Enum):
+    POST = "post"
+    REPOST = "repost"
+    DELETE = "delete"
 
 
 class CreateVehicleOrderSerializer(serializers.ModelSerializer):
@@ -220,6 +228,12 @@ class OrderContractSerializer(serializers.ModelSerializer):
         return "NaN"
 
 
+class CreateOrderContractSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderContract
+        fields = ("contract_type", "order")
+
+
 class RetrieveOrderSerializer(ListOrderSerializer):
     customer = CustomerSerializer(many=False)  # noqa
     origin = CitySerializer(many=False)
@@ -289,9 +303,14 @@ class DetailContractSerializer(serializers.Serializer):
     pdf = BaseContractSerializer(read_only=True)
 
 
-class SigningContractSerializer(serializers.Serializer):
-    agreement = serializers.FileField()
-    terms = serializers.FileField()
+class SigningContractSerializer(serializers.ModelSerializer):
+    agreement = serializers.FileField(write_only=True)
+    terms = serializers.FileField(write_only=True)
+
+    class Meta:
+        model = OrderContract
+        exclude = ("created_at", "order", "contract_type")
+        read_only_fields = ["sign_ip_address", "signed_time", "signed"]
 
 
 class ListOrdersUserSerializer(ListLeadUserSerializer):
@@ -303,3 +322,8 @@ class ListOrdersUserSerializer(ListLeadUserSerializer):
 
 class ListOrdersTeamSerializer(ListLeadTeamSerializer):
     users = ListOrdersUserSerializer(many=True)
+
+
+class PostCDSerializer(serializers.Serializer):
+    status = serializers.CharField(read_only=True)
+    action = serializers.ChoiceField(choices=[(tag.value, tag.name.title()) for tag in CDActions], required=True)

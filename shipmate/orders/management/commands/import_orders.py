@@ -37,6 +37,7 @@ def read_csv(filename):
                 print(f"Skipping row due to incorrect number of fields: {row}")
     return header, data
 
+
 username_mapper = {
     'Addison.oblog': 'info@oceanbluego.com',
     'Grace.oblog': 'grace@oceanbluego.com',
@@ -260,11 +261,11 @@ class Command(BaseCommand):
                 vehicle_year = 2024
 
             car_mark, _created = CarMarks.objects.get_or_create(
-                name=vehicle['make'], defaults={"is_active": True}
+                name=vehicle['make'].capitalize(), defaults={"is_active": True}
             )
             car_model, _created = CarsModel.objects.get_or_create(
                 mark=car_mark,
-                name=vehicle['model'], vehicle_type=vehicle['type'])
+                name=vehicle['model'].capitalize(), vehicle_type=vehicle['type'])
             vehicle_data = {
                 field: rel,
                 "vehicle_year": vehicle_year,

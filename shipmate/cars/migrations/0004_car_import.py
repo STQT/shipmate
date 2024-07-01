@@ -31,5 +31,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_mock_data, reverse_func),
+        # migrations.RunPython(create_mock_data, reverse_func), # FIX: remove for next fix code's
     ]

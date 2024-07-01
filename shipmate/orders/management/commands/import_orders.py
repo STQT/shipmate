@@ -17,7 +17,7 @@ from shipmate.lead_managements.models import Provider
 
 User = get_user_model()
 
-DEFAULT_ESTIMATED_SHIP_DATE = "27-05-2024"
+DEFAULT_ESTIMATED_SHIP_DATE = "01-06-2024"
 
 
 def read_csv(filename):
@@ -38,25 +38,42 @@ def read_csv(filename):
     return header, data
 
 
+# username_mapper = {
+#     'Addison.oblog': 'info@oceanbluego.com',
+#     'Grace.oblog': 'grace@oceanbluego.com',
+#     'John.oblog': 'john@oceanbluego.com',
+#     'Michael.oblog': 'info@oceanbluego.com',
+#     'Dina.oblog': 'info@oceanbluego.com',
+#     '\\N': 'info@oceanbluego.com',
+#     '': 'info@oceanbluego.com',
+#     'Albert.mob': 'info@oceanbluego.com',
+#     'Anne.oblog': 'info@oceanbluego.com',
+#     'Mike.oblog': 'info@oceanbluego.com',
+#     'Steve': 'info@oceanbluego.com',
+#     'Sam': 'info@oceanbluego.com',
+#     'developer': 'info@oceanbluego.com',
+#     'Frank.oblog': 'info@oceanbluego.com',
+#     'Jane.oblog': 'info@oceanbluego.com',
+#     'Kevin.oblog': 'info@oceanbluego.com',
+#     'Leo.oblog': 'info@oceanbluego.com',
+#     'Lucas.oblog': 'info@oceanbluego.com'
+# }
+
+
 username_mapper = {
-    'Addison.oblog': 'info@oceanbluego.com',
-    'Grace.oblog': 'grace@oceanbluego.com',
-    'John.oblog': 'john@oceanbluego.com',
-    'Michael.oblog': 'info@oceanbluego.com',
-    'Dina.oblog': 'info@oceanbluego.com',
-    '\\N': 'info@oceanbluego.com',
-    '': 'info@oceanbluego.com',
-    'Albert.mob': 'info@oceanbluego.com',
-    'Anne.oblog': 'info@oceanbluego.com',
-    'Mike.oblog': 'info@oceanbluego.com',
-    'Steve': 'info@oceanbluego.com',
-    'Sam': 'info@oceanbluego.com',
-    'developer': 'info@oceanbluego.com',
-    'Frank.oblog': 'info@oceanbluego.com',
-    'Jane.oblog': 'info@oceanbluego.com',
-    'Kevin.oblog': 'info@oceanbluego.com',
-    'Leo.oblog': 'info@oceanbluego.com',
-    'Lucas.oblog': 'info@oceanbluego.com'
+    'Ronald.matelog': 'Ronald@gmail.com',
+    'Scott.matelog': 'scott@matelogisticss.com',
+    'developer': 'brian@matelogisticss.com',
+    'James.matelog': 'brian@matelogisticss.com',
+    '\\N': 'brian@matelogisticss.com',
+    'Daniel.matelog': 'daniel@matelogisticss.com',
+    'Tony.matelog': 'brian@matelogisticss.com',
+    'Rachael.matelog': 'brian@matelogisticss.com',
+    'Richard.matelog': 'brian@matelogisticss.com',
+    'Ali.matelog': 'brian@matelogisticss.com',
+    'Patrick.matelog': 'brian@matelogisticss.com',
+    'Sean.matelog': 'brian@matelogisticss.com',
+    'Ben.matelog': 'brian@matelogisticss.com'
 }
 
 QUOTE_MAPPER = {
@@ -158,7 +175,7 @@ class Command(BaseCommand):
             try:
                 user_name: str = row[20]
             except IndexError:
-                user_name: str = "Addison.oblog"
+                user_name: str = "Ali.matelog"  # "Addison.oblog"
             user_email_str: str = username_mapper[user_name]
             user, _created = User.objects.get_or_create(
                 email=user_email_str, defaults={

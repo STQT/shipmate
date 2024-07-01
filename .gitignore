@@ -332,3 +332,4 @@ shipmate/media/
 .ipython/
 .env
 .envs/.production/*
+.envs/.matecrm/*

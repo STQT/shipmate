@@ -55,31 +55,6 @@ data_mapper = {
 #     return lead_data
 
 
-def import_lead_data(original):
-    lead_data = parse_and_update_leads(original)
-
-    for key, value in lead_data.items():
-        item = LeadParsingItem.objects.filter(name=key).first()
-        if item:
-            LeadParsingValue.objects.get_or_create(item=item, value=value)
-            print(f'Set value "{value}" for item "{key}"')
-
-    # Create or update Leads and LeadVehicles instances
-    lead, created = Leads.objects.update_or_create(
-        guid=lead_data.get('guid', uuid.uuid4()),
-        defaults=lead_data
-    )
-
-    # Example of handling LeadVehicles (assuming vehicle data is included in lead_data)
-    for vehicle_key in ['vehicle',
-                        'vehicle2', 'vehicle3']:
-        vehicle_data = {k.split('__')[1]: v for k, v in lead_data.items() if k.startswith(vehicle_key)}
-        if vehicle_data:
-            LeadVehicles.objects.update_or_create(lead=lead, defaults=vehicle_data)
-
-    return lead
-
-
 text = """
 Salom
 Origin City: Gayrat Sultonov

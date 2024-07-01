@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from shipmate.cars.models import CarsModel, CarMarks
 from shipmate.contrib.db import update_sequences
 from shipmate.orders.models import Order, OrderVehicles
-from shipmate.quotes.models import Quote, QuoteVehicles
+from shipmate.quotes.models import Quote, QuoteVehicles, QuoteDates
 from shipmate.contrib.models import OrderStatusChoices, QuoteStatusChoices, TrailerTypeChoices, ConditionChoices
 from shipmate.addresses.models import City, States
 from shipmate.customers.models import Customer
@@ -231,8 +231,10 @@ class Command(BaseCommand):
                         destination=destination,
                         trailer_type=ship_via_id,
                         condition=vehicle_runs,
-
                     )
+                    QuoteDates.objects.get_or_create(quote=quote, defaults={
+                        "quoted": date_entered
+                    })
                 except Exception as e:
                     print(f"Exceptioned quote: {e} {e.args}", row)
                     continue

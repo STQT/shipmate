@@ -3,6 +3,7 @@ from django.conf import settings
 
 from shipmate.contrib.email import fetch_emails
 from shipmate.mails.models import Mail
+from shipmate.mails.utils import parsing_email
 
 
 @shared_task
@@ -20,3 +21,4 @@ def fetch_emails_task():
                 'body': email.body,
             }
             Mail.objects.create(**data)
+            parsing_email(email.body, email.sender)

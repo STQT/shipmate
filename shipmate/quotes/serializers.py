@@ -87,7 +87,12 @@ class ListQuoteSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_customer_name(cls, obj) -> str:
-        return obj.customer.name if obj.customer else "NaN"
+        customer = obj.customer
+        if not obj.customer:
+            return "NaN"
+        name = customer.name
+        last_name = customer.last_name if customer.last_name else ""
+        return name + " " + last_name
 
     @classmethod
     def get_customer_phone(cls, obj) -> str:

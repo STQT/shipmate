@@ -136,9 +136,11 @@ class Command(BaseCommand):
             vehicles_str: str = row[6]
             vehicles: list[dict] = json.loads(vehicles_str)
             pickup_zip: str = row[7][:5] if row[7][:5].isdigit() else "00000"  # 95014
+            pickup_zip = pickup_zip.zfill(5)
             pickup_city: str = row[8].capitalize()  # CUPERTINO
             pickup_state_code: str = row[9]  # CA
             dropoff_zip: str = row[10][:5] if row[10][:5].isdigit() else "00000"  # 76134
+            dropoff_zip = dropoff_zip.zfill(5)
             dropoff_city: str = row[11].capitalize() if len(row[11]) < 100 else "None"  # FORTWORTH
             dropoff_state_code: str = row[12]  # TX
             price_total_total = row[13]

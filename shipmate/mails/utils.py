@@ -158,14 +158,14 @@ def handle_special_fields(text, field, value):
 
 
 def get_city(zip, state_code, city):
-    city_qs = City.objects.filter(zip=zip)  # noqa
+    city_qs = City.objects.filter(zip=zip.zfill(5))  # noqa
     if city_qs.exists():
         city_obj = city_qs.first()
     else:
         destination_state, _created = States.objects.get_or_create(
             code=state_code, defaults={"name": state_code})
         city_obj, _created = City.objects.get_or_create(
-            zip=zip, defaults={"name": city, "state": destination_state}
+            zip=zip.zfill(5), defaults={"name": city, "state": destination_state}
         )
     return city_obj
 
@@ -182,7 +182,7 @@ def parsing_email(text, email):
     try:
         source = Provider.objects.get(email=email)
     except Provider.DoesNotExist:
-        source = Provider.objects.first()
+        return
     # TODO set user with logic prodiver exclusive user
     data["user"] = User.objects.get(pk=1)
     data["source"] = source

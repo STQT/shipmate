@@ -179,7 +179,10 @@ def get_car_model(name, vehicle_type, mark_name):
 def parsing_email(text, email):
     data = {}
     values = LeadParsingValue.objects.all()
-    source = Provider.objects.get(email=email)
+    try:
+        source = Provider.objects.get(email=email)
+    except Provider.DoesNotExist:
+        source = Provider.objects.first()
     # TODO set user with logic prodiver exclusive user
     data["user"] = User.objects.get(pk=1)
     data["source"] = source

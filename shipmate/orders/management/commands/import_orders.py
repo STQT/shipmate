@@ -226,6 +226,7 @@ class Command(BaseCommand):
                 try:
                     quote = Quote.objects.create(
                         created_at=date_entered,
+                        updated_at=date_entered,
                         status=QUOTE_MAPPER[lead_status],
                         price=price_total_total,
                         reservation_price=reservation_price,

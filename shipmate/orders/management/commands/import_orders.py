@@ -180,6 +180,8 @@ class Command(BaseCommand):
                 user_name: str = row[20]
             except IndexError:
                 user_name: str = "Ali.matelog"  # "Addison.oblog"
+            if not user_name:
+                user_name: str = "Ali.matelog"
             user_email_str: str = username_mapper[user_name]
             user, _created = User.objects.get_or_create(
                 email=user_email_str, defaults={

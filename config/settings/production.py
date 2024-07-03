@@ -107,7 +107,6 @@ ANYMAIL = {
     "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
 }
 
-
 # LOGGING
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
@@ -173,11 +172,17 @@ REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] = ("rest_framework.permissions.IsAu
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
     {"url": "https://crmapi01xz.matelogisticss.com", "description": "Development server"},
-    {"url": "https://api.ocean.connectacrm.com", "description": "Production server"},
+    {"url": "https://api.ocean.connectacrm.com", "description": "Ocean CRM server"},
+    {"url": "https://api.mate.connectacrm.com", "description": "Mate CRM server"},
+
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
-CSRF_TRUSTED_ORIGINS = ["https://crmapi01xz.matelogisticss.com", "https://api.ocean.connectacrm.com"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://crmapi01xz.matelogisticss.com",
+    "https://api.ocean.connectacrm.com",
+    "https://api.mate.connectacrm.com",
+]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:3000',

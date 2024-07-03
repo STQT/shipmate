@@ -121,7 +121,7 @@ class Command(BaseCommand):
         json_file_path = kwargs['csv_file']  # noqa
         header, data = read_csv(json_file_path)
         for num, row in enumerate(data):
-            date_entered: datetime = datetime.strptime(row[1], "%d/%m/%Y %H:%M:%S")  # "%Y-%m-%d %H:%M:%S"
+            date_entered: datetime = datetime.strptime(row[1], "%Y/%m/%d %H:%M:%S")  # "%Y-%m-%d %H:%M:%S"
             phone: str = row[2]  # 2395608470
             email: str = row[3]  # amkania@yahoo.com
             if not email:

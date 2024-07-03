@@ -55,7 +55,6 @@ data_mapper = {
     '{notes}': 'notes'
 }
 
-
 # def parse_and_update_leads(original):
 #     lines = original.strip().split('\n')
 #     lead_data = {}
@@ -98,6 +97,34 @@ data_mapper = {
 # Requested On: 07/01/2024 05:37:05 AM
 # ID:1379918
 # """
+text = """
+First Name: JOHN
+Last Name: BRENNAN
+Email: Jbren82364@aol.com
+Phone: (201) 428-7324
+Type: Coupe
+Year: 2022
+Make: Mini
+Model: Cooper
+Running Condition: Running
+Type Of Carrier: Open
+Vehicle #2 Type:
+Vehicle #2 Year:
+Vehicle #2 Make:
+Vehicle #2 Model:
+Vehicle #2 Running Condition:
+Vehicle #2 Type Of Carrier:
+Origin City: Tempe
+Origin State: AZ
+Origin Zip: 85288
+Destination City: North Arlington
+Destination State: NJ
+Destination Zip: 07031
+Proposed Ship Date: 07/15/2024
+Comments:
+Requested On: 07/01/2024 08:10:00 PM
+ID:1380158
+"""
 
 
 def finding_text(original, finding_text_original) -> int:
@@ -177,6 +204,7 @@ def get_car_model(name, vehicle_type, mark_name):
 
 
 def parsing_email(text, email):
+    print("START")
     data = {}
     values = LeadParsingValue.objects.all()
     try:
@@ -192,6 +220,7 @@ def parsing_email(text, email):
     customer_data = {}
     origin_data = {}
     destination_data = {}
+
     for v in values:
         item = v.item.name
         value = v.value
@@ -219,8 +248,14 @@ def parsing_email(text, email):
     destination = get_city(destination_data['zip'],
                            destination_data['state_code'],
                            destination_data['city'])
-
-    customer, _created = Customer.objects.get_or_create(**customer_data)
+    customer, _created = Customer.objects.get_or_create(email=customer_data.get('email',
+                                                                                customer_data['phone'] + "@gmail.com"),
+                                                        defaults=
+                                                        {"phone": customer_data['phone'],
+                                                         "name": customer_data['name'],
+                                                         "last_name": customer_data['last_name']
+                                                         }
+                                                        )
     try:
         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
     except ValidationError:

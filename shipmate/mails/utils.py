@@ -1,15 +1,17 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from shipmate.addresses.models import City, States
+from shipmate.attachments.models import EmailAttachment
 from shipmate.cars.models import CarsModel, CarMarks
 from shipmate.company_management.models import LeadParsingValue
 from shipmate.contrib.models import ConditionChoices, TrailerTypeChoices
 from shipmate.customers.models import Customer
 from shipmate.lead_managements.models import Provider
-from shipmate.leads.models import LeadVehicles, Leads
+from shipmate.leads.models import LeadVehicles, Leads, LeadsAttachment
 
 User = get_user_model()
 
@@ -203,7 +205,7 @@ def get_car_model(name, vehicle_type, mark_name):
     return model
 
 
-def parsing_email(text, email):
+def parsing_email(text, email, subject=""):
     data = {}
     values = LeadParsingValue.objects.all()
     try:
@@ -269,6 +271,11 @@ def parsing_email(text, email):
         condition=ConditionChoices.DRIVES if vehicle1['condition'] == "Running" else ConditionChoices.ROLLS,
         trailer_type=TrailerTypeChoices.OPEN if vehicle1['trailer_type'] == "Open" else TrailerTypeChoices.CLOSE,
         **data)
+    email_attach = EmailAttachment.objects.create(from_email=email, to_email=[settings.IMAP_EMAIL_USER],
+                                                  subject=subject)
+    LeadsAttachment.objects.create(lead=lead, title="Subject: " + subject,
+                                   type=LeadsAttachment.TypesChoices.EMAIL, link=email_attach.pk)
+
     car_model = get_car_model(vehicle1['model'], vehicle1['vehicle_type'], vehicle1['make'])
     LeadVehicles.objects.create(lead=lead, vehicle=car_model, vehicle_year=vehicle1['year'])
     if vehicle2:

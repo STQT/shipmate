@@ -109,18 +109,18 @@ class CentralDispatch:
 
 def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum, vehicles_count: int):
     cd_vehicle_type_mapping = {
-        Type.VehicleType.Car: CarsModel.VehicleTYPES.CAR,
-        Type.VehicleType.Boat: CarsModel.VehicleTYPES.BOAT,
-        Type.VehicleType.ATV: CarsModel.VehicleTYPES.ATV,
-        Type.VehicleType.Large_Yacht: CarsModel.VehicleTYPES.LARGE,
-        Type.VehicleType.Heavy_Equipment: CarsModel.VehicleTYPES.HEAVY,
-        Type.VehicleType.Motorcycle: CarsModel.VehicleTYPES.MOTORCYCLE,
-        Type.VehicleType.Pickup: CarsModel.VehicleTYPES.PICKUP,
-        Type.VehicleType.RV: CarsModel.VehicleTYPES.RV,
-        Type.VehicleType.SUV: CarsModel.VehicleTYPES.SUV,
-        Type.VehicleType.Travel_Trailer: CarsModel.VehicleTYPES.TRAVEL,
-        Type.VehicleType.Van: CarsModel.VehicleTYPES.VAN,
-        Type.VehicleType.Other: CarsModel.VehicleTYPES.OTHER,
+        Type.VehicleType.Car.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.Boat.value: CarsModel.VehicleTYPES.BOAT,
+        Type.VehicleType.ATV.value: CarsModel.VehicleTYPES.ATV,
+        Type.VehicleType.Large_Yacht.value: CarsModel.VehicleTYPES.LARGE,
+        Type.VehicleType.Heavy_Equipment.value: CarsModel.VehicleTYPES.HEAVY,
+        Type.VehicleType.Motorcycle.value: CarsModel.VehicleTYPES.MOTORCYCLE,
+        Type.VehicleType.Pickup.value: CarsModel.VehicleTYPES.PICKUP,
+        Type.VehicleType.RV.value: CarsModel.VehicleTYPES.RV,
+        Type.VehicleType.SUV.value: CarsModel.VehicleTYPES.SUV,
+        Type.VehicleType.Travel_Trailer.value: CarsModel.VehicleTYPES.TRAVEL,
+        Type.VehicleType.Van.value: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.Other.value: CarsModel.VehicleTYPES.OTHER,
 
     }
 
@@ -185,4 +185,3 @@ def delete_cd(order: Order):
     text = f"UID({settings.CD_UID})*\n"
     text += f"DELETE({order.pk})*"
     logging.info(f"Deleted to CD: {order.pk} | {text}")
-

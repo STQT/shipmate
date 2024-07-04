@@ -7,4 +7,4 @@ urlpatterns = [
     path('list/', StaticDictView.as_view(), name='static-dict'),
     path('cd-price/<str:obj>/<uuid:guid>/', GetCDPriceAPIView.as_view(), name='cd-price-dict'),
 ]
-parsing_email(text, email="A01@email.com")
+# parsing_email(text, email="A01@email.com")

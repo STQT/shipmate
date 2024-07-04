@@ -121,7 +121,6 @@ def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum,
         Type.VehicleType.Travel_Trailer.value: CarsModel.VehicleTYPES.TRAVEL,
         Type.VehicleType.Van.value: CarsModel.VehicleTYPES.VAN,
         Type.VehicleType.Other.value: CarsModel.VehicleTYPES.OTHER,
-
     }
 
     form = Type.CentralDispatchForm(

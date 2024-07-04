@@ -18,6 +18,6 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'fetch_emails_periodically': {
         'task': 'shipmate.mails.tasks.fetch_emails_task',
-        'schedule': 60,  # Fetch emails every 60 seconds
+        'schedule': 10,  # Fetch emails every 60 seconds
     },
 }

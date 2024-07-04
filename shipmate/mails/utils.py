@@ -98,37 +98,32 @@ data_mapper = {
 # ID:1379918
 # """
 text = """
-** Please do not reply to this email. It was sent from an unattended mailbox,
-and replies are not reviewed. See below for contact information. **
-
-Dear Ocean Blue Logistics (prev. Unlimited Distance Transportation Inc),
-
-Congratulations, REMM TRANSPORTATION LLC has agreed to move your vehicle or
-vehicles and has electronically signed your dispatch sheet. A summary of the
-order is below:
-
-  Order ID: 30521154ob0
-  Pickup: charlotte, NC 28206
-  Delivery: murfreesboro, TN 37128
-  Vehicle:
-  Ship Via: Open
-  Vehicles Run: Yes
-  Pickup Estimated: 2024-07-05
-  Carrier Pay: 400
-  Driver:
-  Driver Phone:
-  Dispatch Instructions: Cod is $450 and you will send us $50 broker fee by
-Zelle: payment@oceanbluego.com
-
-View the full dispatch sheet online at:
-    https://site.centraldispatch.com/protected/dispatch/view?dsid=41751849
-
-**********
-Questions about Central Dispatch? Feel free to request support at:
-    http://site.centraldispatch.com/contact-us
-If you no longer wish to receive these email notifications, update your
-profile by un-checking "Email Me All Dispatch Updates".
-
+First Name: Test 01
+Last Name: Test
+Email: test01@icloud.com <paigedpatrick@icloud.com>
+Phone: (210) 862-3422
+Type: Sedan Small
+Year: 2007
+Make: Toyota
+Model: Prius
+Running Condition: Running
+Type Of Carrier: Enclosed
+Vehicle #2 Type:
+Vehicle #2 Year:
+Vehicle #2 Make:
+Vehicle #2 Model:
+Vehicle #2 Running Condition:
+Vehicle #2 Type Of Carrier:
+Origin City: RICHMOND
+Origin State: CA
+Origin Zip: 94804
+Destination City: AUSTIN
+Destination State: TX
+Destination Zip: 78713
+Proposed Ship Date: 07/08/2024
+Comments:
+Requested On: 07/04/2024 07:00:59 AM
+ID:1380659
 """
 
 
@@ -212,10 +207,10 @@ def parsing_email(text, email):
     print("START")
     data = {}
     values = LeadParsingValue.objects.all()
-    try:
-        source = Provider.objects.get(email=email)
-    except Provider.DoesNotExist:
-        return
+    # try:
+    source = Provider.objects.get(email=email)
+    # except Provider.DoesNotExist:
+    #     return
     # TODO set user with logic prodiver exclusive user
     data["user"] = User.objects.get(pk=1)
     data["source"] = source
@@ -261,13 +256,13 @@ def parsing_email(text, email):
                                                          "last_name": customer_data['last_name']
                                                          }
                                                         )
-    try:
-        data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
-    except ValidationError:
-        try:
-            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
-        except ValidationError:
-            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
+    # try:
+    data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
+    # except ValidationError:
+    #     try:
+    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
+    #     except ValidationError:
+    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
     lead = Leads.objects.create(
         customer=customer,
         origin=origin,

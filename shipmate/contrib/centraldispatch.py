@@ -109,18 +109,18 @@ class CentralDispatch:
 
 def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum, vehicles_count: int):
     cd_vehicle_type_mapping = {
-        CarsModel.VehicleTYPES.CAR: Type.VehicleType.Car,
-        CarsModel.VehicleTYPES.BOAT: Type.VehicleType.Boat,
-        CarsModel.VehicleTYPES.ATV: Type.VehicleType.ATV,
-        CarsModel.VehicleTYPES.LARGE: Type.VehicleType.Large_Yacht,
-        CarsModel.VehicleTYPES.HEAVY: Type.VehicleType.Heavy_Equipment,
-        CarsModel.VehicleTYPES.MOTORCYCLE: Type.VehicleType.Motorcycle,
-        CarsModel.VehicleTYPES.PICKUP: Type.VehicleType.Pickup,
-        CarsModel.VehicleTYPES.RV: Type.VehicleType.RV,
-        CarsModel.VehicleTYPES.SUV: Type.VehicleType.SUV,
-        CarsModel.VehicleTYPES.TRAVEL: Type.VehicleType.Travel_Trailer,
-        CarsModel.VehicleTYPES.VAN: Type.VehicleType.Van,
-        CarsModel.VehicleTYPES.OTHER: Type.VehicleType.Other,
+        Type.VehicleType.Car: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.Boat: CarsModel.VehicleTYPES.BOAT,
+        Type.VehicleType.ATV: CarsModel.VehicleTYPES.ATV,
+        Type.VehicleType.Large_Yacht: CarsModel.VehicleTYPES.LARGE,
+        Type.VehicleType.Heavy_Equipment: CarsModel.VehicleTYPES.HEAVY,
+        Type.VehicleType.Motorcycle: CarsModel.VehicleTYPES.MOTORCYCLE,
+        Type.VehicleType.Pickup: CarsModel.VehicleTYPES.PICKUP,
+        Type.VehicleType.RV: CarsModel.VehicleTYPES.RV,
+        Type.VehicleType.SUV: CarsModel.VehicleTYPES.SUV,
+        Type.VehicleType.Travel_Trailer: CarsModel.VehicleTYPES.TRAVEL,
+        Type.VehicleType.Van: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.Other: CarsModel.VehicleTYPES.OTHER,
 
     }
 

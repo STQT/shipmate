@@ -45,7 +45,7 @@ class GetCDPriceAPIView(APIView):
             rel_obj.origin.zip,
             rel_obj.destination.zip,
             False if rel_obj.trailer_type == TrailerTypeChoices.OPEN else True,
-            vehicles_list.all()[0].vehicle.vehicle_type if vehicles_list.all() else 1,
+            vehicles_list.all()[0].vehicle.vehicle_type if vehicles_list.all() else "car",
             vehicles_list.count()
         )
         collected_data = {

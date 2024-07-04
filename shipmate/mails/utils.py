@@ -98,32 +98,37 @@ data_mapper = {
 # ID:1379918
 # """
 text = """
-First Name: JOHN
-Last Name: BRENNAN
-Email: Jbren82364@aol.com
-Phone: (201) 428-7324
-Type: Coupe
-Year: 2022
-Make: Mini
-Model: Cooper
-Running Condition: Running
-Type Of Carrier: Open
-Vehicle #2 Type:
-Vehicle #2 Year:
-Vehicle #2 Make:
-Vehicle #2 Model:
-Vehicle #2 Running Condition:
-Vehicle #2 Type Of Carrier:
-Origin City: Tempe
-Origin State: AZ
-Origin Zip: 85288
-Destination City: North Arlington
-Destination State: NJ
-Destination Zip: 07031
-Proposed Ship Date: 07/15/2024
-Comments:
-Requested On: 07/01/2024 08:10:00 PM
-ID:1380158
+** Please do not reply to this email. It was sent from an unattended mailbox,
+and replies are not reviewed. See below for contact information. **
+
+Dear Ocean Blue Logistics (prev. Unlimited Distance Transportation Inc),
+
+Congratulations, REMM TRANSPORTATION LLC has agreed to move your vehicle or
+vehicles and has electronically signed your dispatch sheet. A summary of the
+order is below:
+
+  Order ID: 30521154ob0
+  Pickup: charlotte, NC 28206
+  Delivery: murfreesboro, TN 37128
+  Vehicle:
+  Ship Via: Open
+  Vehicles Run: Yes
+  Pickup Estimated: 2024-07-05
+  Carrier Pay: 400
+  Driver:
+  Driver Phone:
+  Dispatch Instructions: Cod is $450 and you will send us $50 broker fee by
+Zelle: payment@oceanbluego.com
+
+View the full dispatch sheet online at:
+    https://site.centraldispatch.com/protected/dispatch/view?dsid=41751849
+
+**********
+Questions about Central Dispatch? Feel free to request support at:
+    http://site.centraldispatch.com/contact-us
+If you no longer wish to receive these email notifications, update your
+profile by un-checking "Email Me All Dispatch Updates".
+
 """
 
 

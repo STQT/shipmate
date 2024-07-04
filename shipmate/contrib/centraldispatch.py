@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 from shipmate.addresses.models import City
+from shipmate.cars.models import CarsModel
 from shipmate.contrib.models import ConditionChoices
 from shipmate.leads.models import LeadVehicles
 from shipmate.orders.models import Order
@@ -107,15 +108,26 @@ class CentralDispatch:
 
 
 def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum, vehicles_count: int):
-    cd_vehicle_type = Type.VehicleType.Car
-    for t in Type.VehicleType:
-        if t.value.lower() == vehicle_type:
-            cd_vehicle_type = t.value
+    cd_vehicle_type_mapping = {
+        CarsModel.VehicleTYPES.CAR: Type.VehicleType.Car,
+        CarsModel.VehicleTYPES.BOAT: Type.VehicleType.Boat,
+        CarsModel.VehicleTYPES.ATV: Type.VehicleType.ATV,
+        CarsModel.VehicleTYPES.LARGE: Type.VehicleType.Large_Yacht,
+        CarsModel.VehicleTYPES.HEAVY: Type.VehicleType.Heavy_Equipment,
+        CarsModel.VehicleTYPES.MOTORCYCLE: Type.VehicleType.Motorcycle,
+        CarsModel.VehicleTYPES.PICKUP: Type.VehicleType.Pickup,
+        CarsModel.VehicleTYPES.RV: Type.VehicleType.RV,
+        CarsModel.VehicleTYPES.SUV: Type.VehicleType.SUV,
+        CarsModel.VehicleTYPES.TRAVEL: Type.VehicleType.Travel_Trailer,
+        CarsModel.VehicleTYPES.VAN: Type.VehicleType.Van,
+        CarsModel.VehicleTYPES.OTHER: Type.VehicleType.Other,
+
+    }
 
     form = Type.CentralDispatchForm(
         postalCode=(o_zip, d_zip),
         enclosed=enclosed,
-        vehicleType=cd_vehicle_type,
+        vehicleType=cd_vehicle_type_mapping[vehicle_type],
         num_vehicles=vehicles_count
     )
 

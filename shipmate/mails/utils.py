@@ -204,13 +204,12 @@ def get_car_model(name, vehicle_type, mark_name):
 
 
 def parsing_email(text, email):
-    print("START")
     data = {}
     values = LeadParsingValue.objects.all()
-    # try:
-    source = Provider.objects.get(email=email)
-    # except Provider.DoesNotExist:
-    #     return
+    try:
+        source = Provider.objects.get(email=email)
+    except Provider.DoesNotExist:
+        return
     # TODO set user with logic prodiver exclusive user
     data["user"] = User.objects.get(pk=1)
     data["source"] = source
@@ -256,13 +255,13 @@ def parsing_email(text, email):
                                                          "last_name": customer_data['last_name']
                                                          }
                                                         )
-    # try:
-    data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
-    # except ValidationError:
-    #     try:
-    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
-    #     except ValidationError:
-    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
+    try:
+        data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
+    except ValidationError:
+        try:
+            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
+        except ValidationError:
+            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
     lead = Leads.objects.create(
         customer=customer,
         origin=origin,

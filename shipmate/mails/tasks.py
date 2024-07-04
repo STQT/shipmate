@@ -1,3 +1,4 @@
+import email as email_lib
 from celery import shared_task
 from django.conf import settings
 
@@ -20,5 +21,6 @@ def fetch_emails_task():
                 'date': email.date,
                 'body': email.body,
             }
+            sender_email =email_lib.utils.parseaddr(email.sender)[1]
             Mail.objects.create(**data)
-            parsing_email(email.body, email.sender)
+            parsing_email(email.body, sender_email)

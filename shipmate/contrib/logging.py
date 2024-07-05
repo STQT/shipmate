@@ -13,8 +13,11 @@ def store_old_values(sender, instance, **kwargs):
 
 def log_update(sender, instance, created, log_klass, klas_field_name, **kwargs):
     timestamp = timezone.now()
-    updated_user_name = (instance.updated_from.first_name + " " + instance.updated_from.last_name
-                         if instance.updated_from else "Anonym")
+    updated_user = instance.updated_from
+    if updated_user is None:
+        updated_user_name = "Anonym"
+    else:
+        updated_user_name = updated_user.first_name + " " + updated_user.last_name if updated_user.last_name else ""
     if not created:
 
         old_values = getattr(instance, '_old_values', {})

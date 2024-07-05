@@ -153,6 +153,13 @@ def collect_cd_info(pk, origin: City, destination: City, carrier_pay: int,
     return text
 
 
+def _send_message_to_cd(message):
+    send_mail(subject="", from_email=settings.CD_EMAIL,
+              message=message, recipient_list=["cdupd-v4@centraldispatch.com"],
+              auth_user=settings.CD_EMAIL, auth_password=settings.CD_EMAIL_PASSWORD
+              )
+
+
 def post_cd(order: Order):
     text = f"UID({settings.CD_UID})*\n"
     text += collect_cd_info(
@@ -161,11 +168,8 @@ def post_cd(order: Order):
         available_date=order.date_est_ship, last_date=order.date_est_ship, comment=order.cd_note,
         vehicles=order.order_vehicles.all(), is_cash=True
     )
-    x = send_mail(subject="", from_email=settings.CD_EMAIL,
-                  message=text, recipient_list=["cdupd-v4@centraldispatch.com"],
-                  auth_user=settings.CD_EMAIL, auth_password=settings.CD_EMAIL_PASSWORD
-                  )
-    logging.info(f"Sended to CD: {order.pk} | {x}")
+    _send_message_to_cd(text)
+    logging.info(f"Sended to CD: {order.pk}")
 
 
 def repost_cd(order: Order):
@@ -177,10 +181,12 @@ def repost_cd(order: Order):
         available_date=order.date_est_ship, last_date=order.date_est_ship, comment=order.cd_note,
         vehicles=order.order_vehicles.all(), is_cash=True
     )
-    logging.info(f"Reposted to CD: {order.pk} | {text}")
+    _send_message_to_cd(text)
+    logging.info(f"Reposted to CD: {order.pk}")
 
 
 def delete_cd(order: Order):
     text = f"UID({settings.CD_UID})*\n"
     text += f"DELETE({order.pk})*"
+    _send_message_to_cd(text)
     logging.info(f"Deleted to CD: {order.pk} | {text}")

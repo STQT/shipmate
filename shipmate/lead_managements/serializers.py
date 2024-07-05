@@ -13,6 +13,12 @@ class ProviderLogSerializer(serializers.ModelSerializer):
         fields = ("title", "message")
 
 
+class CreateProviderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Provider
+        fields = "__all__"
+
+
 class ProviderSerializer(serializers.ModelSerializer):
     updated_from_email = serializers.StringRelatedField(source="updated_from.email", read_only=True)
 
@@ -31,7 +37,7 @@ class DetailProviderSerializer(serializers.ModelSerializer):
         model = Provider
         fields = "__all__"
 
-    def get_available_exclusive_users(self, obj) -> UserSerializer(many=True): # noqa
+    def get_available_exclusive_users(self, obj) -> UserSerializer(many=True):  # noqa
         exclusive_users = obj.exclusive_users.all()
         features = User.objects.exclude(id__in=exclusive_users.values_list('id', flat=True))
         return UserSerializer(features, many=True).data

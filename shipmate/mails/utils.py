@@ -185,11 +185,10 @@ def get_car_model(name, vehicle_type, mark_name):
 def parsing_email(text, email, subject=""):
     data = {}
     values = LeadParsingValue.objects.select_related("item")
-    print(values)
-    # try:
-    source: Provider = Provider.objects.get(email=email)
-    # except Provider.DoesNotExist:
-    #     return
+    try:
+        source: Provider = Provider.objects.get(email=email)
+    except Provider.DoesNotExist:
+        return
     # if source.type == Provider.ProviderTypeChoices.STANDARD:
     #     # STANDARD
     #     if source.effective == Provider.ProviderEffectiveChoices.YES:

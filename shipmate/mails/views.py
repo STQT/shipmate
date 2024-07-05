@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,7 +7,7 @@ from shipmate.contrib.centraldispatch import get_central_dispatch_price
 from shipmate.contrib.models import TrailerTypeChoices
 from shipmate.leads.models import Leads
 from shipmate.mails.data import static_dict
-from shipmate.mails.serializers import ModulesListSerializer, CDPriceSerializer
+from shipmate.mails.serializers import ModulesListSerializer, CDPriceSerializer, GlobalSearchSerializer
 from shipmate.orders.models import Order
 from shipmate.quotes.models import Quote
 
@@ -79,3 +80,43 @@ class GetCDPriceAPIView(APIView):
             return mapper[key]
         except KeyError:
             return "comparable"
+
+
+class GlobalSearchAPIView(APIView):
+    serializer_class = GlobalSearchSerializer
+
+    def _get_content(self, klass, query):
+        q_objects = (Q(origin__name__icontains=query) |  # noqa
+                     Q(origin__state__name__icontains=query) |
+                     Q(destination__name__icontains=query) |
+                     Q(destination__state__name__icontains=query) |
+                     Q(customer__name__icontains=query) |
+                     Q(customer__email__icontains=query) |
+                     Q(customer__phone__icontains=query))
+
+        if query.isdigit():
+            q_objects |= Q(id=query)
+        queryset = klass.objects.filter(q_objects)[:10]
+        return queryset
+
+    def get(self, request, q, *args, **kwargs):
+        leads = self.get_leads(q)
+        quotes = self.get_quotes(q)
+        orders = self.get_orders(q)
+
+        serializer = self.serializer_class({
+            'leads': leads,
+            'quotes': quotes,
+            'orders': orders
+        })
+
+        return Response(serializer.data)
+
+    def get_orders(self, query):
+        return self._get_content(Order, query)
+
+    def get_quotes(self, query):
+        return self._get_content(Quote, query)
+
+    def get_leads(self, query):
+        return self._get_content(Leads, query)

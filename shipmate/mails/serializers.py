@@ -1,5 +1,9 @@
 from rest_framework import serializers
 
+from shipmate.leads.serializers import ListLeadsSerializer
+from shipmate.orders.serializers import ListOrderSerializer
+from shipmate.quotes.serializers import ListQuoteSerializer
+
 
 class DataListSerializer(serializers.Serializer):
     key = serializers.CharField()
@@ -27,3 +31,9 @@ class CDPriceSerializer(serializers.Serializer):
     accepted = StringListField()
     comparable = StringListField()
     title = serializers.CharField()
+
+
+class GlobalSearchSerializer(serializers.Serializer):
+    leads = ListLeadsSerializer(many=True, allow_empty=True)
+    quotes = ListQuoteSerializer(many=True, allow_empty=True)
+    orders = ListOrderSerializer(many=True, allow_empty=True)

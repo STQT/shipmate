@@ -259,13 +259,13 @@ def parsing_email(text, email, subject=""):
             "last_name": customer_data['last_name']
         }
     )
-    # try:
-    data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
-    # except ValidationError:
-    #     try:
-    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
-    #     except ValidationError:
-    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
+    try:
+        data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
+    except ValidationError:
+        try:
+            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
+        except ValidationError:
+            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
     lead = Leads.objects.create(
         customer=customer,
         origin=origin,

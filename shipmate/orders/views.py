@@ -400,10 +400,14 @@ class PostToCDAPIView(CreateAPIView):
             action = serializer.data['action']
             response_data = serializer.data
             response_data['status'] = OrderStatusChoices.POSTED
+            print(action)
+            print(action == CDActions.REPOST.value, CDActions.POST.value)
             if action == CDActions.REPOST.value:
                 repost_cd(order)
+                ...
             elif action == CDActions.POST.value:
                 post_cd(order)
+                ...
             else:
                 delete_cd(order)
                 order.status = OrderStatusChoices.BOOKED

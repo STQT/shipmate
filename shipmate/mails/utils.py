@@ -1,8 +1,10 @@
+import random
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import Count
 
 from shipmate.addresses.models import City, States
 from shipmate.attachments.models import EmailAttachment
@@ -209,10 +211,30 @@ def parsing_email(text, email, subject=""):
     data = {}
     values = LeadParsingValue.objects.all()
     try:
-        source = Provider.objects.get(email=email)
+        source: Provider = Provider.objects.get(email=email)
     except Provider.DoesNotExist:
         return
-    # TODO set user with logic prodiver exclusive user
+    if source.type == Provider.ProviderTypeChoices.STANDARD:
+        # STANDARD
+        if source.effective == Provider.ProviderEffectiveChoices.YES:
+            # EFFECTIVE YES
+            leads_in_queue = source.leads_in_queue
+            user_leads_count = Leads.objects.values('user').annotate(total=Count('user')).order_by('user')
+            for entry in user_leads_count:
+                user_id = entry['user']
+                leads_count = entry['total']
+                if leads_count < leads_in_queue:
+                    data["user"] = User.objects.get(pk=user_id)
+                    break
+        else:
+            # EFFECTIVE NO
+            active_users = User.objects.filter(is_active=True)
+            if not active_users.exists():
+                raise get_user_model().DoesNotExist("No active users found.")
+            data["user"] = random.choice(active_users)
+    else:
+        # EXCLUSIVE
+        ...
     data["user"] = User.objects.get(pk=1)
     data["source"] = source
     vehicle1 = {}

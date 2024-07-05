@@ -18,8 +18,8 @@ class Provider(models.Model):
         NO = "no", "No"
 
     class ProviderTypeChoices(models.TextChoices):
-        ACTIVE = "standard", "Standard"
-        INACTIVE = "exclusive", "Exclusive"
+        STANDARD = "standard", "Standard"
+        EXCLUSIVE = "exclusive", "Exclusive"
 
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=8,

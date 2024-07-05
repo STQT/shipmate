@@ -443,5 +443,5 @@ class SendSmsToContract(CreateAPIView):
         contract_id = self.kwargs.get('contract')
         contract = get_object_or_404(OrderContract, id=contract_id)
         text = "Test message"
-        # send_sms(settings.FROM_PHONE, contract.order.customer.phone, text)
+        send_sms(settings.FROM_PHONE, contract.order.customer.phone, text)
         return Response(status=status.HTTP_201_CREATED)

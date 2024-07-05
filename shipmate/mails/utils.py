@@ -98,7 +98,25 @@ data_mapper = {
 # Requested On: 07/01/2024 05:37:05 AM
 # ID:1379918
 # """
-text = "\r\nFirst Name: Mohammad\r\nLast Name: Ahmadzai\r\nEmail: Ahmadzaitawab23@gmail.com\r\nPhone: (469) 970-9523\r\nType: SUV Large\r\nYear: 2022\r\nMake: Toyota\r\nModel: Highlander\r\nRunning Condition: Running\r\nType Of Carrier: Open\r\nVehicle #2 Type: \r\nVehicle #2 Year: \r\nVehicle #2 Make: \r\nVehicle #2 Model: \r\nVehicle #2 Running Condition: \r\nVehicle #2 Type Of Carrier: \r\nOrigin City: Plano\r\nOrigin State: TX\r\nOrigin Zip: 75023\r\nDestination City: Worcester\r\nDestination State: MA\r\nDestination Zip: 01606\r\nProposed Ship Date: 07/05/2024\r\nComments: \r\nRequested On: 07/05/2024 11:32:10 AM\r\nID:1380830\r\n\r\n\r\n"
+text = """
+First Name: Raquel
+Last Name: Acob
+Phone: (775) 484-3156
+Email Address: mr.mrsdiaz.acob2022@outlook.com
+
+Moving From City: Sparks
+Moving From State: NV
+Moving From Zip Code: 89431
+
+Moving To City: Kahului
+Moving To State: HI
+Moving To Zip Code: 96732
+
+Move Date: 2024-07-08
+Make Of Vehicle: nissan
+Model Of Vehicle: Altima
+Year Of Vehicle: 2014
+"""
 
 
 def finding_text(original, finding_text_original) -> int:
@@ -176,8 +194,20 @@ def get_city(city_zip, state_code, city):
 
 
 def get_car_model(name, vehicle_type, mark_name):
-    mark, _created = CarMarks.objects.get_or_create(name=mark_name.capitalize())
-    model, _created = CarsModel.objects.get_or_create(mark=mark, name=name.capitalize(), vehicle_type=vehicle_type)
+    print(name, vehicle_type, mark_name)
+    car_marks_qs = CarMarks.objects.filter(name=mark_name.capitalize())
+    if car_marks_qs.exists():
+        mark = car_marks_qs.first()
+    else:
+        mark = CarMarks.objects.create(name=mark_name.capitalize())
+    car_model_qs = CarsModel.objects.filter(mark=mark, name=name.capitalize())
+    if car_model_qs.exists():
+        model = car_model_qs.first()
+    else:
+        model = CarsModel.objects.create(
+            mark=mark, name=name.capitalize(),
+            vehicle_type=vehicle_type
+        )
     return model
 
 
@@ -283,11 +313,18 @@ def parsing_email(text, email, subject=""):
     LeadsAttachment.objects.create(lead=lead, title="Subject: " + subject,
                                    type=LeadsAttachment.TypesChoices.EMAIL, link=email_attach.pk)
 
-    car_model = get_car_model(vehicle1['model'], vehicle1['vehicle_type'], vehicle1['make'])
+    car_model = get_car_model(vehicle1['model'],
+                              vehicle1.get('vehicle_type', CarsModel.VehicleTYPES.CAR),
+                              vehicle1['make'])
     LeadVehicles.objects.create(lead=lead, vehicle=car_model, vehicle_year=vehicle1['year'])
+    print(vehicle1, vehicle2, vehicle3)
     if vehicle2:
-        car_model = get_car_model(vehicle2['model'], vehicle2['vehicle_type'], vehicle2['make'])
+        car_model = get_car_model(vehicle2['model'],
+                                  vehicle2.get('vehicle_type', CarsModel.VehicleTYPES.CAR),
+                                  vehicle2['make'])
         LeadVehicles.objects.create(lead=lead, vehicle=car_model, vehicle_year=vehicle2['year'])
     if vehicle3:
-        car_model = get_car_model(vehicle3['model'], vehicle3['vehicle_type'], vehicle3['make'])
+        car_model = get_car_model(vehicle3['model'],
+                                  vehicle3.get('vehicle_type', CarsModel.VehicleTYPES.CAR),
+                                  vehicle3['make'])
         LeadVehicles.objects.create(lead=lead, vehicle=car_model, vehicle_year=vehicle3['year'])

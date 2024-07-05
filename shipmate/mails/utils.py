@@ -266,6 +266,9 @@ def parsing_email(text, email, subject=""):
             data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
         except ValidationError:
             data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
+
+    if data.get("notes") is None:
+        data.pop("notes", None)
     lead = Leads.objects.create(
         customer=customer,
         origin=origin,

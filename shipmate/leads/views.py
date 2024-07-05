@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView,
     DestroyAPIView, CreateAPIView,
-    get_object_or_404
+    get_object_or_404, UpdateAPIView
 )
 from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
@@ -15,13 +15,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
-from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
+from shipmate.contrib.generics import RetrieveUpdatePUTDestroyAPIView
 from shipmate.contrib.models import LeadsStatusChoices, QuoteStatusChoices
 from shipmate.contrib.pagination import CustomPagination
 from shipmate.contrib.views import ArchiveView, ReAssignView
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
-from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog, LeadAttachmentComment
+from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog
 from shipmate.leads.serializers import (
     ListLeadsSerializer,
     CreateLeadsSerializer,
@@ -31,7 +31,7 @@ from shipmate.leads.serializers import (
     VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, LogSerializer,
     ListLeadTeamSerializer
 )
-from shipmate.quotes.models import Quote, QuoteVehicles, QuoteAttachment
+from shipmate.quotes.models import Quote, QuoteVehicles
 from shipmate.quotes.serializers import CreateQuoteSerializer
 from shipmate.users.models import Team
 
@@ -72,7 +72,7 @@ class CreateLeadsAPIView(CreateAPIView):  # noqa
     serializer_class = CreateLeadsSerializer
 
 
-class UpdateLeadsAPIView(UpdatePUTAPIView):
+class UpdateLeadsAPIView(UpdateAPIView):
     queryset = Leads.objects.all()
     serializer_class = UpdateLeadsSerializer
     lookup_field = 'guid'

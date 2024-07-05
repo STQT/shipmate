@@ -3,9 +3,11 @@ import random
 import string
 import time
 
+
 # Function to generate random string of characters
 def random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+
 
 # Main loop
 while True:

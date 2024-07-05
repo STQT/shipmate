@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
@@ -59,7 +61,7 @@ class UserCreateViewSet(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -148,7 +150,8 @@ class PasswordResetRequestAPIView(APIView):
         OTPCode.objects.update_or_create(user=user, defaults={"code": otp_code})
         try:
             send_mail(subject, message, from_email, to_email)  # TODO: convert to celery task
-        except:
+        except Exception as e:
+            logging.error(str(e))
             pass
         # You may want to save the OTP code in the user's profile or create a separate model to store OTP codes
 

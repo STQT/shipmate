@@ -4,31 +4,36 @@ from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
+from rest_framework.generics import (
+    ListAPIView, RetrieveAPIView,
+    DestroyAPIView, CreateAPIView,
+    get_object_or_404, UpdateAPIView
+)
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .filters import QuoteFilter, QuoteAttachmentFilter
-from shipmate.quotes.serializers import *
-from shipmate.contrib.models import QuoteStatusChoices, Attachments
-from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
-from .models import QuoteAttachment, QuoteLog
+from shipmate.contrib.models import QuoteStatusChoices
+from shipmate.contrib.generics import RetrieveUpdatePUTDestroyAPIView
+from .models import QuoteAttachment, QuoteLog, Quote, QuoteVehicles
+from .serializers import (
+    ListQuoteSerializer, CreateQuoteSerializer,
+    RetrieveQuoteSerializer, UpdateQuoteSerializer,
+    VehicleQuoteSerializer, ProviderQuoteListSerializer,
+    ListQuoteTeamSerializer, QuoteAttachmentSerializer
+)
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..contrib.pagination import CustomPagination
-from ..contrib.serializers import ReassignSerializer, ArchiveSerializer
 from ..contrib.views import ArchiveView, ReAssignView
 from ..lead_managements.models import Provider
 from ..leads.serializers import LogSerializer
 from ..leads.views import ListTeamLeadAPIView
-from ..users.models import Team
 
 VEHICLE_TAG = "quote/vehicle/"
 ATTACHMENTS_TAG = "quote/attachments/"
 REASON_TAG = "quote/reason/"
 
-User = get_user_model()
+User = get_user_model()  # noqa
 
 
 class QuotePagination(LimitOffsetPagination):
@@ -92,7 +97,7 @@ class CreateQuoteAPIView(CreateAPIView):
     serializer_class = CreateQuoteSerializer
 
 
-class UpdateQuoteAPIView(UpdatePUTAPIView):
+class UpdateQuoteAPIView(UpdateAPIView):
     queryset = Quote.objects.all()
     serializer_class = UpdateQuoteSerializer
     lookup_field = 'guid'
@@ -154,7 +159,9 @@ class QuoteAttachmentDeleteAPIView(DestroyAPIView):
         model_class = model_mapping.get(quote_attachment.type)
 
         if not model_class:
-            raise ValidationError({"type": f"`{quote_attachment.type}` doesn't found from allowed deleting attachment"})
+            raise ValidationError(
+                {"type": f"`{quote_attachment.type}` doesn't found from allowed deleting attachment"}
+            )
 
         attachment_instance = model_class.objects.get(id=quote_attachment.link)
         attachment_instance.delete()

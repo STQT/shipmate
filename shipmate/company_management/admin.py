@@ -1,7 +1,10 @@
 from django.contrib import admin
 
-from shipmate.company_management.models import CompanyInfo, Merchant, VoIP, Template, CompanyInfoLog, MerchantLog, \
-    VoIPLog, TemplateLog, PaymentAppLog, PaymentApp, LeadParsingGroup, LeadParsingValue, LeadParsingItem
+from shipmate.company_management.models import (
+    CompanyInfo, Merchant, VoIP, Template, CompanyInfoLog, MerchantLog,
+    VoIPLog, TemplateLog, PaymentAppLog, PaymentApp, LeadParsingGroup,
+    LeadParsingValue, LeadParsingItem
+)
 
 
 class CompanyInfoLogInline(admin.TabularInline):
@@ -76,6 +79,6 @@ class LeadParsingGroupAdmin(admin.ModelAdmin):
 
 
 @admin.register(LeadParsingItem)
-class LeadParsingGroupAdmin(admin.ModelAdmin):
+class LeadParsingItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
     inlines = [LeadParsingValueInline]

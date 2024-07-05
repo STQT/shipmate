@@ -9,23 +9,32 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, get_object_or_404
+from rest_framework.generics import (
+    ListAPIView, RetrieveAPIView,
+    DestroyAPIView, CreateAPIView,
+    get_object_or_404, UpdateAPIView
+)
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import OrderFilter, OrderAttachmentFilter
-from shipmate.orders.serializers import *
-from shipmate.contrib.models import OrderStatusChoices, Attachments
+from shipmate.contrib.models import OrderStatusChoices
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
-from .models import Order, OrderAttachment, OrderLog
+from .models import Order, OrderAttachment, OrderLog, OrderVehicles, OrderContract
+from .serializers import CreateOrderSerializer, UpdateOrderSerializer, RetrieveOrderSerializer, ListOrderSerializer, \
+    OrderAttachmentSerializer, VehicleOrderSerializer, CreateOrderContractSerializer, OrderContractSerializer, \
+    SigningContractSerializer, DetailContractSerializer, ProviderOrderListSerializer, DispatchingOrderSerializer, \
+    DirectDispatchOrderSerializer, CDActions, PostCDSerializer, ListOrdersTeamSerializer
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
+from ..company_management.models import CompanyInfo
 from ..contract.models import Hawaii, Ground, International
 from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
 from ..contrib.pagination import CustomPagination
 from ..contrib.sms import send_sms
 from ..contrib.views import ArchiveView, ReAssignView
+from ..lead_managements.models import Provider
 from ..leads.serializers import LogSerializer
 from ..leads.views import ListTeamLeadAPIView
 from ..quotes.models import Quote
@@ -100,7 +109,7 @@ class CreateOrderAPIView(CreateAPIView):
     serializer_class = CreateOrderSerializer
 
 
-class UpdateOrderAPIView(UpdatePUTAPIView):
+class UpdateOrderAPIView(UpdateAPIView):
     queryset = Order.objects.all()
     serializer_class = UpdateOrderSerializer
     lookup_field = 'guid'
@@ -167,7 +176,9 @@ class OrderAttachmentDeleteAPIView(DestroyAPIView):
         model_class = model_mapping.get(order_attachment.type)
 
         if not model_class:
-            raise ValidationError({"type": f"`{order_attachment.type}` doesn't found from allowed deleting attachment"})
+            raise ValidationError(
+                {"type": f"`{order_attachment.type}` doesn't found from allowed deleting attachment"}
+            )
 
         attachment_instance = model_class.objects.get(id=order_attachment.link)
         attachment_instance.delete()
@@ -212,7 +223,6 @@ class SignOrderContractView(APIView):
         if serializer.is_valid():
             agreement = serializer.validated_data.pop('agreement')
             terms = serializer.validated_data.pop('terms')
-            print(serializer.validated_data)
             try:
                 contract_obj = OrderContract.objects.get(id=contract)
             except OrderContract.DoesNotExist:
@@ -226,7 +236,13 @@ class SignOrderContractView(APIView):
             contract_obj.signed = True
             contract_obj.signer_name = serializer.validated_data['signer_name']
             contract_obj.signer_initials = serializer.validated_data['signer_initials']
-            contract_obj.sign_ip_address = request.META.get('REMOTE_ADDR')
+            x_real_ip = request.META.get('HTTP_X_REAL_IP')
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                ip = x_forwarded_for.split(',')[0]
+            else:
+                ip = x_real_ip or request.META.get('REMOTE_ADDR')
+            contract_obj.sign_ip_address = ip
             contract_obj.signed_time = timezone.now()
             contract_obj.save()
 
@@ -400,14 +416,10 @@ class PostToCDAPIView(CreateAPIView):
             action = serializer.data['action']
             response_data = serializer.data
             response_data['status'] = OrderStatusChoices.POSTED
-            print(action)
-            print(action == CDActions.REPOST.value, CDActions.POST.value)
             if action == CDActions.REPOST.value:
                 repost_cd(order)
-                ...
             elif action == CDActions.POST.value:
                 post_cd(order)
-                ...
             else:
                 delete_cd(order)
                 order.status = OrderStatusChoices.BOOKED

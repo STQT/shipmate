@@ -1,10 +1,8 @@
-import random
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db.models import Count
 
 from shipmate.addresses.models import City, States
 from shipmate.attachments.models import EmailAttachment
@@ -271,14 +269,15 @@ def parsing_email(text, email, subject=""):
     destination = get_city(destination_data['zip'],
                            destination_data['state_code'],
                            destination_data['city'])
-    customer, _created = Customer.objects.get_or_create(email=customer_data.get('email',
-                                                                                customer_data['phone'] + "@gmail.com"),
-                                                        defaults=
-                                                        {"phone": customer_data['phone'],
-                                                         "name": customer_data['name'],
-                                                         "last_name": customer_data['last_name']
-                                                         }
-                                                        )
+    customer, _created = Customer.objects.get_or_create(
+        email=customer_data.get('email',
+                                customer_data['phone'] + "@gmail.com"),
+        defaults={
+            "phone": customer_data['phone'],
+            "name": customer_data['name'],
+            "last_name": customer_data['last_name']
+        }
+    )
     try:
         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
     except ValidationError:

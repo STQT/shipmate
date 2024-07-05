@@ -1,5 +1,5 @@
 from .base import *  # noqa
-from .base import env
+from .base import env, IMAP_EMAIL_USER, IMAP_EMAIL_PASSWORD
 
 # GENERAL
 # ------------------------------------------------------------------------------

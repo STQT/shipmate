@@ -7,7 +7,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 
 from .base import *  # noqa
-from .base import env
+from .base import env, CD_EMAIL, CD_EMAIL_PASSWORD, REST_FRAMEWORK, SIMPLE_JWT
 
 # GENERAL
 # ------------------------------------------------------------------------------

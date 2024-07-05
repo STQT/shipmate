@@ -47,7 +47,6 @@ class Command(BaseCommand):
                 for item in data:
                     if item['model'] == "main.city":
                         fields = item['fields']
-                        state = States.objects.get(id=fields['state'])
                         name = fields['name']['en']
                         latitude, longitude = get_coordinates(fields['zip'])
                         # Process each item and save to your model

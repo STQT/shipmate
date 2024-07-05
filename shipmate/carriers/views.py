@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema, OpenApiCallback
+from drf_spectacular.utils import extend_schema
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView,
     DestroyAPIView, CreateAPIView

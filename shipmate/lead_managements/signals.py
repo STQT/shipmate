@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils import timezone
 from .models import Provider, ProviderLog, Distribution, DistributionLog
 from ..contrib.logging import log_update, store_old_values
 
@@ -25,7 +24,7 @@ def create_user_distribution(sender, instance, created, **kwargs):
 
 
 @receiver(pre_save, sender=Distribution)
-def log_store_user_data(sender, instance, **kwargs):
+def log_store_distribution_data(sender, instance, **kwargs):
     store_old_values(sender, instance, **kwargs)
 
 

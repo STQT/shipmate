@@ -18,4 +18,3 @@ class DistributionFilter(django_filters.FilterSet):
     class Meta:
         model = Distribution
         fields = ['status']
-

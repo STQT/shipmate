@@ -5,7 +5,6 @@ from .models import CarMarks, CarsModel
 class CarMarksFilter(django_filters.FilterSet):
     q = django_filters.CharFilter(method='custom_filter')
 
-
     class Meta:
         model = CarMarks
         fields = ['q']

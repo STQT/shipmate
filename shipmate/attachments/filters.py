@@ -52,7 +52,6 @@ class TaskAttachmentFilter(django_filters.FilterSet):
     def filter_today(self, queryset, name, value):
         if value:
             today = datetime.now()
-            tomorrow = today + timedelta(days=1)
             queryset = queryset.filter(start_time__date=today.date())
         return queryset
 

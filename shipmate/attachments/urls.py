@@ -1,5 +1,11 @@
 from django.urls import path
-from .views import *
+from .views import (
+    CreateNoteAttachmentAPIView,
+    CreateTaskAttachmentAPIView, CreateEmailAttachmentAPIView, CreatePhoneAttachmentAPIView,
+    CreateFileAttachmentAPIView, ListTaskAttachmentAPIView, CreateTaskAttachmentCommentAPIView,
+    TaskAttachmentRetrieveUpdateDestroyAPIView, FileAttachmentRetrieveUpdateDestroyAPIView,
+    NoteAttachmentRetrieveUpdateDestroyAPIView,
+)
 
 urlpatterns = [
     path('create-note/', CreateNoteAttachmentAPIView.as_view(), name='create-note'),

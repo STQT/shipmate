@@ -8,6 +8,7 @@ from shipmate.users.serializers import (
     TeamSerializer, TeamDetailSerializer
 )
 
+
 TAG = "users/team/"
 
 

@@ -60,9 +60,9 @@ class ReAssignView(APIView):
             extra_user = serializer.validated_data['user']
             extra_user_obj = User.objects.get(pk=extra_user)
             reason = serializer.validated_data['reason']
-            if obj.user == extra_user_obj:
-                return Response({"user": ["Reasoning user equal to owner"]}, status=status.HTTP_400_BAD_REQUEST)
-            obj.extra_user = extra_user_obj
+            # if obj.user == extra_user_obj:
+            #     return Response({"user": ["Reasoning user equal to owner"]}, status=status.HTTP_400_BAD_REQUEST)
+            obj.user = extra_user_obj
             obj.save()
             data = {
                 self.base_fk_field: obj,

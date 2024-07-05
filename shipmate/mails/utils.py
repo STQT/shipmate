@@ -99,34 +99,7 @@ data_mapper = {
 # Requested On: 07/01/2024 05:37:05 AM
 # ID:1379918
 # """
-text = """
-First Name: Test 01
-Last Name: Test
-Email: test01@icloud.com <paigedpatrick@icloud.com>
-Phone: (210) 862-3422
-Type: Sedan Small
-Year: 2007
-Make: Toyota
-Model: Prius
-Running Condition: Running
-Type Of Carrier: Enclosed
-Vehicle #2 Type:
-Vehicle #2 Year:
-Vehicle #2 Make:
-Vehicle #2 Model:
-Vehicle #2 Running Condition:
-Vehicle #2 Type Of Carrier:
-Origin City: RICHMOND
-Origin State: CA
-Origin Zip: 94804
-Destination City: AUSTIN
-Destination State: TX
-Destination Zip: 78713
-Proposed Ship Date: 07/08/2024
-Comments:
-Requested On: 07/04/2024 07:00:59 AM
-ID:1380659
-"""
+text = "\r\nFirst Name: Mohammad\r\nLast Name: Ahmadzai\r\nEmail: Ahmadzaitawab23@gmail.com\r\nPhone: (469) 970-9523\r\nType: SUV Large\r\nYear: 2022\r\nMake: Toyota\r\nModel: Highlander\r\nRunning Condition: Running\r\nType Of Carrier: Open\r\nVehicle #2 Type: \r\nVehicle #2 Year: \r\nVehicle #2 Make: \r\nVehicle #2 Model: \r\nVehicle #2 Running Condition: \r\nVehicle #2 Type Of Carrier: \r\nOrigin City: Plano\r\nOrigin State: TX\r\nOrigin Zip: 75023\r\nDestination City: Worcester\r\nDestination State: MA\r\nDestination Zip: 01606\r\nProposed Ship Date: 07/05/2024\r\nComments: \r\nRequested On: 07/05/2024 11:32:10 AM\r\nID:1380830\r\n\r\n\r\n"
 
 
 def finding_text(original, finding_text_original) -> int:
@@ -186,17 +159,21 @@ def handle_special_fields(text, field, value):
         return returned_value, model_field, "destination"
 
 
-def get_city(zip, state_code, city):
-    city_qs = City.objects.filter(zip=zip.zfill(5))  # noqa
-    if city_qs.exists():
-        city_obj = city_qs.first()
-    else:
-        destination_state, _created = States.objects.get_or_create(
-            code=state_code, defaults={"name": state_code})
-        city_obj, _created = City.objects.get_or_create(
-            zip=zip.zfill(5), defaults={"name": city, "state": destination_state}
-        )
-    return city_obj
+def get_city(city_zip, state_code, city):
+    if city_zip:
+        city_qs = City.objects.filter(zip=city_zip.zfill(5))  # noqa
+        if city_qs.exists():
+            city_obj = city_qs.first()
+        else:
+
+            destination_state, _created = States.objects.get_or_create(
+                code=state_code, defaults={"name": state_code})
+            city_obj, _created = City.objects.get_or_create(
+                zip=city_zip.zfill(5) if city_zip.is_digit() else city_zip[:5],
+                defaults={"name": city, "state": destination_state}
+            )
+        return city_obj
+    return None
 
 
 def get_car_model(name, vehicle_type, mark_name):
@@ -207,11 +184,12 @@ def get_car_model(name, vehicle_type, mark_name):
 
 def parsing_email(text, email, subject=""):
     data = {}
-    values = LeadParsingValue.objects.all()
-    try:
-        source: Provider = Provider.objects.get(email=email)
-    except Provider.DoesNotExist:
-        return
+    values = LeadParsingValue.objects.select_related("item")
+    print(values)
+    # try:
+    source: Provider = Provider.objects.get(email=email)
+    # except Provider.DoesNotExist:
+    #     return
     # if source.type == Provider.ProviderTypeChoices.STANDARD:
     #     # STANDARD
     #     if source.effective == Provider.ProviderEffectiveChoices.YES:
@@ -265,10 +243,14 @@ def parsing_email(text, email, subject=""):
                 origin_data[model_field] = returned_value
             elif endpoint == "destination":
                 destination_data[model_field] = returned_value
-    origin = get_city(origin_data['zip'], origin_data['state_code'], origin_data['city'])
-    destination = get_city(destination_data['zip'],
-                           destination_data['state_code'],
-                           destination_data['city'])
+    origin = get_city(
+        origin_data['zip'],
+        origin_data['state_code'],
+        origin_data['city'])
+    destination = get_city(
+        destination_data['zip'],
+        destination_data['state_code'],
+        destination_data['city'])
     customer, _created = Customer.objects.get_or_create(
         email=customer_data.get('email',
                                 customer_data['phone'] + "@gmail.com"),
@@ -278,13 +260,13 @@ def parsing_email(text, email, subject=""):
             "last_name": customer_data['last_name']
         }
     )
-    try:
-        data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
-    except ValidationError:
-        try:
-            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
-        except ValidationError:
-            data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
+    # try:
+    data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m/%d/%Y")
+    # except ValidationError:
+    #     try:
+    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
+    #     except ValidationError:
+    #         data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y/%m/%d")
     lead = Leads.objects.create(
         customer=customer,
         origin=origin,

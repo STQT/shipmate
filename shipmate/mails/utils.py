@@ -169,7 +169,7 @@ def get_city(city_zip, state_code, city):
             destination_state, _created = States.objects.get_or_create(
                 code=state_code, defaults={"name": state_code})
             city_obj, _created = City.objects.get_or_create(
-                zip=city_zip.zfill(5) if city_zip.is_digit() else city_zip[:5],
+                zip=city_zip.zfill(5) if city_zip.isdigit() else city_zip[:5],
                 defaults={"name": city, "state": destination_state}
             )
         return city_obj

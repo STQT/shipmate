@@ -100,7 +100,9 @@ class GlobalSearchAPIView(APIView):
 
         if query.isdigit():
             q_objects |= Q(id=query)
-        queryset = klass.objects.select_related('origin', 'destination', 'customer').filter(q_objects).annotate(
+        queryset = klass.objects.select_related(
+            'origin', 'destination', 'customer', 'user', 'extra_user'
+                                                ).filter(q_objects).annotate(
             status_type=Value(status, output_field=models.CharField())
         )[:10]
         return queryset

@@ -22,16 +22,17 @@ class LeadsFilter(django_filters.FilterSet):
 
     def custom_filter(self, queryset, name, value):
         if value:
-            queryset = queryset.filter(
-                Q(origin__name__icontains=value) |
-                Q(origin__state__name__icontains=value) |
-                Q(destination__name__icontains=value) |
-                Q(destination__state__name__icontains=value) |
-                Q(customer__name__icontains=value) |
-                Q(customer__email__icontains=value) |
-                Q(customer__phone__icontains=value)
-            )
+            q_objects = (Q(origin__name__icontains=value) |
+                         Q(origin__state__name__icontains=value) |
+                         Q(destination__name__icontains=value) |
+                         Q(destination__state__name__icontains=value) |
+                         Q(customer__name__icontains=value) |
+                         Q(customer__email__icontains=value) |
+                         Q(customer__phone__icontains=value))
 
+            if value.isdigit():
+                q_objects |= Q(id=value)
+            queryset = queryset.filter(q_objects)
         return queryset
 
 

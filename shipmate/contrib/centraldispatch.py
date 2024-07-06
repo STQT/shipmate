@@ -23,18 +23,43 @@ URL = "https://site.centraldispatch.com/protected/cargo/sample-prices-lightbox"
 
 class Type:
     class VehicleType(Enum):
-        Boat = "Boat"
-        Car = "Car"
-        ATV = "ATV"
-        Heavy_Equipment = "Heavy Equipment"
-        Large_Yacht = "Large Yacht"
-        Motorcycle = "Motorcycle"
-        Pickup = "Pickup"
-        RV = "RV"
-        SUV = "SUV"
-        Travel_Trailer = "Travel Trailer"
-        Van = "Van"
-        Other = "Other"
+        Boat = "boat"
+        Car = "car"
+        ATV = "atv"
+        Heavy_Equipment = "heavy equipment"
+        Large_Yacht = "large yacht"
+        Motorcycle = "motorcycle"
+        Pickup = "pickup"
+        RV = "rv"
+        SUV = "suv"
+        Travel_Trailer = "travel trailer"
+        Van = "van"
+        Other = "other"
+
+        ATV_UTV = "atv_utv"
+        HEAVY_DUP = "heavy_equipment"
+        PICKUP_CREW_CAB = "pickup crew cab"
+        PICKUP_EXTD_CAB = "pickup extd. cab"
+        PickupFullSize = "pickup full-size"
+        PickupSmall = "pickup small"
+        RVTrailer = "rv_trailer"
+        Hatchback = "hatchback"
+        GolfCart = "golf_cart"
+        CONVERTIBLE = "convertible"
+        COUPE = "coupe"
+        Sedan = "sedan"
+        SedanLarge = "sedan large"
+        SedanMidsize = "sedan midsize"
+        SEDANSMALL = "sedan small"
+        SUVLARGE = "suv large"
+        SUVMidSize = "suv mid-size"
+        SUVSmall = "suv small"
+        MINIVAN = "mini-van"
+        VANEXTDLENGTH = "van extd. length"
+        VANFULLSIZE = "van full-size"
+        VanMini = "van mini"
+        VanMinivan = "van/minivan"
+        VehicleType = "car"
 
     @dataclass
     class CentralDispatchForm:
@@ -121,12 +146,38 @@ def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum,
         Type.VehicleType.Travel_Trailer.value: CarsModel.VehicleTYPES.TRAVEL,
         Type.VehicleType.Van.value: CarsModel.VehicleTYPES.VAN,
         Type.VehicleType.Other.value: CarsModel.VehicleTYPES.OTHER,
+
+        Type.VehicleType.ATV_UTV.value: CarsModel.VehicleTYPES.ATV,
+        Type.VehicleType.HEAVY_DUP.value: CarsModel.VehicleTYPES.HEAVY,
+        Type.VehicleType.PICKUP_CREW_CAB.value: CarsModel.VehicleTYPES.PICKUP,
+        Type.VehicleType.PICKUP_EXTD_CAB.value: CarsModel.VehicleTYPES.PICKUP,
+        Type.VehicleType.PickupFullSize.value: CarsModel.VehicleTYPES.PICKUP,
+        Type.VehicleType.PickupSmall.value: CarsModel.VehicleTYPES.PICKUP,
+        Type.VehicleType.RVTrailer.value: CarsModel.VehicleTYPES.RV,
+        Type.VehicleType.Hatchback.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.GolfCart.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.CONVERTIBLE.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.COUPE.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.Sedan.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.SedanLarge.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.SedanMidsize.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.SEDANSMALL.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.SUVLARGE.value: CarsModel.VehicleTYPES.SUV,
+        Type.VehicleType.SUVMidSize.value: CarsModel.VehicleTYPES.SUV,
+        Type.VehicleType.SUVSmall.value: CarsModel.VehicleTYPES.SUV,
+        Type.VehicleType.MINIVAN.value: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.VANEXTDLENGTH.value: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.VANFULLSIZE.value: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.VanMini.value: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.VanMinivan.value: CarsModel.VehicleTYPES.VAN,
+        Type.VehicleType.VehicleType.value: CarsModel.VehicleTYPES.CAR,
+
     }
 
     form = Type.CentralDispatchForm(
         postalCode=(o_zip, d_zip),
         enclosed=enclosed,
-        vehicleType=cd_vehicle_type_mapping[vehicle_type],
+        vehicleType=cd_vehicle_type_mapping[vehicle_type.lower()],
         num_vehicles=vehicles_count
     )
 

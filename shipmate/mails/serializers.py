@@ -89,9 +89,11 @@ class GlobalListLeadsSerializer(serializers.ModelSerializer):
         return f"{city_name}, {state_code} {city_zip}"
 
     def get_vehicles(self, obj) -> ListVehicleLeadsSerializer(many=True):
-        ...
-        print(type(obj))
-        return "string"
+        if obj.status_type == "Quotes":
+            return ListVehicleLeadsSerializer(obj.quote_vehicles.all())
+        elif obj.status_type == "Orders":
+            return ListVehicleLeadsSerializer(obj.order_vehicles.all())
+        return ListVehicleLeadsSerializer(obj.lead_vehicles.all())
 
 class GlobalSearchSerializer(serializers.Serializer):
     data = GlobalListLeadsSerializer(many=True, allow_empty=True)

@@ -11,6 +11,10 @@ class CreateCarrierSerializer(serializers.ModelSerializer):
 
 class ListCarrierSerializer(serializers.ModelSerializer):
     location_name = serializers.SerializerMethodField()
+    completed = serializers.IntegerField(default=20)
+    ongoing = serializers.IntegerField(default=20)
+    price = serializers.IntegerField(default=1200)
+    owe = serializers.IntegerField(default=50)
 
     class Meta:
         model = Carrier

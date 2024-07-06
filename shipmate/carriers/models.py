@@ -18,6 +18,7 @@ class Carrier(models.Model):
     email = models.EmailField()
     fax = models.CharField(max_length=20)
     status = models.CharField(max_length=8, choices=CarrierStatus.choices, default=CarrierStatus.INACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Carrier"

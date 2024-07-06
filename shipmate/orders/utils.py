@@ -1,10 +1,15 @@
 from django.core.mail import send_mail
 from django.conf import settings
 
+from shipmate.company_management.models import CompanyInfo
 from shipmate.orders.models import OrderContract
 
 
 def send_order_contract_email(order_contract: OrderContract):
+    company = CompanyInfo.objects.first()
+    company_name = company.name
+    contact_email = company.email
+    contact_mainline = company.mainline
     subject = 'New Order Contract Created'
     message = f"""Dear {order_contract.order.customer.name} {order_contract.order.customer.last_name},
 
@@ -24,10 +29,11 @@ Should you have any questions or require any clarifications regarding the contra
 Thank you for your prompt attention to this matter. We look forward to receiving the signed contract at your earliest convenience.
 
 Best regards,
-[Your Full Name]
-[Your Job Title]
-[Your Company Name]
-[Your Contact Information]"""
+{order_contract.order.user.name}
+{company_name}
+{contact_email}
+{contact_mainline}
+"""
     from_email = settings.EMAIL_HOST_USER  # Your email address
     password_email = settings.EMAIL_HOST_PASSWORD
     recipient_list = [order_contract.order.customer.email]  # List of recipients

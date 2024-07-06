@@ -1,4 +1,7 @@
-from django.db.models import Q
+from itertools import chain
+
+from django.db import models
+from django.db.models import Q, Value
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,7 +10,8 @@ from shipmate.contrib.centraldispatch import get_central_dispatch_price
 from shipmate.contrib.models import TrailerTypeChoices
 from shipmate.leads.models import Leads
 from shipmate.mails.data import static_dict
-from shipmate.mails.serializers import ModulesListSerializer, CDPriceSerializer, GlobalSearchSerializer
+from shipmate.mails.serializers import ModulesListSerializer, CDPriceSerializer, GlobalSearchSerializer, \
+    GlobalSearchIDSerializer
 from shipmate.orders.models import Order
 from shipmate.quotes.models import Quote
 
@@ -85,7 +89,7 @@ class GetCDPriceAPIView(APIView):
 class GlobalSearchAPIView(APIView):
     serializer_class = GlobalSearchSerializer
 
-    def _get_content(self, klass, query):
+    def _get_content(self, klass, query, status):
         q_objects = (Q(origin__name__icontains=query) |  # noqa
                      Q(origin__state__name__icontains=query) |
                      Q(destination__name__icontains=query) |
@@ -96,13 +100,52 @@ class GlobalSearchAPIView(APIView):
 
         if query.isdigit():
             q_objects |= Q(id=query)
-        queryset = klass.objects.filter(q_objects)[:10]
+        queryset = klass.objects.select_related('origin', 'destination', 'customer').filter(q_objects).annotate(
+            status_type=Value(status, output_field=models.CharField())
+        )[:10]
         return queryset
 
-    def get(self, request, q, *args, **kwargs):
+    def get(self, request, type, q, *args, **kwargs):
+        status_type = type
         leads = self.get_leads(q)
         quotes = self.get_quotes(q)
         orders = self.get_orders(q)
+        data = {
+            "data": []
+        }
+        if status_type == "all":
+            data["data"] = list(chain(leads, quotes, orders))
+        elif status_type == "orders":
+            data['data'] = orders
+        elif status_type == "quotes":
+            data['data'] = quotes
+        elif status_type == "leads":
+            data['data'] = leads
+        serializer = self.serializer_class(data)
+
+        return Response(serializer.data)
+
+    def get_orders(self, query):
+        return self._get_content(Order, query, "Orders")
+
+    def get_quotes(self, query):
+        return self._get_content(Quote, query, "Quotes")
+
+    def get_leads(self, query):
+        return self._get_content(Leads, query, "Leads")
+
+
+class GlobalSearchIDAPIView(APIView):
+    serializer_class = GlobalSearchIDSerializer
+
+    def _get_content(self, klass, query):
+        queryset = klass.objects.filter(pk=query).exists()
+        return queryset
+
+    def get(self, request, pk, *args, **kwargs):
+        leads = self.get_leads(pk)
+        quotes = self.get_quotes(pk)
+        orders = self.get_orders(pk)
 
         serializer = self.serializer_class({
             'leads': leads,

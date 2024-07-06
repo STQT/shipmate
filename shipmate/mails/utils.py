@@ -182,7 +182,6 @@ def get_city(city_zip, state_code, city):
         if city_qs.exists():
             city_obj = city_qs.first()
         else:
-
             destination_state, _created = States.objects.get_or_create(
                 code=state_code, defaults={"name": state_code})
             city_obj, _created = City.objects.get_or_create(
@@ -194,7 +193,6 @@ def get_city(city_zip, state_code, city):
 
 
 def get_car_model(name, vehicle_type, mark_name):
-    print(name, vehicle_type, mark_name)
     car_marks_qs = CarMarks.objects.filter(name=mark_name.capitalize())
     if car_marks_qs.exists():
         mark = car_marks_qs.first()

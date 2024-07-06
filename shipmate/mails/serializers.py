@@ -90,10 +90,11 @@ class GlobalListLeadsSerializer(serializers.ModelSerializer):
 
     def get_vehicles(self, obj) -> ListVehicleLeadsSerializer(many=True):
         if obj.status_type == "Quotes":
-            return ListVehicleLeadsSerializer(obj.quote_vehicles.all())
+            return ListVehicleLeadsSerializer(obj.quote_vehicles.all(), many=True).data
         elif obj.status_type == "Orders":
-            return ListVehicleLeadsSerializer(obj.order_vehicles.all())
-        return ListVehicleLeadsSerializer(obj.lead_vehicles.all())
+            return ListVehicleLeadsSerializer(obj.order_vehicles.all(), many=True).data
+        return ListVehicleLeadsSerializer(obj.lead_vehicles.all(), many=True).data
+
 
 class GlobalSearchSerializer(serializers.Serializer):
     data = GlobalListLeadsSerializer(many=True, allow_empty=True)

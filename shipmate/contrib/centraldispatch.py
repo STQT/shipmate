@@ -60,6 +60,7 @@ class Type:
         VanMini = "van mini"
         VanMinivan = "van/minivan"
         VehicleType = "car"
+        Wagon = "wagon"
 
     @dataclass
     class CentralDispatchForm:
@@ -171,6 +172,7 @@ def get_central_dispatch_price(o_zip, d_zip, enclosed: bool, vehicle_type: enum,
         Type.VehicleType.VanMini.value: CarsModel.VehicleTYPES.VAN,
         Type.VehicleType.VanMinivan.value: CarsModel.VehicleTYPES.VAN,
         Type.VehicleType.VehicleType.value: CarsModel.VehicleTYPES.CAR,
+        Type.VehicleType.Wagon.value: CarsModel.VehicleTYPES.CAR,
 
     }
 

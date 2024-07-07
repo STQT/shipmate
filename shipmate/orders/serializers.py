@@ -322,6 +322,9 @@ class ListOrdersUserSerializer(ListLeadUserSerializer):
     count = serializers.SerializerMethodField()
 
     def get_count(self, obj) -> int:
+        status = self.context.get('type')
+        if status:
+            return Order.objects.filter(user=obj, status=status).count()
         return Order.objects.filter(user=obj).count()
 
 

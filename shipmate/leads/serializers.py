@@ -183,6 +183,9 @@ class ListLeadUserSerializer(serializers.ModelSerializer):
         fields = ["id", "picture", "first_name", "last_name", "count"]
 
     def get_count(self, obj) -> int:
+        status = self.context.get('type')
+        if status:
+            return Leads.objects.filter(user=obj, status=status).count()
         return Leads.objects.filter(user=obj).count()
 
 

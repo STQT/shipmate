@@ -444,6 +444,7 @@ class ArchiveOrderView(ArchiveView):
     base_fk_field = "order"
 
 
+@extend_schema(parameters=[OpenApiParameter('type', enum=OrderStatusChoices)])
 class ListTeamOrdersAPIView(ListTeamLeadAPIView):
     serializer_class = ListOrdersTeamSerializer
 

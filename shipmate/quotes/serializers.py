@@ -171,6 +171,9 @@ class ListQuoteUserSerializer(ListLeadUserSerializer):
     count = serializers.SerializerMethodField()
 
     def get_count(self, obj) -> int:
+        status = self.context.get('type')
+        if status:
+            return Quote.objects.filter(user=obj, status=status).count()
         return Quote.objects.filter(user=obj).count()
 
 

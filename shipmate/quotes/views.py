@@ -220,5 +220,6 @@ class ArchiveQuoteView(ArchiveView):
     base_fk_field = "quote"
 
 
+@extend_schema(parameters=[OpenApiParameter('type', enum=QuoteStatusChoices)])
 class ListTeamQuoteAPIView(ListTeamLeadAPIView):
     serializer_class = ListQuoteTeamSerializer

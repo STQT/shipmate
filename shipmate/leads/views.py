@@ -256,6 +256,7 @@ class ListLeadLogAPIView(ListAPIView):
         return LeadsLog.objects.filter(lead_id=lead_id)
 
 
+@extend_schema(parameters=[OpenApiParameter('type', enum=LeadsStatusChoices)])
 class ListTeamLeadAPIView(ListAPIView):
     serializer_class = ListLeadTeamSerializer
     pagination_class = None
@@ -264,6 +265,11 @@ class ListTeamLeadAPIView(ListAPIView):
         return Team.objects.filter(status=Team.TeamStatusChoices.ACTIVE).prefetch_related(
             Prefetch('users', queryset=User.objects.filter(is_active=True))
         )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['type'] = self.request.query_params.get('type')
+        return context
 
 
 @extend_schema(tags=[REASON_TAG])

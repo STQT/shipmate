@@ -299,12 +299,16 @@ def parsing_email(text, email, subject=""):
 
     if data.get("notes") is None:
         data.pop("notes", None)
+    condition = vehicle1.get("condition", ConditionChoices.DRIVES)
+    condition = ConditionChoices.DRIVES if condition.lower() == "running" else ConditionChoices.ROLLS
+    trailer_type = vehicle1.get("trailer_type", TrailerTypeChoices.OPEN)
+    trailer_type = TrailerTypeChoices.OPEN if trailer_type.lower() == "open" else TrailerTypeChoices.CLOSE
     lead = Leads.objects.create(
         customer=customer,
         origin=origin,
         destination=destination,
-        condition=ConditionChoices.DRIVES if vehicle1['condition'] == "Running" else ConditionChoices.ROLLS,
-        trailer_type=TrailerTypeChoices.OPEN if vehicle1['trailer_type'] == "Open" else TrailerTypeChoices.CLOSE,
+        condition=condition,
+        trailer_type=trailer_type,
         **data)
     email_attach = EmailAttachment.objects.create(from_email=email, to_email=[settings.IMAP_EMAIL_USER],
                                                   subject=subject)
@@ -315,7 +319,6 @@ def parsing_email(text, email, subject=""):
                               vehicle1.get('vehicle_type', CarsModel.VehicleTYPES.CAR),
                               vehicle1['make'])
     LeadVehicles.objects.create(lead=lead, vehicle=car_model, vehicle_year=vehicle1['year'])
-    print(vehicle1, vehicle2, vehicle3)
     if vehicle2:
         car_model = get_car_model(vehicle2['model'],
                                   vehicle2.get('vehicle_type', CarsModel.VehicleTYPES.CAR),

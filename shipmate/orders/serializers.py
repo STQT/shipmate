@@ -174,7 +174,7 @@ class ListOrderSerializer(serializers.ModelSerializer):
             "customer_name", "customer_phone", "origin_name",
             "destination_name", "order_vehicles", "user", "extra_user",
             "price", "date_est_ship", "condition", "trailer_type", "notes",
-            "status",
+            "status", "updated_at",
         ]
 
     @classmethod

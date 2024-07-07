@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 
-from shipmate.contrib.models import Attachments, OrderAbstract, VehicleAbstract
+from shipmate.contrib.models import Attachments, OrderAbstract, VehicleAbstract, OrderStatusChoices
 from shipmate.utils.models import BaseLog
 
 User = get_user_model()
@@ -113,6 +114,38 @@ class Order(OrderAbstract):
     class Meta:
         verbose_name = "Order"
         verbose_name_plural = "Orders"
+
+    def save(self, *args, **kwargs):
+        # status_mapper = {
+        #     OrderStatusChoices.QUOTES: 'quoted',
+        #     OrderStatusChoices.FOLLOWUP: 'follow_up',
+        #     OrderStatusChoices.WARM: 'warm',
+        #     OrderStatusChoices.ONGOING: 'ongoing',
+        #     OrderStatusChoices.UPCOMING: 'upcoming',
+        #     OrderStatusChoices.ONHOLD: 'on_hold',
+        #     OrderStatusChoices.NOTNOW: 'not_now',
+        #     OrderStatusChoices.ARCHIVED: 'archived'
+        # }
+
+        if not self.pk:
+            self.created_at = timezone.now()
+            self.updated_at = self.created_at
+        else:
+            old_instance = self.__class__.objects.get(pk=self.pk)
+            if self.extra_user != old_instance.extra_user:
+                self.updated_at = timezone.now()
+                # quote_dates, created = QuoteDates.objects.get_or_create(quote=self)
+                # quote_dates.re_assigned = self.updated_at
+                # quote_dates.save()
+            if self.status != old_instance.status:
+                self.updated_at = timezone.now()
+                # quote_dates, created = QuoteDates.objects.get_or_create(quote=self)
+                # status_date_field = status_mapper.get(self.status)
+                # if status_date_field:
+                    # setattr(quote_dates, status_date_field, timezone.now())
+                    # quote_dates.last_time_edited = self.updated_at
+                    # quote_dates.save()
+        super().save(*args, **kwargs)
 
 
 class OrderAttachment(Attachments):

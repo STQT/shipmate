@@ -201,20 +201,23 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
 
     def create(self, validated_data):
         to_emails = validated_data.get('to_email', [])
-        # from_email = validated_data.get('from_email')
-        from_email = "gayratbek.sultonov@gmail.com" if settings.DEBUG else "leads@matelogisticss.com"
+        from_email = validated_data.get('from_email', "leads@matelogisticss.com")
         subject = validated_data.get('subject')
-        text = validated_data.get('text')
+        text = validated_data.get('text', '')
 
         if not to_emails:
             raise ValidationError({"to_email": "At least one recipient email is required."})
 
         email_attachment = super().create(validated_data)
 
-        send_email(subject=subject,
-                   to_emails=to_emails,
-                   from_email=from_email,
-                   html_content=text)
+        send_email(
+            subject=subject,
+            to_emails=to_emails,
+            from_email=from_email,
+            html_content=text,
+            cc_emails=validated_data.get('cc_email', None),
+            bcc_emails=validated_data.get('bcc_email', None),
+        )
 
         return email_attachment
 

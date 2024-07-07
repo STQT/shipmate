@@ -47,6 +47,8 @@ REASON_TAG = "orders/reason/"
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
+
 
 class OrderPagination(LimitOffsetPagination):
     default_limit = 10
@@ -208,9 +210,6 @@ class ListOrderContractView(ListAPIView):  # noqa
         queryset = self.filter_queryset(self.get_queryset().filter(order__guid=order_guid))
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-
-logger = logging.getLogger(__name__)
 
 
 @extend_schema(tags=[CONTRACTS_TAG])

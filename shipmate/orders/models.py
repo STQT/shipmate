@@ -90,12 +90,12 @@ class Order(OrderAbstract):
     destination_buyer_number = models.CharField(max_length=50, null=True, blank=True)
 
     # Payments
-    payment_total_tariff = models.PositiveIntegerField(default=0)
-    payment_reservation = models.PositiveIntegerField(default=0)
-    payment_paid_reservation = models.PositiveIntegerField(default=0)
-    payment_carrier_pay = models.PositiveIntegerField(default=0)
-    payment_cod_to_carrier = models.PositiveIntegerField(default=0)
-    payment_paid_to_carrier = models.PositiveIntegerField(default=0)
+    payment_total_tariff = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    payment_reservation = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    payment_paid_reservation = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    payment_carrier_pay = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    payment_cod_to_carrier = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    payment_paid_to_carrier = models.DecimalField(default=0, max_digits=10, decimal_places=2)
 
     # Date
     date_est_pu = models.DateField(null=True, blank=True)

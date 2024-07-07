@@ -5,7 +5,7 @@ from email.header import decode_header
 from dataclasses import dataclass
 from typing import List
 
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 import os
 
 
@@ -69,18 +69,42 @@ def fetch_emails(username, password, imap_server="imap.example.com", port=993) -
     return emails
 
 
-def send_email(from_email, subject, to_emails, text_content=None, html_content=None, attachment=None):
-    email = EmailMultiAlternatives(subject, text_content, from_email, to_emails)
+def send_email(from_email, subject, to_emails, text_content=None, html_content=None, attachment=None, cc_emails=None,
+               bcc_emails=None, host=None, user=None, password=None):
+    # Set up the connection with custom settings if provided
+    connection = get_connection(
+        backend='django.core.mail.backends.smtp.EmailBackend',
+        host=host,
+        port=587,
+        username=user,
+        password=password,
+        use_tls=True
+    ) if host and user and password else None
 
+    # Create the email message
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_content,
+        from_email=from_email,
+        to=to_emails,
+        cc=cc_emails,
+        bcc=bcc_emails,
+        connection=connection
+    )
+
+    # Attach HTML content if provided
     if html_content:
         email.attach_alternative(html_content, "text/html")
 
+    # Attach a file if provided and exists
     if attachment and os.path.exists(attachment):
         with open(attachment, 'rb') as f:
             file_data = f.read()
         email.attach(os.path.basename(attachment), file_data)
 
+    # Send the email
     email.send()
+
 
 # Example usage:
 # subject = "Subject of the email"

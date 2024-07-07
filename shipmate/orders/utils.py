@@ -1,16 +1,21 @@
-from django.core.mail import send_mail
+from shipmate.contrib.email import send_email
 from django.conf import settings
 
 from shipmate.company_management.models import CompanyInfo
-from shipmate.orders.models import OrderContract
+from shipmate.orders.models import OrderContract, Order
 
 
-def send_order_contract_email(order_contract: OrderContract):
+def get_company_data():
     company = CompanyInfo.objects.first()
     company_name = company.name
     contact_email = company.email
     contact_mainline = company.mainline
+    return company_name, contact_email, contact_mainline
+
+
+def send_order_contract_email(order_contract: OrderContract):
     subject = 'New Order Contract Created'
+    company_name, contact_email, contact_mainline = get_company_data()
     message = f"""Dear {order_contract.order.customer.name} {order_contract.order.customer.last_name},
 
 Please find attached the electronic agreement for your review and signature. This agreement outlines the terms and conditions.
@@ -38,4 +43,38 @@ Best regards,
     password_email = settings.EMAIL_HOST_PASSWORD
     recipient_list = [order_contract.order.customer.email]  # List of recipients
 
-    send_mail(subject, message, from_email, recipient_list, auth_user=from_email, auth_password=password_email)
+    send_email(subject, message, from_email, recipient_list, user=from_email, password=password_email)
+
+
+def send_cc_agreement():
+    order: Order
+    company_name, contact_email, contact_mainline = get_company_data()
+    subject = "Action Required: Credit Card Authorization Form"
+    message = f"""Dear {order.customer.name} {order.customer.last_name},
+
+As part of our process to finalize your transaction, we kindly request that you complete the attached Credit Card Authorization Form. Please follow these steps:
+
+1. Click here to fill out the online Credit Card Authorization Form completely and accurately.
+2. Attach a clear image of both the front and back of the credit card.
+3. Ensure that the name on the credit card matches the name on the contract.
+
+This process helps us ensure the security and accuracy of your payment information.
+
+If you have any questions or need assistance, feel free to contact us.
+
+Thank you for your prompt attention to this matter.
+
+Best regards,
+
+{order.user.name}
+{company_name}
+{contact_email}
+{contact_mainline}
+"""
+    from_email = settings.EMAIL_HOST_USER  # Your email address
+    password_email = settings.EMAIL_HOST_PASSWORD
+    recipient_list = [order.customer.email]  # List of recipients
+    cc_list = ["info@matelogisticss.com", "info@oceanbluego.com"]
+    send_email(subject, message, from_email, recipient_list,
+               cc_emails=cc_list, user=from_email,
+               password=password_email)

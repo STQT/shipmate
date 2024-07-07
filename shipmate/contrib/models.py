@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -58,18 +59,23 @@ class VehicleAbstract(models.Model):
         abstract = True
 
 
+def validate_positive(value):
+    if value < 0:
+        raise ValidationError('Price must be a positive number.')
+
+
 class LeadsAbstract(models.Model):
     guid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(editable=False)
     status = models.CharField(max_length=20, choices=LeadsStatusChoices.choices, default=LeadsStatusChoices.LEADS)
     customer = models.ForeignKey("customers.Customer", on_delete=models.SET_NULL, null=True)
-    price = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
     condition = models.CharField(max_length=50, choices=ConditionChoices.choices, default=ConditionChoices.DRIVES)
     trailer_type = models.CharField(choices=TrailerTypeChoices.choices, default=TrailerTypeChoices.OPEN, max_length=20)
     notes = models.TextField(blank=True)
 
-    reservation_price = models.PositiveIntegerField(default=200)
+    reservation_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
     date_est_ship = models.DateField()
     source = models.ForeignKey("lead_managements.Provider", on_delete=models.SET_NULL, null=True, blank=True)
 

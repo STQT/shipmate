@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from shipmate.payments.models import OrderPayment
+
+
+@admin.register(OrderPayment)
+class OrderPaymentAdmin(admin.ModelAdmin):
+    ...

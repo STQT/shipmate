@@ -48,7 +48,7 @@ class OrderPayment(models.Model):
     surcharge_fee_rate = models.PositiveSmallIntegerField()
     charge_type = models.CharField(max_length=10, choices=ChargeTypeChoices.choices)
     direction = models.CharField(max_length=20, choices=DirectionChoices.choices)
-    created_on = models.DateField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=StatusChoices.choices, default=StatusChoices.CREATED)
 
     def __str__(self):

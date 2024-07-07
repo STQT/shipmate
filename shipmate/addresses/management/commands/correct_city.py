@@ -2,7 +2,7 @@ import json
 import logging
 
 from django.core.management.base import BaseCommand
-from shipmate.addresses.models import City, States
+from shipmate.addresses.models import City
 
 from geopy.geocoders import Nominatim
 

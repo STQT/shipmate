@@ -4,10 +4,11 @@ from shipmate.payments.models import OrderPayment
 
 
 class DetailContractSerializer(serializers.Serializer):
-    order = RetrieveOrderSerializer(read_only=True)
-    contract = OrderPaymentSerializer(read_only=True)
-    company = CompanyDetailInfoSerializer(read_only=True)
-    pdf = BaseContractSerializer(read_only=True)
+    # order = RetrieveOrderSerializer(read_only=True)
+    # contract = OrderPaymentSerializer(read_only=True)
+    # company = CompanyDetailInfoSerializer(read_only=True)
+    # pdf = BaseContractSerializer(read_only=True)
+    ...
 
 
 class SigningContractSerializer(serializers.ModelSerializer):
@@ -23,7 +24,7 @@ class SigningContractSerializer(serializers.ModelSerializer):
 class CreateOrderPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderPayment
-        fields = "__all__"
+        exclude = ("status", "amount_charged")
 
 
 class OrderPaymentSerializer(serializers.ModelSerializer):

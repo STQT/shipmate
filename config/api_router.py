@@ -35,4 +35,5 @@ urlpatterns += [
     path('carriers/', include('shipmate.carriers.urls'), name="carriers"),
     path('company-management/', include('shipmate.company_management.urls'), name="company-management"),
     path('fields/', include('shipmate.mails.urls'), name="fields"),
+    path('order-payments/', include('shipmate.payments.urls'), name="payments"),
 ]

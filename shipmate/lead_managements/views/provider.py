@@ -3,7 +3,11 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from shipmate.lead_managements.filters import ProviderFilter
 from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.lead_managements.models import Provider
-from shipmate.lead_managements.serializers import ProviderSerializer, DetailProviderSerializer, CreateProviderSerializer
+from shipmate.lead_managements.serializers import (
+    ProviderSerializer,
+    DetailProviderSerializer,
+    CreateProviderSerializer
+)
 
 
 class ListProviderAPIView(ListAPIView):

@@ -193,6 +193,7 @@ class OrderContract(models.Model):
     signer_name = models.CharField(null=True, blank=True)
     signer_initials = models.CharField(null=True, blank=True)
     signed_time = models.DateTimeField(null=True, blank=True)
+    attachment = models.ImageField(null=True, blank=True, upload_to="contract_photos")
 
     def __str__(self):
         return self.contract_type

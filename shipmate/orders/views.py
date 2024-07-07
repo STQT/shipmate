@@ -27,6 +27,7 @@ from .serializers import CreateOrderSerializer, UpdateOrderSerializer, RetrieveO
     OrderAttachmentSerializer, VehicleOrderSerializer, CreateOrderContractSerializer, OrderContractSerializer, \
     SigningContractSerializer, DetailContractSerializer, ProviderOrderListSerializer, DispatchingOrderSerializer, \
     DirectDispatchOrderSerializer, CDActions, PostCDSerializer, ListOrdersTeamSerializer
+from .utils import send_order_contract_email
 from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..company_management.models import CompanyInfo
 from ..contract.models import Hawaii, Ground, International
@@ -198,10 +199,14 @@ class CreateOrderContractAPIView(CreateAPIView):  # noqa
     queryset = OrderContract.objects.all()
     serializer_class = CreateOrderContractSerializer
 
+    def perform_create(self, serializer):
+        order_contract = serializer.save()
+        send_order_contract_email(order_contract)
+
 
 @extend_schema(tags=[CONTRACTS_TAG])
 class ListOrderContractView(ListAPIView):  # noqa
-    queryset = OrderContract.objects.all()
+    queryset = OrderContract.objects.all() # noqa
     serializer_class = OrderContractSerializer
     pagination_class = None
 

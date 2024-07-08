@@ -1,7 +1,9 @@
+import random
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 from shipmate.addresses.models import City, States
 from shipmate.attachments.models import EmailAttachment
@@ -56,124 +58,39 @@ data_mapper = {
     '{notes}': 'notes'
 }
 
-# def parse_and_update_leads(original):
-#     lines = original.strip().split('\n')
-#     lead_data = {}
-#     for value in LeadParsingValue.objects.all():
-#
-#         for line in lines:
-#             # Split the line to separate the field placeholder and the value
-#             ...
-#
-#     return lead_data
-
-
 # text = """
-#
-#
-# First Name: viviano
-# Last Name: villarreal
-# Email: viviano.v@gmail.com
-# Phone: 8882309117
-# Type: COUPE
-# Year: 1985
-# Make: MERCEDES-BENZ
-# Model: 380SL
-# Running Condition: Running
-# Type Of Carrier: Open
-# Vehicle #2 Type:
-# Vehicle #2 Year:
-# Vehicle #2 Make:
-# Vehicle #2 Model:
-# Vehicle #2 Running Condition:
-# Vehicle #2 Type Of Carrier:
-# Origin City: NEWARK
-# Origin State: NJ
-# Origin Zip: 07101
-# Destination City: HOUSTON
-# Destination State: TX
-# Destination Zip: 77001
-# Proposed Ship Date: 07/14/2024
-# Comments:
-# Requested On: 07/01/2024 05:37:05 AM
-# ID:1379918
+# "\r\nFirst Name: Acacio\r\nLast Name: Iglesias\r\nEmail: Iglesiaspt@aol.com\r\n
+# Phone: 3475819677\r\nType: SEDAN MIDSIZE\r\nYear: 2019\r\nMake: TOYOTA\r\n
+# Model: HIGHLANDER\r\nRunning Condition: Running\r\nType Of Carrier: Open\r\n
+# Vehicle #2 Type: \r\nVehicle #2 Year: \r\nVehicle #2 Make: \r\nVehicle #2 Model: \r\n
+# Vehicle #2 Running Condition: \r\nVehicle #2 Type Of Carrier: \r\nOrigin City: BROOKLYN\r\n
+# Origin State: NY\r\nOrigin Zip: 11236\r\nDestination City: KISSIMMEE\r\nDestination State: FL\r\n
+# Destination Zip: 34758\r\nProposed Ship Date: 07/14/2024\r\nComments: \r\n
+# Requested On: 07/08/2024 06:42:06 AM\r\nID:1381310\r\n\r\n\r\n"
 # """
-text = """
-First Name: Raquel
-Last Name: Acob
-Phone: (775) 484-3156
-Email Address: mr.mrsdiaz.acob2022@outlook.com
-
-Moving From City: Sparks
-Moving From State: NV
-Moving From Zip Code: 89431
-
-Moving To City: Kahului
-Moving To State: HI
-Moving To Zip Code: 96732
-
-Move Date: 2024-07-08
-Make Of Vehicle: nissan
-Model Of Vehicle: Altima
-Year Of Vehicle: 2014
-"""
 
 
-def finding_text(original, finding_text_original) -> int:
-    lower_text = original.lower()
-    lower_finding_text = finding_text_original.lower()
-    finding_text_len = len(finding_text_original)
-    num_index = lower_text.find(lower_finding_text)
-    if num_index != -1:
-        end_index = finding_text_len + num_index
-        return end_index
-    return num_index
-
-
-def get_value(original, finding_text_original):
-    num_index = finding_text(original, finding_text_original)
-    if num_index == -1:
-        return None
-    start_line_index = original.rfind('\n', 0, num_index) + 1
-
-    # Find the end of the line containing the found text
-    end_line_index = original.find('\n', num_index)
-    if end_line_index == -1:
-        end_line_index = len(original)
-
-    # Extract the line containing the found text
-    line = original[start_line_index:end_line_index]
-
-    # Extract the substring starting from num_index to the end of the line
-    result = line[num_index - start_line_index:]
-
-    return result.strip()
-
-
-def handle_special_fields(text, field, value):
-    # Add your custom logic to handle fields that start with "vehicle", "customer", "origin", or "destination"
-    # For now, it will simply return the value after finding the specified text
-    returned_value = get_value(text, value)
+def handle_special_fields(field):
     if field.startswith("vehicle"):
         if not (field.startswith("vehicle2") or field.startswith("vehicle3")):
             # for only vehicle__field
             _vehicle, model_field = field.split("__")
-            return returned_value, model_field, "vehicle1"
+            return model_field, "vehicle1"
         elif field.startswith("vehicle2"):
             _vehicle, model_field = field.split("__")
-            return returned_value, model_field, "vehicle2"
+            return model_field, "vehicle2"
         else:
             _vehicle, model_field = field.split("__")
-            return returned_value, model_field, "vehicle3"
+            return model_field, "vehicle3"
     elif field.startswith("customer"):
         _customer, model_field = field.split("__")
-        return returned_value, model_field, "customer"
+        return model_field, "customer"
     elif field.startswith("origin"):
         _origin, model_field = field.split("__")
-        return returned_value, model_field, "origin"
+        return model_field, "origin"
     elif field.startswith("destination"):
         _destination, model_field = field.split("__")
-        return returned_value, model_field, "destination"
+        return model_field, "destination"
 
 
 def get_city(city_zip, state_code, city):
@@ -211,33 +128,34 @@ def get_car_model(name, vehicle_type, mark_name):
 
 def parsing_email(text, email, subject=""):
     data = {}
-    values = LeadParsingValue.objects.select_related("item")
     try:
         source: Provider = Provider.objects.get(email=email)
+        if source.subject != subject:
+            return
     except Provider.DoesNotExist:
         return
-    # if source.type == Provider.ProviderTypeChoices.STANDARD:
-    #     # STANDARD
-    #     if source.effective == Provider.ProviderEffectiveChoices.YES:
-    #         # EFFECTIVE YES
-    #         leads_in_queue = source.leads_in_queue
-    #         user_leads_count = Leads.objects.values('user').annotate(total=Count('user')).order_by('user')
-    #         for entry in user_leads_count:
-    #             user_id = entry['user']
-    #             leads_count = entry['total']
-    #             if leads_count < leads_in_queue:
-    #                 data["user"] = User.objects.get(pk=user_id)
-    #                 break
-    #     else:
-    #         # EFFECTIVE NO
-    #         active_users = User.objects.filter(is_active=True)
-    #         if not active_users.exists():
-    #             raise get_user_model().DoesNotExist("No active users found.")
-    #         data["user"] = random.choice(active_users)
-    # else:
-    #     # EXCLUSIVE
-    #     ...
-    data["user"] = User.objects.get(pk=1)
+    if source.type == Provider.ProviderTypeChoices.STANDARD:
+        # STANDARD
+        if source.effective == Provider.ProviderEffectiveChoices.YES:
+            # EFFECTIVE YES
+            leads_in_queue = source.leads_in_queue
+            user_leads_count = Leads.objects.values('user').annotate(total=Count('user')).order_by('user')
+            for entry in user_leads_count:
+                user_id = entry['user']
+                leads_count = entry['total']
+                if leads_count < leads_in_queue:
+                    data["user"] = User.objects.get(pk=user_id)
+                    break
+        else:
+
+            # EFFECTIVE NO
+            active_users = User.objects.filter(is_active=True)
+            if not active_users.exists():
+                raise get_user_model().DoesNotExist("No active users found.")
+            data["user"] = random.choice(active_users)
+    else:
+        # EXCLUSIVE
+        data["user"] = User.objects.get(pk=1)
     data["source"] = source
     vehicle1 = {}
     vehicle2 = {}
@@ -245,30 +163,37 @@ def parsing_email(text, email, subject=""):
     customer_data = {}
     origin_data = {}
     destination_data = {}
+    cleaned_text = text.strip('"\r\n')
+    lines = cleaned_text.split('\r\n')
 
-    for v in values:
-        item = v.item.name
-        value = v.value
-        field = data_mapper[item]
-        if not (
-            field.startswith("vehicle") or field.startswith("customer") or field.startswith("origin") or
-            field.startswith("destination")
-        ):
-            data[field] = get_value(text, value)
-        else:
-            returned_value, model_field, endpoint = handle_special_fields(text, field, value)
-            if endpoint == "vehicle1":
-                vehicle1[model_field] = returned_value
-            elif endpoint == "vehicle2":
-                vehicle2[model_field] = returned_value
-            elif endpoint == "vehicle3":
-                vehicle3[model_field] = returned_value
-            elif endpoint == "customer":
-                customer_data[model_field] = returned_value
-            elif endpoint == "origin":
-                origin_data[model_field] = returned_value
-            elif endpoint == "destination":
-                destination_data[model_field] = returned_value
+    parsing_value = LeadParsingValue.objects.select_related("item")
+
+    for line in lines:
+        for lpv in parsing_value:
+            if line.lower().startswith(lpv.value.lower()):
+                # Perform your action here
+                value = line.split(lpv.value)[1].strip()
+                item = lpv.item.name
+                field = data_mapper[item]
+                if not (
+                    field.startswith("vehicle") or field.startswith("customer") or field.startswith("origin") or
+                    field.startswith("destination")
+                ):
+                    data[field] = value
+                else:
+                    model_field, endpoint = handle_special_fields(field)
+                    if endpoint == "vehicle1":
+                        vehicle1[model_field] = value
+                    elif endpoint == "vehicle2":
+                        vehicle2[model_field] = value
+                    elif endpoint == "vehicle3":
+                        vehicle3[model_field] = value
+                    elif endpoint == "customer":
+                        customer_data[model_field] = value
+                    elif endpoint == "origin":
+                        origin_data[model_field] = value
+                    elif endpoint == "destination":
+                        destination_data[model_field] = value
     origin = get_city(
         origin_data['zip'],
         origin_data['state_code'],

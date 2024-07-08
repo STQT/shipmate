@@ -15,9 +15,9 @@ class LeadsAttachmentCommentInline(admin.TabularInline):
 
 @admin.register(Leads)
 class LeadsAdmin(admin.ModelAdmin):
+    list_display = ["customer", "status", "price", 'user', 'guid', 'created_at']
     autocomplete_fields = ["origin", "destination", "customer"]
     ordering = ["-id"]
-    list_display = ["customer", "status", "price", 'guid', 'created_at']
     inlines = [LeadsLogInline]
     search_fields = ['id', ]
 

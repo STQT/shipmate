@@ -25,5 +25,5 @@ class StatesFilter(django_filters.FilterSet):
 
     def custom_filter(self, queryset, name, value):
         if value:
-            return queryset.filter(name__icontains=value)
+            return queryset.filter(code__icontains=value)
         return queryset

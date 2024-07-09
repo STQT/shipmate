@@ -49,7 +49,7 @@ class Merchant(models.Model):
 
     authorize_login = models.CharField(max_length=50, null=True, blank=True)
     authorize_password = models.CharField(max_length=50, null=True, blank=True)
-    authorize_pin_code = models.CharField(max_length=50, null=True, blank=True)
+    authorize_pin_code = models.CharField(max_length=255, null=True, blank=True)
 
     firstdata_gateway_id = models.CharField(max_length=50, null=True, blank=True)
     firstdata_password = models.CharField(max_length=50, null=True, blank=True)
@@ -60,7 +60,8 @@ class Merchant(models.Model):
 
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
-    created_on = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", editable=False)
+    created_on = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", editable=False,
+                                   null=True, blank=True)
 
     def __str__(self):
         return self.name

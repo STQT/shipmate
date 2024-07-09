@@ -52,6 +52,35 @@ class MerchantSerializer(serializers.ModelSerializer):
         model = Merchant
         fields = "__all__"
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data = self.blur_sensitive_fields(data)
+        return data
+
+    def blur_sensitive_fields(self, data):
+        sensitive_fields = [
+            'authorize_login',
+            'authorize_password',
+            'authorize_pin_code',
+            'firstdata_gateway_id',
+            'firstdata_password',
+            'firstdata_key_id',
+            'firstdata_hmac_key',
+            'paypal_secret_key',
+        ]
+
+        for field in sensitive_fields:
+            if field in data and data[field]:
+                data[field] = self.blur_value(data[field])
+
+        return data
+
+    def blur_value(self, value):
+        if isinstance(value, str):
+            blurred_part = "*" * (len(value) - 4) + value[-4:]
+            return blurred_part
+        return value
+
 
 class VoIPSerializer(serializers.ModelSerializer):
     logs = VoIPLogSerializer(many=True, read_only=True)

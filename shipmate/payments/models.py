@@ -4,29 +4,29 @@ from datetime import datetime
 from django.db import models
 
 
+class TypeChoices(models.TextChoices):
+    credit_card = "credit_card", "Credit Card"
+    zelle = "zelle", "Zelle"
+    cashapp = "cashapp", "CashApp"
+    venmo = "venmo", "Venmo"
+    paypal = "paypal", "PayPal"
+    cash = "cash", "Cash"
+    cashier = "cashier", "Cashier"
+    cashier_check = "cashier_check", "Cashier's check"
+    ach = "ach", "ACH"
+
+
 class OrderPayment(models.Model):
     class NameChoices(models.TextChoices):
         auto_transportation = "auto", "Auto Transportation"
         auto_carrier_fee = "auto_carrier", "Auto Transportation (carrier fee)"
         carrier_fee = "carrier", "Carrier fee"
 
-    class TypeChoices(models.TextChoices):
-        credit = "credit", "Credit"
-        card = "card", "Card"
-        zelle = "zelle", "Zelle"
-        cashapp = "cashapp", "CashApp"
-        venmo = "venmo", "Venmo"
-        paypal = "paypal", "PayPal"
-        cash = "cash", "Cash"
-        cashier = "cashier", "Cashier"
-        cashier_check = "cashier_check", "Cashier's check"
-        ach = "ach", "ACH"
-
     class ChargeTypeChoices(models.TextChoices):
         charge = "charge", "Charge"
         refund = "refund", "Refund"
         chargeback = "chargeback", "Chargeback"
-        send = "send", "Send"
+        sent = "send", "Send"
         payroll = "payroll", "Payroll"
 
     class DirectionChoices(models.TextChoices):
@@ -72,7 +72,26 @@ def upload_to(instance, filename):
 class OrderPaymentAttachment(models.Model):
     order_payment = models.ForeignKey(OrderPayment, on_delete=models.CASCADE, related_name="attachments")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to=upload_to)
+    image = models.ImageField(upload_to=upload_to, blank=True, null=True)
+    payment_type = models.CharField(max_length=14, choices=TypeChoices.choices)
+    is_success = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.amount)
+
+
+class OrderPaymentCreditCard(models.Model):
+    order_payment = models.ForeignKey(OrderPayment, on_delete=models.CASCADE, related_name="credit_cards")
+    card_number = models.CharField(max_length=16)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    expiration_date = models.CharField(max_length=5)
+    cvv = models.CharField(max_length=4)
+    billing_address = models.CharField(max_length=50)
+    billing_city = models.CharField(max_length=50)
+    billing_state = models.CharField(max_length=2, blank=True, null=True)
+    billing_zip = models.CharField(max_length=5, blank=True, null=True)
+
+    def __str__(self):
+        return self.card_number

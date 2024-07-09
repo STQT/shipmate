@@ -19,7 +19,7 @@ from shipmate.contrib.sms import send_sms
 from shipmate.leads.models import LeadsAttachment, LeadAttachmentComment
 from shipmate.orders.models import OrderAttachment, OrderAttachmentComment
 from shipmate.quotes.models import QuoteAttachment, QuoteAttachmentComment
-
+from django.template.defaultfilters import truncatechars_html
 
 class AttachmentType(Enum):
     QUOTE = "quote"
@@ -70,7 +70,7 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
                 attachment_class_data = {
                     "type": _type,
                     "link": created_data.pk,
-                    "title": strip_tags(text)[:499],
+                    "title": truncatechars_html(text, 400),
                     converter_field_name[field_name]: rel
                 }
                 related_model = Class._meta.get_field(converter_field_name[field_name]).related_model

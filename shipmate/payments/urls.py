@@ -10,6 +10,6 @@ urlpatterns = [
          name='order-contract-create'),
     path('attachments/', CreateOrderPaymentAttachmentView.as_view(),
          name='order-contract-attachments-create'),
-    path('attachments/', ListOrderPaymentAttachmentView.as_view(),
+    path('attachments/list/', ListOrderPaymentAttachmentView.as_view(),
          name='order-contract-attachments-list'),
 ]

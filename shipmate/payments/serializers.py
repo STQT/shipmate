@@ -1,5 +1,7 @@
+from django.db.models import Sum
 from rest_framework import serializers
 
+from shipmate.contrib.serializers import Base64ImageField
 from shipmate.payments.models import OrderPayment, OrderPaymentAttachment
 
 
@@ -42,15 +44,28 @@ class OrderPaymentSerializer(serializers.ModelSerializer):
 
 
 class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(use_url=True)
+
     class Meta:
         model = OrderPaymentAttachment
         fields = ['order_payment', 'amount', 'image']
 
 
 class CreateOrderPaymentAttachmentListSerializer(serializers.Serializer):
-    attachments = OrderPaymentAttachmentSerializer(many=True)
+    attachments = OrderPaymentAttachmentSerializer(many=True, write_only=True)
 
     def create(self, validated_data):
         attachments_data = validated_data.pop('attachments')
-        attachments = [OrderPaymentAttachment(**item) for item in attachments_data]
+        overall_amount = 0
+        attachments = []
+        for item in attachments_data:
+            overall_amount += item['amount']
+            attachments.append(OrderPaymentAttachment(**item))
+        order_payment: OrderPayment = attachments_data[0]['order_payment']
+        order_payment_attachments_all_amount = OrderPaymentAttachment.objects.filter(order_payment=order_payment)
+        total_amount = order_payment_attachments_all_amount.aggregate(Sum('amount'))['amount__sum'] or 0
+        order_payment.amount_charged = total_amount + overall_amount
+        if order_payment.amount <= order_payment.amount_charged:
+            order_payment.status = OrderPayment.StatusChoices.PAID
+        order_payment.save()
         return OrderPaymentAttachment.objects.bulk_create(attachments)

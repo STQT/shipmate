@@ -46,24 +46,31 @@ class OrderPaymentSerializer(serializers.ModelSerializer):
 
 
 class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(use_url=True, required=False)
+    image = Base64ImageField(use_url=True, required=False, allow_null=True)
     credit_card = serializers.IntegerField(allow_null=True, write_only=True, required=False)
 
     class Meta:
         model = OrderPaymentAttachment
-        fields = ['order_payment', 'amount', 'image', 'payment_type', 'created_at', 'is_success', 'credit_card']
+        fields = ['id', 'order_payment', 'amount', 'image', 'payment_type', 'created_at', 'is_success', 'credit_card']
         extra_kwargs = {
             'is_success': {'read_only': True},
             'payment_type': {'read_only': True},
         }
+
     def create(self, validated_data):
         order_payment: OrderPayment = validated_data['order_payment']
         amount = validated_data['amount']
         validated_data['payment_type'] = order_payment.payment_type
         credit_card = validated_data.pop("credit_card")
         if credit_card:
-            credit_card: OrderPaymentCreditCard = OrderPaymentCreditCard.objects.get(pk=credit_card)
-            result = charge_payment(amount, credit_card.card_number, credit_card.expiration_date, credit_card.cvv)
+            try:
+                credit_card: OrderPaymentCreditCard = OrderPaymentCreditCard.objects.get(pk=credit_card)
+                if credit_card.order_payment != order_payment:
+                    raise ValidationError({"credit_card": "This credit card attached from another orderPayment"})
+            except OrderPaymentCreditCard.DoesNotExist:
+                raise ValidationError({"credit_card": "Does not found this Credit Card object in DB"})
+            # result = charge_payment(amount, credit_card.card_number, credit_card.expiration_date, credit_card.cvv)
+            result = {"success": True}  # TODO: remove after
             if result['success'] is False:
                 validated_data['is_success'] = False
                 OrderPaymentAttachment.objects.create(**validated_data)

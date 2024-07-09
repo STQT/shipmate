@@ -122,7 +122,7 @@ class Attachments(models.Model):
         EMAIL = "email", "Email"  # API
         FILE = "file", "File"  # API
 
-    title = models.CharField(max_length=500)
+    title = models.TextField()
     second_title = models.CharField(max_length=150, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=10, choices=TypesChoices.choices)

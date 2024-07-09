@@ -51,7 +51,7 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderPaymentAttachment
-        fields = ['order_payment', 'amount', 'image', 'payment_type', 'created_at', 'is_success']
+        fields = ['order_payment', 'amount', 'image', 'payment_type', 'created_at', 'is_success', 'credit_card']
 
     def create(self, validated_data):
         order_payment: OrderPayment = validated_data['order_payment']

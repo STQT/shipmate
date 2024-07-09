@@ -8,8 +8,7 @@ from rest_framework.views import APIView
 
 from .models import OrderPayment, OrderPaymentAttachment
 from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
-    SigningContractSerializer, DetailContractSerializer, CreateOrderPaymentAttachmentListSerializer, \
-    OrderPaymentAttachmentSerializer
+    SigningContractSerializer, OrderPaymentAttachmentSerializer
 
 
 class CreateOrderPaymentAPIView(CreateAPIView):  # noqa
@@ -125,15 +124,8 @@ class DetailOrderPaymentView(APIView):
     #     return Response(serializer.data)
 
 
-class CreateOrderPaymentAttachmentView(APIView):
-    serializer_class = CreateOrderPaymentAttachmentListSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = CreateOrderPaymentAttachmentListSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CreateOrderPaymentAttachmentView(CreateAPIView):
+    serializer_class = OrderPaymentAttachmentSerializer
 
 
 class ListOrderPaymentAttachmentView(ListAPIView):

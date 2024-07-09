@@ -18,7 +18,7 @@ class EmailMessage:
     body: str
 
 
-def fetch_emails(username, password, imap_server="imap.example.com", port=993) -> List[EmailMessage]:
+def fetch_emails(username, password, imap_server="imap.gmail.com", port=993) -> List[EmailMessage]:
     emails = []
 
     try:

@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.generics import (
     ListAPIView, CreateAPIView,
 )
@@ -5,9 +6,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import OrderPayment
+from .models import OrderPayment, OrderPaymentAttachment
 from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
-    SigningContractSerializer, DetailContractSerializer
+    SigningContractSerializer, DetailContractSerializer, CreateOrderPaymentAttachmentListSerializer, \
+    OrderPaymentAttachmentSerializer
 
 
 class CreateOrderPaymentAPIView(CreateAPIView):  # noqa
@@ -90,7 +92,7 @@ class SignOrderPaymentView(APIView):
 
 
 class DetailOrderPaymentView(APIView):
-    serializer_class = DetailContractSerializer(many=False)
+    # serializer_class = DetailContractSerializer(many=False)
     permission_classes = [AllowAny]
     #
     # def get(self, request, order, contract):
@@ -121,3 +123,21 @@ class DetailOrderPaymentView(APIView):
     #
     #     serializer = DetailContractSerializer(data)
     #     return Response(serializer.data)
+
+
+class CreateOrderPaymentAttachmentView(APIView):
+    serializer_class = CreateOrderPaymentAttachmentListSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreateOrderPaymentAttachmentListSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListOrderPaymentAttachmentView(ListAPIView):
+    queryset = OrderPaymentAttachment.objects.all().order_by("-id")
+    serializer_class = OrderPaymentAttachmentSerializer
+    filterset_fields = ["order_payment"]
+    pagination_class = None

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    ListOrderPaymentView, CreateOrderPaymentAPIView,
+    ListOrderPaymentView, CreateOrderPaymentAPIView, CreateOrderPaymentAttachmentView, ListOrderPaymentAttachmentView,
 )
 
 urlpatterns = [
@@ -8,4 +8,8 @@ urlpatterns = [
          name='order-contract-list'),
     path('create/', CreateOrderPaymentAPIView.as_view(),
          name='order-contract-create'),
+    path('attachments/', CreateOrderPaymentAttachmentView.as_view(),
+         name='order-contract-attachments-create'),
+    path('attachments/', ListOrderPaymentAttachmentView.as_view(),
+         name='order-contract-attachments-list'),
 ]

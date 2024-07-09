@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from shipmate.payments.models import OrderPayment
+from shipmate.payments.models import OrderPayment, OrderPaymentAttachment
 
 
 class DetailContractSerializer(serializers.Serializer):
@@ -39,3 +39,18 @@ class OrderPaymentSerializer(serializers.ModelSerializer):
         if obj.created_at:
             return obj.created_at.strftime("%m/%d/%Y")
         return "NaN"
+
+
+class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderPaymentAttachment
+        fields = ['order_payment', 'amount', 'image']
+
+
+class CreateOrderPaymentAttachmentListSerializer(serializers.Serializer):
+    attachments = OrderPaymentAttachmentSerializer(many=True)
+
+    def create(self, validated_data):
+        attachments_data = validated_data.pop('attachments')
+        attachments = [OrderPaymentAttachment(**item) for item in attachments_data]
+        return OrderPaymentAttachment.objects.bulk_create(attachments)

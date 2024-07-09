@@ -11,7 +11,7 @@ from shipmate.cars.models import CarsModel, CarMarks
 from shipmate.company_management.models import LeadParsingValue
 from shipmate.contrib.models import ConditionChoices, TrailerTypeChoices
 from shipmate.customers.models import Customer
-from shipmate.lead_managements.models import Provider
+from shipmate.lead_managements.models import Provider, Distribution
 from shipmate.leads.models import LeadVehicles, Leads, LeadsAttachment
 
 User = get_user_model()
@@ -128,6 +128,7 @@ def get_car_model(name, vehicle_type, mark_name):
 
 def parsing_email(text, email, subject=""):
     data = {}
+    # users = Distribution.objects.filter()  # TODO: get all active users for now
     try:
         source: Provider = Provider.objects.get(email=email)
         if source.subject != subject:
@@ -147,7 +148,6 @@ def parsing_email(text, email, subject=""):
                     data["user"] = User.objects.get(pk=user_id)
                     break
         else:
-
             # EFFECTIVE NO
             active_users = User.objects.filter(is_active=True)
             if not active_users.exists():
@@ -155,6 +155,8 @@ def parsing_email(text, email, subject=""):
             data["user"] = random.choice(active_users)
     else:
         # EXCLUSIVE
+        # last_lead = Leads.objects.last()
+        # last_lead.user
         data["user"] = User.objects.get(pk=1)
     data["source"] = source
     vehicle1 = {}

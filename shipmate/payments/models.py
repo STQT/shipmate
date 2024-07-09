@@ -1,3 +1,6 @@
+import os
+from datetime import datetime
+
 from django.db import models
 
 
@@ -53,3 +56,23 @@ class OrderPayment(models.Model):
 
     def __str__(self):
         return f"{self.order.pk} | {self.name}"
+
+
+def upload_to(instance, filename):
+    today = datetime.today()
+    return os.path.join(
+        'payment_attachments',
+        str(today.year),
+        str(today.month).zfill(2),
+        str(today.day).zfill(2),
+        filename
+    )
+
+
+class OrderPaymentAttachment(models.Model):
+    order_payment = models.ForeignKey(OrderPayment, on_delete=models.CASCADE, related_name="attachments")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to=upload_to)
+
+    def __str__(self):
+        return str(self.amount)

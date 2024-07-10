@@ -33,6 +33,8 @@ class Automation(models.Model):
     delays_minutes = models.IntegerField(default=0)
     status = models.CharField(max_length=10, choices=StatusChoices.choices)
     included_users = models.ManyToManyField(User, '+', blank=True)
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
 
     def __str__(self):
         return self.name

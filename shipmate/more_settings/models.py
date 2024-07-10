@@ -1,7 +1,13 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from shipmate.utils.models import BaseLog
+
 User = get_user_model()
+
+
+class AutomationLog(BaseLog):
+    automation = models.ForeignKey("Automation", on_delete=models.CASCADE, related_name="logs")
 
 
 class Automation(models.Model):

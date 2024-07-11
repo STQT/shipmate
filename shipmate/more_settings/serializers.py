@@ -17,6 +17,8 @@ class LogSerializer(serializers.Serializer):
 
 
 class RetrieveAutomationSerializer(serializers.ModelSerializer):
+    email_template_name = serializers.SerializerMethodField(allow_null=True, read_only=True)
+    sms_template_name = serializers.SerializerMethodField(allow_null=True, read_only=True)
     included_users = AutomationUserSerializer(many=True)
     available_users = serializers.SerializerMethodField(read_only=True)
     logs = LogSerializer(many=True)
@@ -25,6 +27,13 @@ class RetrieveAutomationSerializer(serializers.ModelSerializer):
         model = Automation
         fields = "__all__"
 
+
+    def get_email_template_name(self, obj) -> str:
+        return obj.email_template.name if obj.email_template else None
+
+    def get_sms_template_name(self, obj) -> str:
+        return obj.sms_template.name if obj.sms_template else None
+
     def get_available_users(self, obj) -> AutomationUserSerializer(many=True):
         included_users = obj.included_users.all()
         users = User.objects.exclude(id__in=included_users.values_list('id', flat=True))
@@ -32,8 +41,8 @@ class RetrieveAutomationSerializer(serializers.ModelSerializer):
 
 
 class AutomationSerializer(serializers.ModelSerializer):
-    email_template_name = serializers.SerializerMethodField(allow_null=True)
-    sms_template_name = serializers.SerializerMethodField(allow_null=True)
+    email_template_name = serializers.SerializerMethodField(allow_null=True, read_only=True)
+    sms_template_name = serializers.SerializerMethodField(allow_null=True, read_only=True)
 
     class Meta:
         model = Automation

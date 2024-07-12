@@ -109,3 +109,14 @@ class CreateOrderPaymentCreditCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderPaymentCreditCard
         fields = "__all__"
+
+
+class CreateOrderPaymentClientCreditCardSerializer(serializers.ModelSerializer):
+    receipt_file = serializers.FileField(write_only=True, required=True)
+    cc_file = serializers.FileField(write_only=True, required=True)
+    cc_front_img_file = serializers.ImageField(write_only=True, required=True)
+    cc_back_img_file = serializers.ImageField(write_only=True, required=True)
+
+    class Meta:
+        model = OrderPaymentCreditCard
+        fields = "__all__"

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     ListOrderPaymentView, CreateOrderPaymentAPIView, CreateOrderPaymentAttachmentView, ListOrderPaymentAttachmentView,
-    ListOrderPaymentCreditCardView, CreateOrderPaymentCreditCardAPIView,
+    ListOrderPaymentCreditCardView, CreateOrderPaymentCreditCardAPIView, CreateOrderCustomerPaymentCreditCardAPIView,
 )
 
 urlpatterns = [
@@ -14,5 +14,7 @@ urlpatterns = [
     path('attachments/list/', ListOrderPaymentAttachmentView.as_view(),
          name='order-contract-attachments-list'),
     path('credit-cards/', ListOrderPaymentCreditCardView.as_view(), name='cc-list'),
+    path('credit-cards/customer/create/', CreateOrderCustomerPaymentCreditCardAPIView.as_view(),
+         name='cc-customer-create'),
     path('credit-cards/create/', CreateOrderPaymentCreditCardAPIView.as_view(), name='cc-create'),
 ]

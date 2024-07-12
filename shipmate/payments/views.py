@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from .models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
 from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
     SigningContractSerializer, OrderPaymentAttachmentSerializer, ListOrderPaymentCreditCardSerializer, \
-    CreateOrderPaymentCreditCardSerializer
+    CreateOrderPaymentCreditCardSerializer, CreateOrderPaymentClientCreditCardSerializer
 from ..attachments.models import FileAttachment
 from ..contrib.authorize import charge_payment, refund_payment, sent_payment, tip_payment
 from ..contrib.email import send_email
@@ -150,9 +150,9 @@ class ListOrderPaymentCreditCardView(ListAPIView):
     pagination_class = None
 
 
-class CreateOrderPaymentCreditCardAPIView(CreateAPIView):  # noqa
+class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
     queryset = OrderPaymentCreditCard.objects.all()
-    serializer_class = CreateOrderPaymentCreditCardSerializer
+    serializer_class = CreateOrderPaymentClientCreditCardSerializer
 
     def perform_create(self, serializer):
         files = {
@@ -161,7 +161,11 @@ class CreateOrderPaymentCreditCardAPIView(CreateAPIView):  # noqa
             'cc_front_img_file': self.request.FILES.get('cc_front_img_file'),
             'cc_back_img_file': self.request.FILES.get('cc_back_img_file'),
         }
-        instance = serializer.save()
+        validated_data = serializer.validated_data
+        for file_field in ['receipt_file', 'cc_file', 'cc_front_img_file', 'cc_back_img_file']:
+            validated_data.pop(file_field, None)
+
+        instance = OrderPaymentCreditCard.objects.create(**validated_data)
         self.send_email_with_attachments(instance, files)
 
     def send_email_with_attachments(self, instance, files):
@@ -191,3 +195,8 @@ class CreateOrderPaymentCreditCardAPIView(CreateAPIView):  # noqa
         email = EmailMessage(subject, body, to=[email])
         email.attach(file.name, file.read(), file.content_type)
         email.send()
+
+
+class CreateOrderPaymentCreditCardAPIView(CreateAPIView):  # noqa
+    queryset = OrderPaymentCreditCard.objects.all()
+    serializer_class = CreateOrderPaymentCreditCardSerializer

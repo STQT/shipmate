@@ -65,8 +65,6 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
         if credit_card:
             try:
                 credit_card: OrderPaymentCreditCard = OrderPaymentCreditCard.objects.get(pk=credit_card)
-                if credit_card.order_payment != order_payment:
-                    raise ValidationError({"credit_card": "This credit card attached from another orderPayment"})
             except OrderPaymentCreditCard.DoesNotExist:
                 raise ValidationError({"credit_card": "Does not found this Credit Card object in DB"})
             # result = charge_payment(amount, credit_card.card_number, credit_card.expiration_date, credit_card.cvv)

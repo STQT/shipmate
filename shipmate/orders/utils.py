@@ -43,7 +43,8 @@ Best regards,
     password_email = settings.EMAIL_HOST_PASSWORD
     recipient_list = [order_contract.order.customer.email]  # List of recipients
 
-    send_email(subject, message, from_email, recipient_list, user=from_email, password=password_email)
+    send_email(subject=subject, text_content=message, from_email=from_email,
+               to_emails=recipient_list, user=from_email, password=password_email)
 
 
 def send_cc_agreement(order: Order, order_contract):
@@ -75,6 +76,6 @@ Best regards,
     password_email = settings.EMAIL_HOST_PASSWORD
     recipient_list = [order.customer.email]  # List of recipients
     cc_list = ["info@matelogisticss.com", "info@oceanbluego.com"]
-    send_email(subject, message, from_email, recipient_list,
+    send_email(subject=subject, text_content=message, from_email=from_email, to_emails=recipient_list,
                cc_emails=cc_list, user=from_email,
                password=password_email)

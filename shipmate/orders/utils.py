@@ -34,7 +34,7 @@ Should you have any questions or require any clarifications regarding the contra
 Thank you for your prompt attention to this matter. We look forward to receiving the signed contract at your earliest convenience.
 
 Best regards,
-{order_contract.order.user.name}
+{order_contract.order.user.first_name} {order_contract.order.user.last_name}
 {company_name}
 {contact_email}
 {contact_mainline}
@@ -46,8 +46,7 @@ Best regards,
     send_email(subject, message, from_email, recipient_list, user=from_email, password=password_email)
 
 
-def send_cc_agreement():
-    order: Order
+def send_cc_agreement(order: Order, order_contract):
     company_name, contact_email, contact_mainline = get_company_data()
     subject = "Action Required: Credit Card Authorization Form"
     message = f"""Dear {order.customer.name} {order.customer.last_name},
@@ -55,6 +54,7 @@ def send_cc_agreement():
 As part of our process to finalize your transaction, we kindly request that you complete the attached Credit Card Authorization Form. Please follow these steps:
 
 1. Click here to fill out the online Credit Card Authorization Form completely and accurately.
+{settings.FRONTEND_URL}/contract/{order.guid}/{order_contract}
 2. Attach a clear image of both the front and back of the credit card.
 3. Ensure that the name on the credit card matches the name on the contract.
 
@@ -66,7 +66,7 @@ Thank you for your prompt attention to this matter.
 
 Best regards,
 
-{order.user.name}
+{order.user.first_name} {order.user.last_name}
 {company_name}
 {contact_email}
 {contact_mainline}

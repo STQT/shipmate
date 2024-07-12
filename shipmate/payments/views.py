@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.generics import (
-    ListAPIView, CreateAPIView,
+    ListAPIView, CreateAPIView, get_object_or_404,
 )
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -13,15 +13,28 @@ from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
     SigningContractSerializer, OrderPaymentAttachmentSerializer, ListOrderPaymentCreditCardSerializer, \
     CreateOrderPaymentCreditCardSerializer, CreateOrderPaymentClientCreditCardSerializer
 from ..attachments.models import FileAttachment
-from ..contrib.authorize import charge_payment, refund_payment, sent_payment, tip_payment
 from ..contrib.email import send_email
 from ..contrib.models import Attachments
 from ..orders.models import OrderAttachment
+from ..orders.utils import send_cc_agreement
 
 
 class CreateOrderPaymentAPIView(CreateAPIView):  # noqa
     queryset = OrderPayment.objects.all()
     serializer_class = CreateOrderPaymentSerializer
+
+
+class SendCCAToPaymentView(CreateAPIView):
+    serializer_class = None
+
+    def create(self, request, *args, **kwargs):
+        payment_id = self.kwargs.get('payment')
+        payment = get_object_or_404(OrderPayment, id=payment_id)
+        contract = payment.order.contracts.all().first()
+        if contract:
+            send_cc_agreement(payment.order, contract.pk)
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(data={"error": "No contracts"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ListOrderPaymentView(ListAPIView):  # noqa

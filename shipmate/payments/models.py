@@ -82,7 +82,8 @@ class OrderPaymentAttachment(models.Model):
 
 
 class OrderPaymentCreditCard(models.Model):
-    order_payment = models.ForeignKey(OrderPayment, on_delete=models.CASCADE, related_name="credit_cards")
+    order = models.ForeignKey("orders.Order", to_field="guid",
+                              on_delete=models.CASCADE, related_name="credit_cards")
     card_number = models.CharField(max_length=16)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)

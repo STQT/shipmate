@@ -32,6 +32,7 @@ from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..company_management.models import CompanyInfo
 from ..contract.models import Hawaii, Ground, International
 from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
+from ..contrib.email import send_email
 from ..contrib.pagination import CustomPagination
 from ..contrib.sms import send_sms
 from ..contrib.views import ArchiveView, ReAssignView
@@ -206,7 +207,7 @@ class CreateOrderContractAPIView(CreateAPIView):  # noqa
 
 @extend_schema(tags=[CONTRACTS_TAG])
 class ListOrderContractView(ListAPIView):  # noqa
-    queryset = OrderContract.objects.all() # noqa
+    queryset = OrderContract.objects.all()  # noqa
     serializer_class = OrderContractSerializer
     pagination_class = None
 
@@ -266,6 +267,7 @@ class SignOrderContractView(APIView):
             email.attach(agreement.name, agreement.read(), agreement.content_type)
             email.attach(terms.name, terms.read(), terms.content_type)
 
+
             try:
                 email.send()
                 logger.info(f"Email sent successfully to {customer_email}")
@@ -295,7 +297,7 @@ class DetailOrderContractView(APIView):
             contract_obj = OrderContract.objects.get(id=contract)
         except OrderContract.DoesNotExist:
             return Response({'error': 'OrderContract not found'}, status=status.HTTP_404_NOT_FOUND)
-        order_obj = contract_obj.order
+        order_obj: Order = contract_obj.order
         if order_obj.guid != order:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         company_obj = CompanyInfo.objects.first()
@@ -303,12 +305,14 @@ class DetailOrderContractView(APIView):
         pdf_obj = pdf_obj.first()
         if not pdf_obj:
             return Response({"error": f'Default contract not exists for {contract_obj.contract_type}'})
+        credit_card = order_obj.payments.filter(payment_type="credit_card").first()
 
         data = {
             'order': order_obj,
             'contract': contract_obj,
             'company': company_obj,
-            'pdf': pdf_obj
+            'pdf': pdf_obj,
+            'cc': True if credit_card else False
         }
 
         serializer = DetailContractSerializer(data)

@@ -136,14 +136,6 @@ class Attachments(models.Model):
     def __str__(self):
         return self.title
 
-    # def delete(self, *args, **kwargs):
-    #     rel_model_dict = {
-    #
-    #     }
-    #     ModelC.objects.filter(pk=self.link).delete()
-    #     # Continue with the deletion of ModelB instance
-    #     super().delete(*args, **kwargs)
-
 
 class UserLog(BaseLog):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="logs")

@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.generics import (
     ListAPIView, CreateAPIView,
@@ -10,7 +12,11 @@ from .models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
 from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
     SigningContractSerializer, OrderPaymentAttachmentSerializer, ListOrderPaymentCreditCardSerializer, \
     CreateOrderPaymentCreditCardSerializer
+from ..attachments.models import FileAttachment
 from ..contrib.authorize import charge_payment, refund_payment, sent_payment, tip_payment
+from ..contrib.email import send_email
+from ..contrib.models import Attachments
+from ..orders.models import OrderAttachment
 
 
 class CreateOrderPaymentAPIView(CreateAPIView):  # noqa
@@ -140,10 +146,48 @@ class ListOrderPaymentAttachmentView(ListAPIView):
 class ListOrderPaymentCreditCardView(ListAPIView):
     queryset = OrderPaymentCreditCard.objects.all().order_by("-id")
     serializer_class = ListOrderPaymentCreditCardSerializer
-    filterset_fields = ["order_payment"]
+    filterset_fields = ["order"]
     pagination_class = None
 
 
 class CreateOrderPaymentCreditCardAPIView(CreateAPIView):  # noqa
     queryset = OrderPaymentCreditCard.objects.all()
     serializer_class = CreateOrderPaymentCreditCardSerializer
+
+    def perform_create(self, serializer):
+        files = {
+            'receipt_file': self.request.FILES.get('receipt_file'),
+            'cc_file': self.request.FILES.get('cc_file'),
+            'cc_front_img_file': self.request.FILES.get('cc_front_img_file'),
+            'cc_back_img_file': self.request.FILES.get('cc_back_img_file'),
+        }
+        instance = serializer.save()
+        self.send_email_with_attachments(instance, files)
+
+    def send_email_with_attachments(self, instance, files):
+        receipt = files['receipt_file']
+        cc_file = files['cc_file']
+        cc_front_img_file = files['cc_front_img_file']
+        cc_back_img_file = files['cc_back_img_file']
+        self.send_receipt(instance.order.customer.email, receipt)
+        self.send_cc(settings.DEFAULT_FROM_EMAIL, cc_file)
+        front_file_attachment = FileAttachment.objects.create(file=cc_front_img_file, text="Front credit card")
+        back_file_attachment = FileAttachment.objects.create(file=cc_back_img_file, text="Back credit card")
+        OrderAttachment.objects.create(order=instance.order, link=front_file_attachment.pk,
+                                       title="Front credit card", type=Attachments.TypesChoices.FILE)
+        OrderAttachment.objects.create(order=instance.order, link=back_file_attachment.pk,
+                                       title="Back credit card", type=Attachments.TypesChoices.FILE)
+
+    def send_receipt(self, customer, file):
+        subject = 'Receipt'
+        body = 'Receipt'
+        email = EmailMessage(subject, body, to=[customer])
+        email.attach(file.name, file.read(), file.content_type)
+        email.send()
+
+    def send_cc(self, email, file):
+        subject = 'CC'
+        body = 'cc'
+        email = EmailMessage(subject, body, to=[email])
+        email.attach(file.name, file.read(), file.content_type)
+        email.send()

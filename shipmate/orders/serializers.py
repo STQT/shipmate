@@ -260,21 +260,6 @@ class RetrieveOrderSerializer(ListOrderSerializer):
         ]
 
 
-class RetrieveOrderContractSerializer(ListOrderSerializer):
-    customer = CustomerSerializer(many=False)  # noqa
-    origin = CitySerializer(many=False)
-    destination = CitySerializer(many=False)
-    order_vehicles = DetailVehicleOrderSerializer(many=True)
-    source = ProviderSmallDataSerializer(many=False)
-    dispatch_data = DispatchingOrderSerializer(source="*", allow_null=True, required=False)
-    dates = OrderDatesSerializer(many=False, source="*")
-    payments = OrderPaymentsSerializer(many=False, source="*")
-
-    class Meta:
-        model = Order
-        fields = "__all__"
-
-
 class UpdateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
@@ -317,7 +302,7 @@ class CompanyDetailInfoSerializer(serializers.ModelSerializer):
 
 
 class DetailContractSerializer(serializers.Serializer):
-    order = RetrieveOrderContractSerializer(read_only=True)
+    order = RetrieveOrderSerializer(read_only=True)
     contract = OrderContractSerializer(read_only=True)
     company = CompanyDetailInfoSerializer(read_only=True)
     pdf = BaseContractSerializer(read_only=True)

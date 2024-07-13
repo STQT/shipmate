@@ -34,7 +34,7 @@ class SendCCAToPaymentView(CreateAPIView):
         payment = get_object_or_404(OrderPayment, id=payment_id)
         contract = payment.order.contracts.all().first()
         if contract:
-            send_cc_agreement(payment.order, contract.pk)
+            send_cc_agreement(payment.order, payment)
             return Response(status=status.HTTP_201_CREATED)
         return Response(data={"error": "No contracts"}, status=status.HTTP_400_BAD_REQUEST)
 

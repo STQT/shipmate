@@ -3,6 +3,7 @@ from django.conf import settings
 
 from shipmate.company_management.models import CompanyInfo
 from shipmate.orders.models import OrderContract, Order
+from shipmate.payments.models import OrderPayment, TypeChoices
 
 
 def get_company_data():
@@ -47,15 +48,18 @@ Best regards,
                to_emails=recipient_list, user=from_email, password=password_email)
 
 
-def send_cc_agreement(order: Order, order_contract):
+def send_cc_agreement(order: Order, payment: OrderPayment):
     company_name, contact_email, contact_mainline = get_company_data()
+    url = f"{settings.FRONTEND_URL}/contract/pay/{order.guid}"
+    if payment.payment_type == TypeChoices.credit_card:
+        url = f"{settings.FRONTEND_URL}/contract/cc-auth/{order.guid}"
     subject = "Action Required: Credit Card Authorization Form"
     message = f"""Dear {order.customer.name} {order.customer.last_name},
 
 As part of our process to finalize your transaction, we kindly request that you complete the attached Credit Card Authorization Form. Please follow these steps:
 
 1. Click here to fill out the online Credit Card Authorization Form completely and accurately.
-{settings.FRONTEND_URL}/contract/pay/{order.guid}
+{url}
 2. Attach a clear image of both the front and back of the credit card.
 3. Ensure that the name on the credit card matches the name on the contract.
 

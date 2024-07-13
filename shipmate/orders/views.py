@@ -304,11 +304,14 @@ class DetailOrderContractView(APIView):
         pdf_obj = pdf_obj.first()
         if not pdf_obj:
             return Response({"error": f'Default contract not exists for {contract_obj.contract_type}'})
+        credit_card = order_obj.payments.filter(payment_type="credit_card").first()
+
         data = {
             'order': order_obj,
             'contract': contract_obj,
             'company': company_obj,
-            'pdf': pdf_obj
+            'pdf': pdf_obj,
+            'cc': True if credit_card else False
         }
 
         serializer = DetailContractSerializer(data)

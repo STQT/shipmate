@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     ListOrderPaymentView, CreateOrderPaymentAPIView, CreateOrderPaymentAttachmentView, ListOrderPaymentAttachmentView,
     ListOrderPaymentCreditCardView, CreateOrderPaymentCreditCardAPIView, CreateOrderCustomerPaymentCreditCardAPIView,
-    SendCCAToPaymentView,
+    SendCCAToPaymentView, DetailOrderCustomerContractView,
 )
 
 urlpatterns = [
@@ -12,6 +12,8 @@ urlpatterns = [
          name='order-contract-create'),
     path('send-cca/<int:payment>/', SendCCAToPaymentView.as_view(),
          name='order-cca-send'),
+    path('customer/<uuid:order>/', DetailOrderCustomerContractView.as_view(),
+         name='order-payment-detail'),
     path('attachments/', CreateOrderPaymentAttachmentView.as_view(),
          name='order-contract-attachments-create'),
     path('attachments/list/', ListOrderPaymentAttachmentView.as_view(),

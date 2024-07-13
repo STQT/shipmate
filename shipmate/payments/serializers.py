@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from shipmate.contrib.authorize import charge_payment
 from shipmate.contrib.serializers import Base64ImageField
+from shipmate.orders.serializers import CompanyDetailInfoSerializer, RetrieveOrderSerializer
 from shipmate.payments.models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
 
 
@@ -118,3 +119,9 @@ class CreateOrderPaymentClientCreditCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderPaymentCreditCard
         fields = "__all__"
+
+
+class DetailCustomerPaymentSerializer(serializers.Serializer):
+    order = RetrieveOrderSerializer(read_only=True)
+    company = CompanyDetailInfoSerializer(read_only=True)
+    cc = serializers.BooleanField(read_only=True)

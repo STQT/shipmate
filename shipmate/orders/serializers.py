@@ -306,7 +306,6 @@ class DetailContractSerializer(serializers.Serializer):
     contract = OrderContractSerializer(read_only=True)
     company = CompanyDetailInfoSerializer(read_only=True)
     pdf = BaseContractSerializer(read_only=True)
-    cc = serializers.BooleanField(read_only=True)
 
 
 class SigningContractSerializer(serializers.ModelSerializer):

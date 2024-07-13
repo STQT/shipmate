@@ -55,7 +55,7 @@ def send_cc_agreement(order: Order, order_contract):
 As part of our process to finalize your transaction, we kindly request that you complete the attached Credit Card Authorization Form. Please follow these steps:
 
 1. Click here to fill out the online Credit Card Authorization Form completely and accurately.
-{settings.FRONTEND_URL}/contract/{order.guid}/{order_contract}
+{settings.FRONTEND_URL}/contract/pay/{order.guid}
 2. Attach a clear image of both the front and back of the credit card.
 3. Ensure that the name on the credit card matches the name on the contract.
 

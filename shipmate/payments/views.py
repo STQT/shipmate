@@ -11,11 +11,13 @@ from rest_framework.views import APIView
 from .models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
 from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
     SigningContractSerializer, OrderPaymentAttachmentSerializer, ListOrderPaymentCreditCardSerializer, \
-    CreateOrderPaymentCreditCardSerializer, CreateOrderPaymentClientCreditCardSerializer
+    CreateOrderPaymentCreditCardSerializer, CreateOrderPaymentClientCreditCardSerializer, \
+    DetailCustomerPaymentSerializer
 from ..attachments.models import FileAttachment
+from ..company_management.models import CompanyInfo
 from ..contrib.email import send_email
 from ..contrib.models import Attachments
-from ..orders.models import OrderAttachment
+from ..orders.models import OrderAttachment, Order
 from ..orders.utils import send_cc_agreement
 
 
@@ -213,3 +215,24 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
 class CreateOrderPaymentCreditCardAPIView(CreateAPIView):  # noqa
     queryset = OrderPaymentCreditCard.objects.all()
     serializer_class = CreateOrderPaymentCreditCardSerializer
+
+
+class DetailOrderCustomerContractView(APIView):
+    serializer_class = DetailCustomerPaymentSerializer(many=False)
+    permission_classes = [AllowAny]
+
+    def get(self, request, order):
+        try:
+            order_obj = Order.objects.get(guid=order)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        company_obj = CompanyInfo.objects.first()
+        credit_card = order_obj.payments.filter(payment_type="credit_card").first()
+        data = {
+            'order': order_obj,
+            'company': company_obj,
+            'cc': True if credit_card else False
+        }
+
+        serializer = DetailCustomerPaymentSerializer(data)
+        return Response(serializer.data)

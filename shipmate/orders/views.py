@@ -267,7 +267,6 @@ class SignOrderContractView(APIView):
             email.attach(agreement.name, agreement.read(), agreement.content_type)
             email.attach(terms.name, terms.read(), terms.content_type)
 
-
             try:
                 email.send()
                 logger.info(f"Email sent successfully to {customer_email}")
@@ -305,14 +304,11 @@ class DetailOrderContractView(APIView):
         pdf_obj = pdf_obj.first()
         if not pdf_obj:
             return Response({"error": f'Default contract not exists for {contract_obj.contract_type}'})
-        credit_card = order_obj.payments.filter(payment_type="credit_card").first()
-
         data = {
             'order': order_obj,
             'contract': contract_obj,
             'company': company_obj,
-            'pdf': pdf_obj,
-            'cc': True if credit_card else False
+            'pdf': pdf_obj
         }
 
         serializer = DetailContractSerializer(data)

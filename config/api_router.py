@@ -5,6 +5,8 @@ from shipmate.company_management.views import MerchantViewSet, VoIPViewSet, Temp
 from shipmate.contract.views import GroundViewSet, HawaiiViewSet, InternationalViewSet
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
+from shipmate.insights.views import GoalGroupViewSet
+
 if settings.DEBUG:
     router = DefaultRouter()
 else:
@@ -19,6 +21,7 @@ router.register(r'merchant', MerchantViewSet)
 router.register(r'voip', VoIPViewSet)
 router.register(r'template', TemplateViewSet)
 router.register(r'payment-app', PaymentAppViewSet)
+router.register(r'insights/goal-group', GoalGroupViewSet)
 
 urlpatterns = router.urls
 
@@ -37,4 +40,5 @@ urlpatterns += [
     path('fields/', include('shipmate.mails.urls'), name="fields"),
     path('order-payments/', include('shipmate.payments.urls'), name="payments"),
     path('more-settings/', include('shipmate.more_settings.urls'), name="more-settings"),
+    path('insights/', include('shipmate.insights.urls'), name="insights"),
 ]

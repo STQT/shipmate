@@ -171,8 +171,7 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
 
     def perform_create(self, serializer):
         files = {
-            'receipt_file': self.request.FILES.get('receipt_file'),
-            'cc_file': self.request.FILES.get('cc_file'),
+            'sign_file': self.request.FILES.get('sign_file'),
             'cc_front_img_file': self.request.FILES.get('cc_front_img_file'),
             'cc_back_img_file': self.request.FILES.get('cc_back_img_file'),
         }
@@ -184,14 +183,11 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
         self.send_email_with_attachments(instance, files)
 
     def send_email_with_attachments(self, instance, files):
-        receipt = files['receipt_file']
-        cc_file = files['cc_file']
         cc_front_img_file = files['cc_front_img_file']
         cc_back_img_file = files['cc_back_img_file']
-        self.send_receipt(instance.order.customer.email, receipt)
-        self.send_cc(settings.DEFAULT_FROM_EMAIL, cc_file)
         front_file_attachment = FileAttachment.objects.create(file=cc_front_img_file, text="Front credit card")
         back_file_attachment = FileAttachment.objects.create(file=cc_back_img_file, text="Back credit card")
+        # TODO: add code for saving PDF receipt in the OrderAttachment
         OrderAttachment.objects.create(order=instance.order, link=front_file_attachment.pk,
                                        title="Front credit card", type=Attachments.TypesChoices.FILE)
         OrderAttachment.objects.create(order=instance.order, link=back_file_attachment.pk,

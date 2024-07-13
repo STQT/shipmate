@@ -93,6 +93,7 @@ class OrderPaymentCreditCard(models.Model):
     billing_city = models.CharField(max_length=50)
     billing_state = models.CharField(max_length=2, blank=True, null=True)
     billing_zip = models.CharField(max_length=5, blank=True, null=True)
+    sign_file = models.ImageField(blank=True, null=True)
 
     def __str__(self):
         return self.card_number

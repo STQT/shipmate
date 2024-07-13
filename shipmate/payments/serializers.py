@@ -111,8 +111,7 @@ class CreateOrderPaymentCreditCardSerializer(serializers.ModelSerializer):
 
 
 class CreateOrderPaymentClientCreditCardSerializer(serializers.ModelSerializer):
-    receipt_file = serializers.FileField(write_only=True, required=True)
-    cc_file = serializers.FileField(write_only=True, required=True)
+    sign_file = Base64ImageField(use_url=True, required=False, allow_null=True)
     cc_front_img_file = serializers.ImageField(write_only=True, required=True)
     cc_back_img_file = serializers.ImageField(write_only=True, required=True)
 

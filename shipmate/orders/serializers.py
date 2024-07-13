@@ -296,9 +296,18 @@ class OrderAttachmentSerializer(serializers.ModelSerializer):
 
 
 class CompanyDetailInfoSerializer(serializers.ModelSerializer):
+    logo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = CompanyInfo
         fields = "__all__"
+
+    def get_logo_url(self, obj):
+        print(obj.logo)
+        if obj.logo:
+            request = self.context.get('request')
+            return request.build_absolute_uri(obj.logo.url)
+        return None
 
 
 class DetailContractSerializer(serializers.Serializer):
@@ -307,6 +316,23 @@ class DetailContractSerializer(serializers.Serializer):
     company = CompanyDetailInfoSerializer(read_only=True)
     pdf = BaseContractSerializer(read_only=True)
     cc = serializers.BooleanField(read_only=True)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+
+        if request:
+            representation['order'] = RetrieveOrderSerializer(
+                instance['order'], context={'request': request}).data
+            representation['contract'] = OrderContractSerializer(
+                instance['contract'],
+                context={'request': request}).data
+            representation['company'] = CompanyDetailInfoSerializer(
+                instance['company'],
+                context={'request': request}).data
+            representation['pdf'] = BaseContractSerializer(instance['pdf'], context={'request': request}).data
+
+        return representation
 
 
 class SigningContractSerializer(serializers.ModelSerializer):

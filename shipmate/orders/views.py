@@ -314,7 +314,7 @@ class DetailOrderContractView(APIView):
             'cc': True if credit_card else False
         }
 
-        serializer = DetailContractSerializer(data)
+        serializer = DetailContractSerializer(data, context={"request": request})
         return Response(serializer.data)
 
 

@@ -317,23 +317,6 @@ class DetailContractSerializer(serializers.Serializer):
     pdf = BaseContractSerializer(read_only=True)
     cc = serializers.BooleanField(read_only=True)
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        request = self.context.get('request')
-
-        if request:
-            representation['order'] = RetrieveOrderSerializer(
-                instance['order'], context={'request': request}).data
-            representation['contract'] = OrderContractSerializer(
-                instance['contract'],
-                context={'request': request}).data
-            representation['company'] = CompanyDetailInfoSerializer(
-                instance['company'],
-                context={'request': request}).data
-            representation['pdf'] = BaseContractSerializer(instance['pdf'], context={'request': request}).data
-
-        return representation
-
 
 class SigningContractSerializer(serializers.ModelSerializer):
     agreement = serializers.FileField(write_only=True)

@@ -1,4 +1,5 @@
 import logging
+import os
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -255,18 +256,28 @@ class SignOrderContractView(APIView):
                 order_obj.status = OrderStatusChoices.BOOKED
                 order_obj.save()
 
+            def save_file(file):
+                file_name = f'{timezone.now().strftime("%Y%m%d%H%M%S")}_{file.name}'
+                file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+                return f'{settings.MEDIA_URL}{file_name}'
+
+            agreement_url = save_file(agreement)
+            terms_url = save_file(terms)
+
             # Send email with ZIP attachment
             customer_email = order_obj.customer.email
 
             email = EmailMessage(
                 subject='Signed Contract and Terms',
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                body='Dear Customer, please find attached the signed contract and terms.',
+                body=f'Dear Customer, please find the signed contract and terms at the following links:\n\n'
+                     f'Agreement: {request.build_absolute_uri(agreement_url)}\n'
+                     f'Terms: {request.build_absolute_uri(terms_url)}',
                 to=[customer_email],
             )
-            email.attach(agreement.name, agreement.read(), agreement.content_type)
-            email.attach(terms.name, terms.read(), terms.content_type)
-
             try:
                 email.send()
                 logger.info(f"Email sent successfully to {customer_email}")

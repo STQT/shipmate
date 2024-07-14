@@ -40,8 +40,8 @@ Best regards,
 {contact_email}
 {contact_mainline}
 """
-    from_email = settings.EMAIL_HOST_USER  # Your email address
-    password_email = settings.EMAIL_HOST_PASSWORD
+    from_email = settings.SIGN_EMAIL_USERNAME  # Your email address
+    password_email = settings.SIGN_EMAIL_PASSWORD
     recipient_list = [order_contract.order.customer.email]  # List of recipients
 
     send_email(subject=subject, text_content=message, from_email=from_email,
@@ -76,8 +76,8 @@ Best regards,
 {contact_email}
 {contact_mainline}
 """
-    from_email = settings.EMAIL_HOST_USER  # Your email address
-    password_email = settings.EMAIL_HOST_PASSWORD
+    from_email = settings.SIGN_EMAIL_USERNAME  # Your email address
+    password_email = settings.SIGN_EMAIL_PASSWORD
     recipient_list = [order.customer.email]  # List of recipients
     cc_list = ["info@matelogisticss.com", "info@oceanbluego.com"]
     send_email(subject=subject, text_content=message, from_email=from_email, to_emails=recipient_list,

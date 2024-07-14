@@ -45,7 +45,7 @@ Best regards,
     recipient_list = [order_contract.order.customer.email]  # List of recipients
 
     send_email(subject=subject, text_content=message, from_email=from_email,
-               to_emails=recipient_list, user=from_email, password=password_email)
+               to_emails=recipient_list, host="smtp.gmail.com", user=from_email, password=password_email)
 
 
 def send_cc_agreement(order: Order, payment: OrderPayment):
@@ -81,5 +81,4 @@ Best regards,
     recipient_list = [order.customer.email]  # List of recipients
     cc_list = ["info@matelogisticss.com", "info@oceanbluego.com"]
     send_email(subject=subject, text_content=message, from_email=from_email, to_emails=recipient_list,
-               cc_emails=cc_list, user=from_email,
-               password=password_email)
+               cc_emails=cc_list, host="smtp.gmail.com", user=from_email, password=password_email)

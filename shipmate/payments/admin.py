@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from shipmate.payments.models import OrderPayment, OrderPaymentAttachment
+from shipmate.payments.models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
 
 
 class OrderPaymentAttachmentInline(admin.TabularInline):
@@ -15,4 +15,9 @@ class OrderPaymentAdmin(admin.ModelAdmin):
 
 @admin.register(OrderPaymentAttachment)
 class OrderPaymentAttachmentAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(OrderPaymentCreditCard)
+class OrderPaymentCreditCardAdmin(admin.ModelAdmin):
     ...

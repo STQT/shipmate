@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.core.mail import EmailMessage
 from rest_framework import status
@@ -176,7 +178,7 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
             'cc_back_img_file': self.request.FILES.get('cc_back_img_file'),
         }
         validated_data = serializer.validated_data
-        for file_field in ['receipt_file', 'cc_file', 'cc_front_img_file', 'cc_back_img_file']:
+        for file_field in ['cc_front_img_file', 'cc_back_img_file']:
             validated_data.pop(file_field, None)
 
         instance = OrderPaymentCreditCard.objects.create(**validated_data)
@@ -232,3 +234,46 @@ class DetailOrderCustomerContractView(APIView):
 
         serializer = DetailCustomerPaymentSerializer(data, context={"request": request})
         return Response(serializer.data)
+
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from weasyprint import HTML
+import tempfile
+
+
+def generate_pdf(request):
+    # Render the HTML template
+    html_string = render(request, 'pdfs/cca.html', {}).content.decode('utf-8')
+
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as output:
+        # Convert HTML to PDF
+        HTML(string=html_string).write_pdf(output.name)
+        output.seek(0)
+
+        # Define the file path to save the PDF
+        save_dir = settings.MEDIA_ROOT + '/pdfs/output/'  # Change this to your desired directory
+        os.makedirs(save_dir, exist_ok=True)  # Ensure the directory exists
+        pdf_file_path = os.path.join(save_dir, 'output.pdf')
+
+        # Save the PDF to the defined file path
+        with open(pdf_file_path, 'wb') as f:
+            f.write(output.read())
+
+        # Optionally, delete the temporary file
+        os.unlink(output.name)
+
+    return HttpResponse(f"PDF generated and saved successfully at {pdf_file_path}.")
+
+    # with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as output:
+    #     # Convert HTML to PDF
+    #     HTML(string=html_string).write_pdf(output.name)
+    #     output.seek(0)
+    #
+    #     # Return the PDF file as a response
+    #     response = HttpResponse(output.read(), content_type='application/pdf')
+    #     response['Content-Disposition'] = 'inline; filename="output.pdf"'
+    #
+    #     return response
+

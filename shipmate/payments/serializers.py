@@ -52,7 +52,8 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderPaymentAttachment
-        fields = ['id', 'order_payment', 'amount', 'image', 'payment_type', 'created_at', 'is_success', 'credit_card']
+        fields = ['id', 'order_payment', 'amount', 'image', 'payment_type',
+                  'created_at', 'is_success', 'credit_card', 'transaction_id']
         extra_kwargs = {
             'is_success': {'read_only': True},
             'payment_type': {'read_only': True},
@@ -68,12 +69,12 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
                 credit_card: OrderPaymentCreditCard = OrderPaymentCreditCard.objects.get(pk=credit_card)
             except OrderPaymentCreditCard.DoesNotExist:
                 raise ValidationError({"credit_card": "Does not found this Credit Card object in DB"})
-            # result = charge_payment(amount, credit_card.card_number, credit_card.expiration_date, credit_card.cvv)
-            result = {"success": True}  # TODO: remove after
+            result = charge_payment(amount, credit_card.card_number, credit_card.expiration_date, credit_card.cvv)
             if result['success'] is False:
                 validated_data['is_success'] = False
                 OrderPaymentAttachment.objects.create(**validated_data)
                 raise ValidationError({"credit_card": f"Problem via Authorize.net: {result['message']}"})
+            validated_data['transaction_id'] = result['transaction_id']
         order_payment_attachments_all_amount = OrderPaymentAttachment.objects.filter(order_payment=order_payment)
         total_amount = order_payment_attachments_all_amount.aggregate(Sum('amount'))['amount__sum'] or 0
         order_payment.amount_charged = total_amount + amount

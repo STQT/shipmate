@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credit Card Authorization</title>
+  <style>
+    @font-face {
+      font-family: 'Rubik';
+      src: url('/static/fonts/Rubik-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Rubik';
+      src: url('/static/fonts/Rubik-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    body {
+      font-family: "Rubik", sans-serif;
+      margin: 0;
+      padding: 0;
+      {#background-color: #f4f4f4;#}
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      padding: 0;
+      margin: 0 auto;
+    }
+
+    .box-log img {
+      width: 275px;
+      height: 95.19px;
+    }
+
+    .box-logo {
+      display: flex;
+      justify-content: center;
+    }
+
+    .box h1 {
+      color: rgb(33, 35, 44);
+      font-size: 25.89px;
+      font-weight: 700;
+      line-height: 31px;
+      letter-spacing: 0%;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .signature {
+      width: 336px;
+      height: 105px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 4px;
+      background: rgb(234, 234, 234);
+      margin-bottom: 5px;
+      margin-top: 15px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 25.89px;
+      font-weight: 500;
+      line-height: 30.68px;
+      color: #21232c;
+    }
+
+    .amount-paragraph {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
+
+    .amount-col {
+      flex: 1;
+      padding: 0 5px;
+    }
+
+    .amount-col div {
+      color: rgb(22, 72, 99);
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .amount-col p {
+      font-weight: 300;
+      color: black;
+      width: 170px;
+      padding: 4px;
+      margin: 4px;
+    }
+    .amount-col strong {
+      font-size: 14px;
+    }
+
+    .d-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .col {
+      width: 25%;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 18.96px;
+      text-align: left;
+      color: #164863;
+      padding: 3px;
+    }
+
+    .col span {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: rgb(234, 234, 234);
+      outline: none;
+      display: flex;
+      justify-content: left;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18.96px;
+      text-align: left;
+      color: #21232c;
+      padding: 3px 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="box">
+  <div class="container">
+    <div class="box-logo">
+
+      <img src="http://{{ request.get_host }}{% static 'logo.png' %}" alt="Mate Logistics">
+    </div>
+    <h1>Credit Card Authorization</h1>
+    <div class="table">
+      <div class="row d-flex">
+        <div class="col">Card number</div>
+        <div class="col">
+          <span>40** **** 2323 2323</span>
+        </div>
+        <div class="col">Address</div>
+        <div class="col">
+          <span>3 Germay Dr</span>
+        </div>
+      </div>
+
+      <div class="row d-flex">
+        <div class="col">First name</div>
+        <div class="col">
+          <span>Gayratbek Sultonov</span>
+        </div>
+        <div class="col">City</div>
+        <div class="col">
+          <span>Wilmington</span>
+        </div>
+      </div>
+
+      <div class="row d-flex">
+        <div class="col">Last name</div>
+        <div class="col">
+          <span>Summer</span>
+        </div>
+        <div class="col">State</div>
+        <div class="col">
+          <span>DE</span>
+        </div>
+      </div>
+
+      <div class="row d-flex">
+        <div class="col">Expiration date</div>
+        <div class="col">
+          <span>10/24</span>
+        </div>
+        <div class="col">Zip</div>
+        <div class="col">
+          <span>12345</span>
+        </div>
+      </div>
+
+      <div class="row d-flex">
+        <div class="col">Security code</div>
+        <div class="col">
+          <span>322</span>
+        </div>
+        <div class="col">Phone Number</div>
+        <div class="col">
+          <span>(999) 999-9999</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="amount-paragraph">
+      <div class="amount-col">
+        <div>
+          <strong>Order ID</strong>
+          <p>101001</p>
+        </div>
+        <div>
+          <strong>Vehicle</strong>
+          <p>2023 Toyota Camry</p>
+        </div>
+        <div>
+          <strong>Date</strong>
+          <p>12/31/2024</p>
+        </div>
+      </div>
+      <div class="amount-col">
+        <div>
+          <strong>Amount</strong>
+          <p>$200.00</p>
+        </div>
+        <div>
+          <strong>Surcharge fee</strong>
+          <p>$9.00</p>
+        </div>
+        <div>
+          <strong>Total amount</strong>
+          <p>$209.00</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p>
+        I authorize <strong>Mate Logistics Inc</strong> to charge the credit
+        card indicated in this authorization form according to the terms
+        mentioned above and the agreement under "Order ID". This payment
+        authorization is for the goods/services described above, for the
+        amount indicated above and the terms mentioned in the agreement
+        under "Order ID".
+      </p>
+      <p>
+        I certify that I am an authorized user of this credit card and will
+        not dispute the payment with my credit card company; so long as the
+        transaction corresponds to the terms indicated in the agreement
+        under "Order ID".
+      </p>
+    </div>
+    <div>
+      <strong>Signature</strong>
+      <div class="signature">
+        <img
+          width="100%"
+          height="100%"
+          src="https://crmapi01xz.matelogisticss.com/media/credit_cards/2024/07/15/25f279fb-b8b6-4e59-93be-67d2f1458067.png"
+          alt=""
+        />
+      </div>
+
+      <p>E-Signed: 12/31/2024 02:12 PM EST<br>IP: 191.12.12.12</p>
+    </div>
+    <div class="footer">
+      <b>Thank you for your business!</b>
+    </div>
+  </div>
+</div>
+</body>
+</html>

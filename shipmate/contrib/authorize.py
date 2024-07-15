@@ -9,7 +9,10 @@ URL = "https://api2.authorize.net/xml/v1/request.api"
 
 def get_authorize_credentials():
     merchant = Merchant.objects.filter(merchant_type=MerchantTypeChoices.AUTHORIZE).first()
-    return merchant.authorize_login, merchant.authorize_password
+    if merchant:
+        return merchant.authorize_login, merchant.authorize_password
+    else:
+        raise Exception("No merchant credentials for authorize.net")
 
 
 def charge_payment(amount, card_number, expiration_date, card_code):
@@ -83,10 +86,14 @@ def handle_response(response):
         if response.status_code == 200:
             if response_json.get('messages', {}).get('resultCode') == "Ok":
                 if 'transactionResponse' in response_json and 'messages' in response_json['transactionResponse']:
+                    try:
+                        transaction_id = response_json['transactionResponse']['transId']
+                    except KeyError:
+                        transaction_id = "None"
                     return {
                         "success": True,
                         "message": "Transaction successful.",
-                        "transaction_id": response_json['transactionResponse']['transId']
+                        "transaction_id": transaction_id
                     }
                 else:
                     return {

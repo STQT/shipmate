@@ -1,17 +1,23 @@
 from django.utils import timezone
 
 
+def blur_value(value):
+    if isinstance(value, str):
+        blurred_part = "*" * (len(value) - 4) + value[-4:]
+        return blurred_part
+    return value
+
+
 def store_old_values(sender, instance, **kwargs):
     if instance.pk:  # Check if the instance already exists in the database
         old_instance = sender.objects.get(pk=instance.pk)
-
         instance._old_values = {field.name: getattr(old_instance, field.name) for field in instance._meta.fields}
-        print(instance._old_values)
     else:
         instance._old_values = {}
 
 
 def log_update(sender, instance, created, log_klass, klas_field_name, **kwargs):
+    is_secured = kwargs.get('is_secured', False)
     timestamp = timezone.now()
     updated_user = instance.updated_from
     if updated_user is None:
@@ -29,10 +35,10 @@ def log_update(sender, instance, created, log_klass, klas_field_name, **kwargs):
             old_value = old_values.get(field_name)
             new_value = getattr(instance, field_name)
             if old_value != new_value:
+                new_value = blur_value(new_value) if is_secured else new_value
                 title += (f"{field_name} field was edited on "
                           f"{timestamp.strftime('%B %d, %Y %I:%M %p')} by {updated_user_name}\n")
                 message += f"{old_value}     →    {new_value}\n"
-
             if title:
                 data = {
                     klas_field_name: instance,

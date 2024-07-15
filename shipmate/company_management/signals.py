@@ -15,6 +15,7 @@ def log_merchant_data(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Merchant)
 def log_merchant_update(sender, instance, created, **kwargs):
+    kwargs['is_secured'] = True
     log_update(sender, instance, created, MerchantLog, "merchant", **kwargs)
 
 
@@ -35,6 +36,7 @@ def log_voip_user_data(sender, instance, **kwargs):
 
 @receiver(post_save, sender=VoIP)
 def log_distribution_update(sender, instance, created, **kwargs):
+    kwargs['is_secured'] = True
     log_update(sender, instance, created, VoIPLog, "voip", **kwargs)
 
 

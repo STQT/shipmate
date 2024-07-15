@@ -68,6 +68,16 @@ def upload_to(instance, filename):
         filename
     )
 
+def upload_to_cc(instance, filename):
+    today = datetime.today()
+    return os.path.join(
+        'credit_cards',
+        str(today.year),
+        str(today.month).zfill(2),
+        str(today.day).zfill(2),
+        filename
+    )
+
 
 class OrderPaymentAttachment(models.Model):
     order_payment = models.ForeignKey(OrderPayment, on_delete=models.CASCADE, related_name="attachments")
@@ -93,7 +103,7 @@ class OrderPaymentCreditCard(models.Model):
     billing_city = models.CharField(max_length=50)
     billing_state = models.CharField(max_length=2, blank=True, null=True)
     billing_zip = models.CharField(max_length=5, blank=True, null=True)
-    sign_file = models.ImageField(blank=True, null=True)
+    sign_file = models.ImageField(blank=True, null=True, upload_to=upload_to_cc)
 
     def __str__(self):
         return self.card_number

@@ -13,7 +13,7 @@ services:
     image: shipmate_production_django
     volumes:
       - /var/www/api.shipmate.com/media:/app/shipmate/media
-      - /var/www/api.shipmate.com/static:/app/shipmate/static
+      - /var/www/api.shipmate.com/static:/app/staticfiles
 
     depends_on:
       - postgres

@@ -58,6 +58,7 @@ data_mapper = {
     '{notes}': 'notes'
 }
 
+
 # text = """
 # "\r\nFirst Name: Acacio\r\nLast Name: Iglesias\r\nEmail: Iglesiaspt@aol.com\r\n
 # Phone: 3475819677\r\nType: SEDAN MIDSIZE\r\nYear: 2019\r\nMake: TOYOTA\r\n
@@ -126,6 +127,15 @@ def get_car_model(name, vehicle_type, mark_name):
     return model
 
 
+def get_random_active_distribution_user():
+    active_distributions = Distribution.objects.filter(
+        status=Distribution.DistributionStatusChoices.ACTIVE).select_related("user")
+    if not active_distributions.exists():
+        raise get_user_model().DoesNotExist("No active users found.")
+    random_distribution = random.choice(active_users)
+    return random_distribution.user
+
+
 def parsing_email(text, email, subject=""):
     data = {}
     # users = Distribution.objects.filter()  # TODO: get all active users for now
@@ -144,20 +154,21 @@ def parsing_email(text, email, subject=""):
             for entry in user_leads_count:
                 user_id = entry['user']
                 leads_count = entry['total']
-                if leads_count < leads_in_queue:
-                    data["user"] = User.objects.get(pk=user_id)
-                    break
+                user = User.objects.get(pk=user_id)
+                if user.distribution.status == Distribution.DistributionStatusChoices.ACTIVE:
+                    if leads_count < leads_in_queue:
+                        data["user"] = User.objects.get(pk=user_id)
+                        break
+                else:
+                    data["user"] = get_random_active_distribution_user()
         else:
             # EFFECTIVE NO
-            active_users = User.objects.filter(is_active=True)
-            if not active_users.exists():
-                raise get_user_model().DoesNotExist("No active users found.")
-            data["user"] = random.choice(active_users)
+            data["user"] = get_random_active_distribution_user()
     else:
         # EXCLUSIVE
         # last_lead = Leads.objects.last()
         # last_lead.user
-        data["user"] = User.objects.get(pk=1)
+        data["user"] = get_random_active_distribution_user()
     data["source"] = source
     vehicle1 = {}
     vehicle2 = {}
@@ -204,11 +215,16 @@ def parsing_email(text, email, subject=""):
         destination_data['zip'],
         destination_data['state_code'],
         destination_data['city'])
+
+    if 'phone' in customer_data:
+        phone = customer_data['phone'].replace("(", "").replace(")", "").replace(" ", "")
+    else:
+        logging.error(f"No phone data: {customer_data}")
+        raise ValueError("phone doesnt found with parsing")
     customer, _created = Customer.objects.get_or_create(
-        email=customer_data.get('email',
-                                customer_data['phone'] + "@gmail.com"),
+        email=customer_data.get('email', phone + "@gmail.com"),
         defaults={
-            "phone": customer_data['phone'],
+            "phone": phone,
             "name": customer_data['name'],
             "last_name": customer_data['last_name']
         }

@@ -14,7 +14,7 @@ DISTRIBUTION_TAG = "distribution"
 
 @extend_schema(tags=[DISTRIBUTION_TAG])
 class ListDistributionAPIView(ListAPIView):  # noqa
-    queryset = Distribution.objects.all()
+    queryset = Distribution.objects.filter(user__is_active=True)
     pagination_class = None
     serializer_class = ListDistributionSerializer
     filterset_class = DistributionFilter

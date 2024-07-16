@@ -10,7 +10,7 @@ from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..company_management.models import CompanyInfo
 from ..contract.serializers import BaseContractSerializer
-from ..customers.serializers import CustomerSerializer
+from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
@@ -202,7 +202,10 @@ class ListOrderSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_customer_phone(cls, obj) -> str:
-        return obj.customer.phone if obj.customer else "NaN"
+        phone = obj.customer.phone if obj.customer else "NaN"
+        if phone and len(phone) == 10:  # Assuming phone is a 10-digit number
+            return f"({phone[:3]}) {phone[3:6]}-{phone[6:]}"
+        return phone
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
@@ -240,7 +243,7 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
 
 
 class RetrieveOrderSerializer(ListOrderSerializer):
-    customer = CustomerSerializer(many=False)  # noqa
+    customer = RetrieveCustomerSerializer(many=False)  # noqa
     origin = CitySerializer(many=False)
     destination = CitySerializer(many=False)
     order_vehicles = DetailVehicleOrderSerializer(many=True)

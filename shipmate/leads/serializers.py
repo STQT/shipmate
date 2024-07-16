@@ -7,7 +7,7 @@ from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
 from shipmate.addresses.serializers import CitySerializer
 from shipmate.cars.serializers import CarsModelSerializer
-from shipmate.customers.serializers import CustomerSerializer
+from shipmate.customers.serializers import RetrieveCustomerSerializer
 from shipmate.users.models import Team
 from shipmate.users.serializers import ListUserSerializer
 
@@ -105,7 +105,10 @@ class ListLeadsSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_customer_phone(cls, obj) -> str:
-        return obj.customer.phone if obj.customer else "NaN"
+        phone = obj.customer.phone if obj.customer else "NaN"
+        if phone and len(phone) == 10:  # Assuming phone is a 10-digit number
+            return f"({phone[:3]}) {phone[3:6]}-{phone[6:]}"
+        return phone
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
@@ -123,7 +126,7 @@ class ListLeadsSerializer(serializers.ModelSerializer):
 
 
 class RetrieveLeadsSerializer(ListLeadsSerializer):
-    customer = CustomerSerializer(many=False)
+    customer = RetrieveCustomerSerializer(many=False)
     origin = CitySerializer(many=False)
     destination = CitySerializer(many=False)
     lead_vehicles = DetailVehicleLeadsSerializer(many=True)

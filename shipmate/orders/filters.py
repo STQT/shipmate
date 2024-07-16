@@ -22,6 +22,7 @@ class OrderFilter(django_filters.FilterSet):
         fields = ['status', 'source', 'user', 'extraUser', 'q']
 
     def custom_filter(self, queryset, name, value):
+        value = value.replace("(", "").replace(")", "").replace(" ", "").replace("-", "")
         if value:
             q_objects = (Q(origin__name__icontains=value) |
                          Q(origin__state__name__icontains=value) |

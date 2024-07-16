@@ -90,6 +90,7 @@ class GlobalSearchAPIView(APIView):
     serializer_class = GlobalSearchSerializer
 
     def _get_content(self, klass, query, status):
+        query = query.replace("(", "").replace(")", "").replace(" ", "").replace("-", "")
         q_objects = (Q(origin__name__icontains=query) |  # noqa
                      Q(origin__state__name__icontains=query) |
                      Q(destination__name__icontains=query) |

@@ -217,7 +217,7 @@ def parsing_email(text, email, subject=""):
         destination_data['city'])
 
     if 'phone' in customer_data:
-        phone = customer_data['phone'].replace("(", "").replace(")", "").replace(" ", "")
+        phone = customer_data['phone'].replace("(", "").replace(")", "").replace(" ", "").replace("-", "")
     else:
         logging.error(f"No phone data: {customer_data}")
         raise ValueError("phone doesnt found with parsing")

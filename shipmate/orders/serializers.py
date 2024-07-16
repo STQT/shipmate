@@ -166,6 +166,7 @@ class ListOrderSerializer(serializers.ModelSerializer):
     order_vehicles = OrderVehicleLeadsSerializer(many=True)
     user = ListUserSerializer(many=False)
     extra_user = ListUserSerializer(many=False, allow_null=True)
+    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -176,6 +177,10 @@ class ListOrderSerializer(serializers.ModelSerializer):
             "price", "date_est_ship", "condition", "trailer_type", "notes",
             "status", "updated_at",
         ]
+
+    @classmethod
+    def get_price(cls, obj) -> float:
+        return obj.payment_total_tariff
 
     @classmethod
     def get_origin_name(cls, obj) -> str:

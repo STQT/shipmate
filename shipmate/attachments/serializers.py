@@ -73,6 +73,12 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
                     "title": text,
                     converter_field_name[field_name]: rel
                 }
+                if _type == Attachments.TypesChoices.FILE:
+                    file_url = created_data.file.url if created_data.file else None
+                    if file_url:
+                        request = self.context['request']
+                        url = request.build_absolute_uri('/')[:-1]
+                        attachment_class_data["file"] = f"{url}{file_url}"
                 related_model = Class._meta.get_field(converter_field_name[field_name]).related_model
                 if not related_model.objects.filter(pk=rel).exists():
                     raise ValidationError(

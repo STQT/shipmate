@@ -7,7 +7,7 @@ from ..cars.serializers import CarsModelSerializer
 from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
-from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
+from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer, ListLeadMixinSerializer
 from ..users.serializers import ListUserSerializer
 
 
@@ -58,62 +58,12 @@ class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
         return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
 
 
-class ListQuoteSerializer(serializers.ModelSerializer):
-    customer_name = serializers.SerializerMethodField()
-    customer_phone = serializers.SerializerMethodField()
-    origin_name = serializers.SerializerMethodField()
-    destination_name = serializers.SerializerMethodField()
+class ListQuoteSerializer(ListLeadMixinSerializer):
     quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
-    user = ListUserSerializer(many=False)
-    extra_user = ListUserSerializer(many=False, allow_null=True)
 
     class Meta:
         model = Quote
         fields = "__all__"
-
-    @classmethod
-    def get_origin_name(cls, obj) -> str:
-        city_name = "NaN"  # noqa
-        state_code = "NaN"
-        city_zip = "NaN"
-
-        if obj.origin:
-            if obj.origin.state:
-                city_name = obj.origin.name
-                state_code = obj.origin.state.code
-            city_zip = obj.origin.zip
-
-        return f"{city_name}, {state_code} {city_zip}"
-
-    @classmethod
-    def get_customer_name(cls, obj) -> str:
-        customer = obj.customer
-        if not obj.customer:
-            return "NaN"
-        name = customer.name
-        last_name = customer.last_name if customer.last_name else ""
-        return name + " " + last_name
-
-    @classmethod
-    def get_customer_phone(cls, obj) -> str:
-        phone = obj.customer.phone if obj.customer else "NaN"
-        if phone and len(phone) == 10:  # Assuming phone is a 10-digit number
-            return f"({phone[:3]}) {phone[3:6]}-{phone[6:]}"
-        return phone
-
-    @classmethod
-    def get_destination_name(cls, obj) -> str:
-        city_name = "NaN"  # noqa
-        state_code = "NaN"
-        city_zip = "NaN"
-
-        if obj.destination:
-            if obj.destination.state:
-                city_name = obj.destination.name
-                state_code = obj.destination.state.code
-            city_zip = obj.destination.zip
-
-        return f"{city_name}, {state_code} {city_zip}"
 
 
 class QuoteDatesSerializer(serializers.ModelSerializer):

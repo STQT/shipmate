@@ -13,7 +13,7 @@ from ..contract.serializers import BaseContractSerializer
 from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
-from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer
+from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer, ListLeadMixinSerializer
 from ..users.serializers import ListUserSerializer
 
 
@@ -158,14 +158,8 @@ class OrderPaymentsSerializer(serializers.ModelSerializer):
         ]
 
 
-class ListOrderSerializer(serializers.ModelSerializer):
-    customer_name = serializers.SerializerMethodField()
-    customer_phone = serializers.SerializerMethodField()
-    origin_name = serializers.SerializerMethodField()
-    destination_name = serializers.SerializerMethodField()
+class ListOrderSerializer(ListLeadMixinSerializer):
     order_vehicles = OrderVehicleLeadsSerializer(many=True)
-    user = ListUserSerializer(many=False)
-    extra_user = ListUserSerializer(many=False, allow_null=True)
     price = serializers.SerializerMethodField()
 
     class Meta:

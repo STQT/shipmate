@@ -67,12 +67,11 @@ class CreateLeadsSerializer(serializers.ModelSerializer):
         return lead
 
 
-class ListLeadsSerializer(serializers.ModelSerializer):
+class ListLeadMixinSerializer(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()  # noqa
     customer_phone = serializers.SerializerMethodField()
     origin_name = serializers.SerializerMethodField()
     destination_name = serializers.SerializerMethodField()
-    lead_vehicles = ListVehicleLeadsSerializer(many=True)
     user = ListUserSerializer(many=False)
     extra_user = ListUserSerializer(many=False, allow_null=True)
 
@@ -123,6 +122,14 @@ class ListLeadsSerializer(serializers.ModelSerializer):
             city_zip = obj.destination.zip
 
         return f"{city_name}, {state_code} {city_zip}"
+
+
+class ListLeadsSerializer(ListLeadMixinSerializer):
+    lead_vehicles = ListVehicleLeadsSerializer(many=True)
+
+    class Meta:
+        model = Leads
+        fields = "__all__"
 
 
 class RetrieveLeadsSerializer(ListLeadsSerializer):

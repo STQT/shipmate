@@ -178,9 +178,7 @@ def parsing_email(text, email, subject=""):
     destination_data = {}
     cleaned_text = text.strip('"\r\n')
     lines = cleaned_text.split('\r\n')
-
     parsing_value = LeadParsingValue.objects.select_related("item")
-
     for line in lines:
         for lpv in parsing_value:
             if line.lower().startswith(lpv.value.lower()):
@@ -215,7 +213,6 @@ def parsing_email(text, email, subject=""):
         destination_data['zip'],
         destination_data['state_code'],
         destination_data['city'])
-
     if 'phone' in customer_data:
         phone = customer_data['phone'].replace("(", "").replace(")", "").replace(" ", "").replace("-", "")
     else:
@@ -224,9 +221,9 @@ def parsing_email(text, email, subject=""):
     customer, _created = Customer.objects.get_or_create(
         email=customer_data.get('email', phone + "@gmail.com"),
         defaults={
-            "phone": phone,
-            "name": customer_data['name'],
-            "last_name": customer_data['last_name']
+            "phone": phone[:20],
+            "name": customer_data['name'][:99],
+            "last_name": customer_data['last_name'][:99]
         }
     )
     try:
@@ -239,9 +236,10 @@ def parsing_email(text, email, subject=""):
                 data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%m-%d-%Y")
             except ValueError:
                 data['date_est_ship'] = datetime.strptime(data['date_est_ship'], "%Y-%m-%d")
-
     if data.get("notes") is None:
         data.pop("notes", None)
+    else:
+        data['notes'] = data['notes'][:499]
     condition = vehicle1.get("condition", ConditionChoices.DRIVES)
     condition = ConditionChoices.DRIVES if condition.lower() == "running" else ConditionChoices.ROLLS
     trailer_type = vehicle1.get("trailer_type", TrailerTypeChoices.OPEN)
@@ -257,7 +255,6 @@ def parsing_email(text, email, subject=""):
                                                   subject=subject)
     LeadsAttachment.objects.create(lead=lead, title="Subject: " + subject,
                                    type=LeadsAttachment.TypesChoices.EMAIL, link=email_attach.pk)
-
     car_model = get_car_model(vehicle1['model'],
                               vehicle1.get('vehicle_type', CarsModel.VehicleTYPES.CAR),
                               vehicle1['make'])

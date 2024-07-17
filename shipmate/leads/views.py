@@ -74,6 +74,9 @@ class CreateLeadsAPIView(CreateAPIView):  # noqa
     queryset = Leads.objects.all()
     serializer_class = CreateLeadsSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class UpdateLeadsAPIView(UpdateAPIView):
     queryset = Leads.objects.all()
@@ -81,18 +84,16 @@ class UpdateLeadsAPIView(UpdateAPIView):
     lookup_field = 'guid'
 
     def update(self, request, *args, **kwargs):
+        super().update()
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
             return Response(RetrieveLeadsSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(responses={200: RetrieveLeadsSerializer})
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
 
 class DeleteLeadsAPIView(DestroyAPIView):

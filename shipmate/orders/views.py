@@ -113,6 +113,9 @@ class CreateOrderAPIView(CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = CreateOrderSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class UpdateOrderAPIView(UpdateAPIView):
     queryset = Order.objects.all()
@@ -122,16 +125,13 @@ class UpdateOrderAPIView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
             return Response(RetrieveOrderSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(responses={200: RetrieveOrderSerializer})
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
 
 class DeleteOrderAPIView(DestroyAPIView):

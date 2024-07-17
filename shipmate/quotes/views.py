@@ -96,6 +96,9 @@ class CreateQuoteAPIView(CreateAPIView):
     queryset = Quote.objects.all()
     serializer_class = CreateQuoteSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
 
 class UpdateQuoteAPIView(UpdateAPIView):
     queryset = Quote.objects.all()
@@ -105,16 +108,13 @@ class UpdateQuoteAPIView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
             return Response(RetrieveQuoteSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(responses={200: RetrieveQuoteSerializer})
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-
-    def perform_update(self, serializer):
-        serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
 
 
 class DeleteQuoteAPIView(DestroyAPIView):

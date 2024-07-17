@@ -132,7 +132,7 @@ def get_random_active_distribution_user():
         status=Distribution.DistributionStatusChoices.ACTIVE).select_related("user")
     if not active_distributions.exists():
         raise get_user_model().DoesNotExist("No active users found.")
-    random_distribution = random.choice(active_users)
+    random_distribution = random.choice(active_distributions)
     return random_distribution.user
 
 

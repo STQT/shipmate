@@ -28,7 +28,10 @@ from shipmate.leads.serializers import (
     UpdateLeadsSerializer,
     RetrieveLeadsSerializer,
     LeadsAttachmentSerializer,
-    VehicleLeadsSerializer, LeadConvertSerializer, ProviderLeadListSerializer, LogSerializer,
+    VehicleLeadsSerializer,
+    LeadConvertSerializer,
+    ProviderLeadListSerializer,
+    LogSerializer,
     ListLeadTeamSerializer
 )
 from shipmate.quotes.models import Quote, QuoteVehicles

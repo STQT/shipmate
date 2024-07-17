@@ -84,7 +84,6 @@ class UpdateLeadsAPIView(UpdateAPIView):
     lookup_field = 'guid'
 
     def update(self, request, *args, **kwargs):
-        super().update()
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
             serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)

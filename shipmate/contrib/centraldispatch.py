@@ -194,7 +194,7 @@ def collect_cd_info(pk, origin: City, destination: City, carrier_pay: int,
     condition = "operable" if condition == ConditionChoices.DRIVES else "inop"
     vehicles_str = ""
     for num, vehicle in enumerate(vehicles):
-        if num > 1:
+        if num > 0:
             vehicles_str += ";"
         vehicles_str += (f"{vehicle.vehicle_year}|{vehicle.vehicle.mark.name}|"
                          f"{vehicle.vehicle.name}|{vehicle.vehicle.vehicle_type}")

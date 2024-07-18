@@ -152,8 +152,14 @@ class CreateOrderPaymentClientCreditCardSerializer(serializers.ModelSerializer):
         model = OrderPaymentCreditCard
         fields = "__all__"
 
+class OrderPaymentViewSerializer(serializers.Serializer):
+    amount = serializers.FloatField()
+    surcharge_fee_rate = serializers.IntegerField()
+    discount = serializers.FloatField()
+
 
 class DetailCustomerPaymentSerializer(serializers.Serializer):
     order = RetrieveOrderSerializer(read_only=True)
     company = CompanyDetailInfoSerializer(read_only=True)
     cc = serializers.BooleanField(read_only=True)
+    payment = OrderPaymentViewSerializer(many=False, allow_null=True)

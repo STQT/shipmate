@@ -87,6 +87,8 @@ class OrderPaymentAttachment(models.Model):
     is_success = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     transaction_id = models.CharField(max_length=20, null=True, blank=True)
+    credit_card = models.ForeignKey("OrderPaymentCreditCard", on_delete=models.DO_NOTHING,
+                                    blank=True, null=True, related_name="+")
 
     def __str__(self):
         return str(self.amount)

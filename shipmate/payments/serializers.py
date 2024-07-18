@@ -2,10 +2,10 @@ from django.db.models import Sum
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from shipmate.contrib.authorize import charge_payment
+from shipmate.contrib.authorize import charge_payment, refund_payment
 from shipmate.contrib.serializers import Base64ImageField
 from shipmate.orders.serializers import CompanyDetailInfoSerializer, RetrieveOrderSerializer
-from shipmate.payments.models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
+from shipmate.payments.models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard, TypeChoices
 
 
 class DetailContractSerializer(serializers.Serializer):
@@ -75,6 +75,7 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
                 OrderPaymentAttachment.objects.create(**validated_data)
                 raise ValidationError({"credit_card": f"Problem via Authorize.net: {result['message']}"})
             validated_data['transaction_id'] = result['transaction_id']
+            validated_data['credit_card'] = credit_card.pk
         order_payment_attachments_all_amount = OrderPaymentAttachment.objects.filter(order_payment=order_payment)
         total_amount = order_payment_attachments_all_amount.aggregate(Sum('amount'))['amount__sum'] or 0
         order_payment.amount_charged = total_amount + amount
@@ -82,6 +83,37 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
             order_payment.status = OrderPayment.StatusChoices.PAID
         order_payment.save()
         return OrderPaymentAttachment.objects.create(**validated_data)
+
+
+class RefundPaymentSerializer(serializers.ModelSerializer):
+    transaction_id = serializers.IntegerField()
+    amount = serializers.FloatField()
+
+    class Meta:
+        model = OrderPayment
+        fields = ["amount", "direction", "transaction_id", "order"]
+
+    def create(self, validated_data):
+        transaction_id = validated_data.pop('transaction_id')
+        amount = validated_data['amount']
+        try:
+            transaction = OrderPaymentAttachment.objects.get(transaction_id=transaction_id)
+        except:
+            raise ValidationError({"transaction_id": "Not found transaction"})
+        validated_data['name'] = OrderPayment.NameChoices.auto_transportation
+        validated_data['quantity'] = 1
+        validated_data['amount_charged'] = -amount
+        validated_data['discount'] = 0
+        validated_data['payment_type'] = TypeChoices.credit_card
+        validated_data['surcharge_fee_rate'] = 5
+        validated_data['charge_type'] = OrderPayment.ChargeTypeChoices.refund
+        validated_data['status'] = OrderPayment.StatusChoices.PAID
+        order_payment = OrderPayment.objects.create(**validated_data)
+        if transaction.credit_card:
+            refund_payment(amount, transaction_id, transaction.credit_card.card_number,
+                           transaction.credit_card.expiration_date)
+            return order_payment
+        raise ValidationError({"transaction_id": "Not found card number from this transaction"})
 
 
 def blur_card_number(card_number):
@@ -125,4 +157,3 @@ class DetailCustomerPaymentSerializer(serializers.Serializer):
     order = RetrieveOrderSerializer(read_only=True)
     company = CompanyDetailInfoSerializer(read_only=True)
     cc = serializers.BooleanField(read_only=True)
-

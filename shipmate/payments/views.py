@@ -14,7 +14,7 @@ from .models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard
 from .serializers import CreateOrderPaymentSerializer, OrderPaymentSerializer, \
     SigningContractSerializer, OrderPaymentAttachmentSerializer, ListOrderPaymentCreditCardSerializer, \
     CreateOrderPaymentCreditCardSerializer, CreateOrderPaymentClientCreditCardSerializer, \
-    DetailCustomerPaymentSerializer
+    DetailCustomerPaymentSerializer, RefundPaymentSerializer
 from ..attachments.models import FileAttachment
 from ..company_management.models import CompanyInfo
 from ..contrib.email import send_email
@@ -153,6 +153,10 @@ class CreateOrderPaymentAttachmentView(CreateAPIView):
     serializer_class = OrderPaymentAttachmentSerializer
 
 
+class RefundPaymentSerializerView(CreateAPIView):
+    serializer_class = RefundPaymentSerializer
+
+
 class ListOrderPaymentAttachmentView(ListAPIView):
     queryset = OrderPaymentAttachment.objects.all().order_by("-id")
     serializer_class = OrderPaymentAttachmentSerializer
@@ -276,4 +280,3 @@ def generate_pdf(request):
     #     response['Content-Disposition'] = 'inline; filename="output.pdf"'
     #
     #     return response
-

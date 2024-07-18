@@ -97,6 +97,7 @@ LOCAL_APPS = [
     "shipmate.payments",
     "shipmate.more_settings",
     "shipmate.insights",
+    "shipmate.group_actions",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

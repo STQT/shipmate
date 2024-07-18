@@ -41,4 +41,5 @@ urlpatterns += [
     path('order-payments/', include('shipmate.payments.urls'), name="payments"),
     path('more-settings/', include('shipmate.more_settings.urls'), name="more-settings"),
     path('insights/', include('shipmate.insights.urls'), name="insights"),
+    path('group-actions/', include('shipmate.group_actions.urls'), name="group-actions"),
 ]

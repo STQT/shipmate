@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Sum
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -59,6 +60,7 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
             'payment_type': {'read_only': True},
         }
 
+    @transaction.atomic
     def create(self, validated_data):
         order_payment: OrderPayment = validated_data['order_payment']
         amount = validated_data['amount']
@@ -76,6 +78,9 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
                 raise ValidationError({"credit_card": f"Problem via Authorize.net: {result['message']}"})
             validated_data['transaction_id'] = result['transaction_id']
             validated_data['credit_card'] = credit_card.pk
+        order = order_payment.order
+        order.payment_carrier_pay = order.payment_carrier_pay + amount
+        order.save()
         order_payment_attachments_all_amount = OrderPaymentAttachment.objects.filter(order_payment=order_payment)
         total_amount = order_payment_attachments_all_amount.aggregate(Sum('amount'))['amount__sum'] or 0
         order_payment.amount_charged = total_amount + amount

@@ -11,7 +11,7 @@ from shipmate.contrib.models import TrailerTypeChoices
 from shipmate.leads.models import Leads
 from shipmate.mails.data import static_dict
 from shipmate.mails.serializers import ModulesListSerializer, CDPriceSerializer, GlobalSearchSerializer, \
-    GlobalSearchIDSerializer
+    GlobalSearchIDSerializer, CDPOSTPriceSerializer
 from shipmate.orders.models import Order
 from shipmate.quotes.models import Quote
 
@@ -53,7 +53,7 @@ class GetCDPriceAPIView(APIView):
             vehicles_list.all()[0].vehicle.vehicle_type if vehicles_list.all() else "car",
             vehicles_list.count()
         )
-        collected_data = {
+        collected_data = {  # noqa
             'cargo': [],
             'route': [],
             'price': [],
@@ -86,6 +86,60 @@ class GetCDPriceAPIView(APIView):
             return "comparable"
 
 
+class GetCDPricePOSTAPIView(APIView):
+    serializer_class = CDPOSTPriceSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            origin_zip = validated_data['origin_zip']
+            destination_zip = validated_data['destination_zip']
+            trailer_type = validated_data['trailer_type']
+            vehicle_type = validated_data['vehicle_type']
+            vehicles_length = validated_data['vehicles_length']
+
+            data = get_central_dispatch_price(
+                origin_zip,
+                destination_zip,
+                False if trailer_type == TrailerTypeChoices.OPEN else True,
+                vehicle_type.lower(),
+                vehicles_length
+            )
+            collected_data = {
+                'cargo': [],
+                'route': [],
+                'price': [],
+                'accepted': [],
+                'comparable': [],
+                'title': ""
+            }
+            for i in data:
+                for j in data[i]:
+                    if j == 5:
+                        continue
+                    key = self.set_dict_key(i)
+                    collected_data[key].append(data[i][j])
+                collected_data['title'] = i
+            if not collected_data:
+                return Response({"nodata": ["CD Price doesnt return data"]}, status=status.HTTP_204_NO_CONTENT)
+            serializer_data = self.serializer_class(collected_data)
+            return Response(serializer_data.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def set_dict_key(self, key):
+        mapper = {
+            "Cargo": "cargo",
+            "Route": "route",
+            "Price": "price",
+            "Accepted by Carrier?": "accepted"
+        }
+        try:
+            return mapper[key]
+        except KeyError:
+            return "comparable"
+
+
 class GlobalSearchAPIView(APIView):
     serializer_class = GlobalSearchSerializer
 
@@ -103,7 +157,7 @@ class GlobalSearchAPIView(APIView):
             q_objects |= Q(id=query)
         queryset = klass.objects.select_related(
             'origin', 'destination', 'customer', 'user', 'extra_user'
-                                                ).filter(q_objects).annotate(
+        ).filter(q_objects).annotate(
             status_type=Value(status, output_field=models.CharField())
         )[:10]
         return queryset

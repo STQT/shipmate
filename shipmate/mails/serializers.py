@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from shipmate.contrib.models import TrailerTypeChoices
 from shipmate.leads.models import Leads
 from shipmate.leads.serializers import ListVehicleLeadsSerializer
 from shipmate.users.serializers import ListUserSerializer
@@ -25,12 +26,21 @@ class StringListField(serializers.ListField):
 
 
 class CDPriceSerializer(serializers.Serializer):
-    cargo = StringListField()
-    route = StringListField()
-    price = StringListField()
-    accepted = StringListField()
-    comparable = StringListField()
-    title = serializers.CharField()
+    cargo = StringListField(read_only=True)
+    route = StringListField(read_only=True)
+    price = StringListField(read_only=True)
+    accepted = StringListField(read_only=True)
+    comparable = StringListField(read_only=True)
+    title = serializers.CharField(read_only=True)
+
+
+class CDPOSTPriceSerializer(CDPriceSerializer):
+    origin_zip = serializers.CharField(max_length=5, write_only=True, required=True)
+    destination_zip = serializers.CharField(max_length=5, write_only=True, required=True)
+    trailer_type = serializers.ChoiceField(required=True, choices=TrailerTypeChoices.choices,
+                                           write_only=True, help_text="Trailer tipi")
+    vehicle_type = serializers.CharField(write_only=True, required=True, help_text="Vehicle tipi")
+    vehicles_length = serializers.IntegerField(default=1, help_text="Vehicle larni soni")
 
 
 class GlobalListLeadsSerializer(serializers.ModelSerializer):

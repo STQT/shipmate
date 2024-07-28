@@ -54,6 +54,34 @@ class Quote(QuoteAbstract):
                     quote_dates.save()
         super().save(*args, **kwargs)
 
+    @property
+    def origin_name(self):
+        city_name = "NaN"  # noqa
+        state_code = "NaN"
+        city_zip = "NaN"
+
+        if self.origin:
+            if self.origin.state:
+                city_name = self.origin.name
+                state_code = self.origin.state.code
+            city_zip = self.origin.zip
+
+        return f"{city_name}, {state_code} {city_zip}"
+
+    @property
+    def destination_name(self):
+        city_name = "NaN"  # noqa
+        state_code = "NaN"
+        city_zip = "NaN"
+
+        if self.destination:
+            if self.destination.state:
+                city_name = self.destination.name
+                state_code = self.destination.state.code
+            city_zip = self.destination.zip
+
+        return f"{city_name}, {state_code} {city_zip}"
+
 
 class QuoteAttachment(Attachments):
     quote = models.ForeignKey(Quote, on_delete=models.CASCADE)

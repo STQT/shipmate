@@ -96,6 +96,22 @@ class LeadsAbstract(models.Model):
                 self.updated_at = timezone.now()
         super().save(*args, **kwargs)
 
+    @property
+    def customer_name(self):
+        customer = self.customer
+        if not self.customer:
+            return "NaN"
+        name = customer.name
+        last_name = customer.last_name if customer.last_name else ""
+        return name + " " + last_name
+
+    @property
+    def customer_phone(self):
+        phone = self.customer.phone if self.customer else "NaN"
+        if phone and len(phone) == 10:  # Assuming phone is a 10-digit number
+            return f"({phone[:3]}) {phone[3:6]}-{phone[6:]}"
+        return phone
+
 
 class QuoteAbstract(LeadsAbstract):
     status = models.CharField(max_length=20, choices=QuoteStatusChoices.choices, default=QuoteStatusChoices.QUOTES)

@@ -81,47 +81,19 @@ class ListLeadMixinSerializer(serializers.ModelSerializer):
 
     @classmethod
     def get_origin_name(cls, obj) -> str:
-        city_name = "NaN"  # noqa
-        state_code = "NaN"
-        city_zip = "NaN"
-
-        if obj.origin:
-            if obj.origin.state:
-                city_name = obj.origin.name
-                state_code = obj.origin.state.code
-            city_zip = obj.origin.zip
-
-        return f"{city_name}, {state_code} {city_zip}"
-
-    @classmethod
-    def get_customer_name(cls, obj) -> str:
-        customer = obj.customer
-        if not obj.customer:
-            return "NaN"
-        name = customer.name
-        last_name = customer.last_name if customer.last_name else ""
-        return name + " " + last_name
-
-    @classmethod
-    def get_customer_phone(cls, obj) -> str:
-        phone = obj.customer.phone if obj.customer else "NaN"
-        if phone and len(phone) == 10:  # Assuming phone is a 10-digit number
-            return f"({phone[:3]}) {phone[3:6]}-{phone[6:]}"
-        return phone
+        return obj.origin_name
 
     @classmethod
     def get_destination_name(cls, obj) -> str:
-        city_name = "NaN"  # noqa
-        state_code = "NaN"
-        city_zip = "NaN"
+        return obj.destination_name
 
-        if obj.destination:
-            if obj.destination.state:
-                city_name = obj.destination.name
-                state_code = obj.destination.state.code
-            city_zip = obj.destination.zip
+    @classmethod
+    def get_customer_name(cls, obj) -> str:
+        return obj.customer_name
 
-        return f"{city_name}, {state_code} {city_zip}"
+    @classmethod
+    def get_customer_phone(cls, obj) -> str:
+        return obj.customer_phone
 
 
 class ListLeadsSerializer(ListLeadMixinSerializer):

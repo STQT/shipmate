@@ -1,4 +1,5 @@
 from enum import Enum
+from copy import deepcopy
 
 from rest_framework import serializers
 
@@ -239,6 +240,66 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderContract
         fields = ("contract_type", "order")
+
+    def create(self, validated_data):
+        order = validated_data['order']
+        order_data = deepcopy(order.__dict__)
+        order_data.pop('_state', None)  # Удаляем внутреннее поле Django
+
+        # Удаляем поля, которые не нужны в контракте
+        excluded_fields = {'id', 'guid', 'created_at', 'updated_at', 'updated_from'}
+        for field in excluded_fields:
+            order_data.pop(field, None)
+
+        # Customer
+        customer_data = {
+            "name": order.customer.name,
+            "last_name": order.customer.last_name,
+            "email": order.customer.email,
+            "phone": order.customer.phone,
+        }
+
+        # Dates
+        dates = {
+            "date_est_pu": order.date_est_pu,
+            "date_est_del": order.date_est_del
+        }
+
+        # Vehicles
+        vehicles = []
+        for vehicle in order.order_vehicles.all():
+            vehicle: OrderVehicles
+            vehicle_data = {
+                'vehicle_year': vehicle.vehicle_year,
+                "vehicle": {
+                    "name": vehicle.vehicle.name,
+                    "mark": {
+                        "name": vehicle.vehicle.mark.name
+                    },
+                    "vehicle_type": vehicle.vehicle.vehicle_type
+                }
+            }
+
+            vehicles.append(vehicle_data)
+
+        # Payments
+        payment_data = {
+            "payment_total_tariff": order.payment_total_tariff,
+            "payment_reservation": order.payment_reservation,
+
+        }
+
+        order_data.update({
+            "customer": customer_data,
+            "origin_name": order.origin_name,
+            "destination_name": order.destination_name,
+            "dates": dates,
+            "order_vehicles": vehicles,
+            "payments": payment_data
+        })
+
+        validated_data['order_data'] = order_data
+        return super().create(validated_data)
 
 
 class RetrieveOrderSerializer(ListOrderSerializer):

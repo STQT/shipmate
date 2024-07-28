@@ -142,10 +142,38 @@ class Order(OrderAbstract):
                 # quote_dates, created = QuoteDates.objects.get_or_create(quote=self)
                 # status_date_field = status_mapper.get(self.status)
                 # if status_date_field:
-                    # setattr(quote_dates, status_date_field, timezone.now())
-                    # quote_dates.last_time_edited = self.updated_at
-                    # quote_dates.save()
+                # setattr(quote_dates, status_date_field, timezone.now())
+                # quote_dates.last_time_edited = self.updated_at
+                # quote_dates.save()
         super().save(*args, **kwargs)
+
+    @property
+    def origin_name(self):
+        city_name = "NaN"  # noqa
+        state_code = "NaN"
+        city_zip = "NaN"
+
+        if self.origin:
+            if self.origin.state:
+                city_name = self.origin.name
+                state_code = self.origin.state.code
+            city_zip = self.origin.zip
+
+        return f"{city_name}, {state_code} {city_zip}"
+
+    @property
+    def destination_name(self):
+        city_name = "NaN"  # noqa
+        state_code = "NaN"
+        city_zip = "NaN"
+
+        if self.destination:
+            if self.destination.state:
+                city_name = self.destination.name
+                state_code = self.destination.state.code
+            city_zip = self.destination.zip
+
+        return f"{city_name}, {state_code} {city_zip}"
 
 
 class OrderAttachment(Attachments):
@@ -194,6 +222,8 @@ class OrderContract(models.Model):
     signer_initials = models.CharField(null=True, blank=True)
     signed_time = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(null=True, blank=True, upload_to="contract_photos")
+
+    order_data = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.contract_type

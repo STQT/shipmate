@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -22,12 +23,15 @@ class GroupReassignSerializer(serializers.Serializer):
         get_object_or_404(User, pk=value)
         return value
 
+    @transaction.atomic
     def create(self, validated_data):
         ids = validated_data['ids']
         endpoint_type = validated_data['endpoint_type']
         reason = validated_data['reason']
 
         user = self.context['request'].user
+        extra_user = validated_data['user']
+
         model_class = ATTACHMENT_CLASS_MAP[endpoint_type]
         fk_field = ATTACHMENT_FK_FIELD_MAP[endpoint_type]
         attachment_class = ATTACHMENT_ATTACHMENT_MAP[endpoint_type]
@@ -50,8 +54,8 @@ class GroupReassignSerializer(serializers.Serializer):
                 "link": 0
             }
             attachment_objects.append(attachment_class(**data))
+        objs.update(user_id=extra_user)
         attachment_class.objects.bulk_create(attachment_objects)
-        # TODO: Sending message from this place after creating all attachments
         return validated_data
 
 

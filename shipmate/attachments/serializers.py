@@ -186,16 +186,17 @@ class PhoneAttachmentSerializer(BaseAttachmentSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user if request else None
+
         to_phone = validated_data.get('to_phone', [])
-        # from_phone = validated_data.get('from_phone')
-        from_phone = settings.FROM_PHONE
         text = validated_data.get('text')
 
         if not to_phone:
             raise ValidationError({"to_phone": "At least one recipient email is required."})
 
         email_attachment = super().create(validated_data)
-        send_sms(from_phone, to_phone, text)
+        send_sms(user.email, to_phone, text)
 
         return email_attachment
 

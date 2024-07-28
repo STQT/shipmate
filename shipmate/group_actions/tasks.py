@@ -18,6 +18,7 @@ def send_sms_task(user_id, ids, endpoint_type, message):
     attachment_class = ATTACHMENT_ATTACHMENT_MAP[endpoint_type]
 
     objs = model_class.objects.filter(id__in=ids).select_related("customer")
+    phones = []
     for obj in objs:
         data = {
             fk_field: obj,
@@ -27,8 +28,9 @@ def send_sms_task(user_id, ids, endpoint_type, message):
             "type": Attachments.TypesChoices.PHONE,
             "link": 0
         }
+        phones.append(obj.customer.phone)
         attachment_class.objects.create(**data)
-        send_sms(settings.FROM_PHONE, obj.customer.phone, message)
+    send_sms(user.email, phones, message)
 
 
 @shared_task

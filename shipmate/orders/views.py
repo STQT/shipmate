@@ -33,7 +33,6 @@ from ..attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from ..company_management.models import CompanyInfo
 from ..contract.models import Hawaii, Ground, International
 from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
-from ..contrib.email import send_email
 from ..contrib.pagination import CustomPagination
 from ..contrib.sms import send_sms
 from ..contrib.views import ArchiveView, ReAssignView
@@ -473,6 +472,7 @@ class SendSmsToContract(CreateAPIView):
     def create(self, request, *args, **kwargs):
         contract_id = self.kwargs.get('contract')
         contract = get_object_or_404(OrderContract, id=contract_id)
-        text = "Test message"
-        send_sms(settings.FROM_PHONE, contract.order.customer.phone, text)
+        user = request.user
+        text = f"Please sign the contract at the link: {settings.FRONTEND_URL}/{contract.order.guid}/{contract.pk}"
+        send_sms(user.email, [contract.order.customer.phone], text)
         return Response(status=status.HTTP_201_CREATED)

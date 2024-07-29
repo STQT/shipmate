@@ -288,7 +288,9 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
             "payment_reservation": order.payment_reservation,
 
         }
-
+        for key, value in order_data.items():
+            if isinstance(value, Decimal):
+                order_data[key] = str(value)
         order_data.update({
             "customer": customer_data,
             "origin_name": order.origin_name,

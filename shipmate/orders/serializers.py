@@ -1,3 +1,4 @@
+from decimal import Decimal
 from enum import Enum
 from copy import deepcopy
 

@@ -150,8 +150,8 @@ class CreateOrderPaymentCreditCardSerializer(serializers.ModelSerializer):
 
 class CreateOrderPaymentClientCreditCardSerializer(serializers.ModelSerializer):
     sign_file = Base64ImageField(use_url=True, required=False, allow_null=True)
-    cc_front_img_file = serializers.ImageField(write_only=True, required=True)
-    cc_back_img_file = serializers.ImageField(write_only=True, required=True)
+    cc_front_img_file = serializers.ImageField(write_only=True, required=False, allow_null=True, allow_empty_file=True)
+    cc_back_img_file = serializers.ImageField(write_only=True, required=False, allow_null=True, allow_empty_file=True)
 
     class Meta:
         model = OrderPaymentCreditCard

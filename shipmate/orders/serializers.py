@@ -294,22 +294,21 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
         for key, value in payment_data.items():
             if isinstance(value, Decimal):
                 payment_data[key] = str(value)
-
-        converted_order_data = {
+        for key, value in order_data.items():
+            if isinstance(value, Decimal):
+                order_data[key] = str(value)
+            elif isinstance(value, (date, datetime)):
+                order_data[key] = value.isoformat()
+        order_data.update({
             "customer": customer_data,
             "origin_name": order.origin_name,
             "destination_name": order.destination_name,
             "dates": dates,
             "order_vehicles": vehicles,
-            "payments": payment_data
-        }
-        for key, value in converted_order_data.items():
-            if isinstance(value, Decimal):
-                converted_order_data[key] = str(value)
-            elif isinstance(value, (date, datetime)):
-                converted_order_data[key] = value.isoformat()
-        validated_data['order_data'] = converted_order_data
-        print(validated_data)
+            "payments": payment_data,
+        })
+
+        validated_data['order_data'] = order_data
         return super().create(validated_data)
 
 

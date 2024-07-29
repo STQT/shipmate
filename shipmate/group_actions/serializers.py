@@ -3,13 +3,53 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from shipmate.contrib.models import Attachments
+from shipmate.contrib.models import Attachments, LeadsStatusChoices
 from shipmate.group_actions.utils import AttachmentType, ATTACHMENT_FK_FIELD_MAP, ATTACHMENT_CLASS_MAP, \
     ATTACHMENT_ATTACHMENT_MAP
 from shipmate.leads.models import Leads
 from shipmate.group_actions.tasks import send_sms_task, send_email_task
 
 User = get_user_model()
+
+
+class GroupArchiveSerializer(serializers.Serializer):
+    endpoint_type = serializers.ChoiceField(choices=[(tag.value, tag.name.title()) for tag in AttachmentType],
+                                            write_only=True, required=False, allow_null=True)
+    ids = serializers.ListField(child=serializers.IntegerField())
+    reason = serializers.CharField()
+
+    @transaction.atomic
+    def create(self, validated_data):
+        ids = validated_data['ids'] # noqa
+        endpoint_type = validated_data['endpoint_type']
+        reason = validated_data['reason']
+
+        user = self.context['request'].user
+        model_class = ATTACHMENT_CLASS_MAP[endpoint_type] # noqa
+        fk_field = ATTACHMENT_FK_FIELD_MAP[endpoint_type]
+        attachment_class = ATTACHMENT_ATTACHMENT_MAP[endpoint_type]
+
+        if not model_class or not fk_field or not attachment_class:
+            raise serializers.ValidationError("Invalid endpoint type")
+
+        objs = model_class.objects.filter(id__in=ids)
+        if not objs.exists():
+            raise serializers.ValidationError({fk_field: [f"{fk_field.capitalize()} not found"]})
+
+        attachment_objects = []
+        for obj in objs:
+            data = {
+                fk_field: obj,
+                "title": f'Archived by {user.first_name} {user.last_name}',
+                "user": user,
+                "second_title": f'Reason: {reason}',
+                "type": Attachments.TypesChoices.ACTIVITY,
+                "link": 0
+            }
+            attachment_objects.append(attachment_class(**data))
+        objs.update(status=LeadsStatusChoices.ARCHIVED)
+        attachment_class.objects.bulk_create(attachment_objects)
+        return validated_data
 
 
 class GroupReassignSerializer(serializers.Serializer):

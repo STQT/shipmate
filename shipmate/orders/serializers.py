@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
 from copy import deepcopy
@@ -16,7 +17,6 @@ from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer, ListLeadMixinSerializer
-from ..users.serializers import ListUserSerializer
 
 
 class CDActions(Enum):
@@ -292,6 +292,11 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
         for key, value in order_data.items():
             if isinstance(value, Decimal):
                 order_data[key] = str(value)
+            elif isinstance(value, (date, datetime)):
+                order_data[key] = value.isoformat()
+        for key, value in dates.items():
+            if isinstance(value, (date, datetime)):
+                dates[key] = value.isoformat()
         order_data.update({
             "customer": customer_data,
             "origin_name": order.origin_name,

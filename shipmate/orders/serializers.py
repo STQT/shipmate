@@ -265,7 +265,9 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
             "date_est_pu": order.date_est_pu,
             "date_est_del": order.date_est_del
         }
-
+        for key, value in dates.items():
+            if isinstance(value, (date, datetime)):
+                dates[key] = value.isoformat()
         # Vehicles
         vehicles = []
         for vehicle in order.order_vehicles.all():
@@ -289,24 +291,25 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
             "payment_reservation": order.payment_reservation,
 
         }
-        for key, value in order_data.items():
+        for key, value in payment_data.items():
             if isinstance(value, Decimal):
-                order_data[key] = str(value)
-            elif isinstance(value, (date, datetime)):
-                order_data[key] = value.isoformat()
-        for key, value in dates.items():
-            if isinstance(value, (date, datetime)):
-                dates[key] = value.isoformat()
-        order_data.update({
+                payment_data[key] = str(value)
+
+        converted_order_data = {
             "customer": customer_data,
             "origin_name": order.origin_name,
             "destination_name": order.destination_name,
             "dates": dates,
             "order_vehicles": vehicles,
             "payments": payment_data
-        })
-
-        validated_data['order_data'] = order_data
+        }
+        for key, value in converted_order_data.items():
+            if isinstance(value, Decimal):
+                converted_order_data[key] = str(value)
+            elif isinstance(value, (date, datetime)):
+                converted_order_data[key] = value.isoformat()
+        validated_data['order_data'] = converted_order_data
+        print(validated_data)
         return super().create(validated_data)
 
 

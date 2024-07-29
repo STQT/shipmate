@@ -386,6 +386,7 @@ class CompanyDetailInfoSerializer(serializers.ModelSerializer):
 
 class DetailContractSerializer(serializers.Serializer):
     order = RetrieveOrderSerializer(read_only=True)
+    order_data = serializers.JSONField(read_only=True, allow_null=True)
     contract = OrderContractSerializer(read_only=True)
     company = CompanyDetailInfoSerializer(read_only=True)
     pdf = BaseContractSerializer(read_only=True)

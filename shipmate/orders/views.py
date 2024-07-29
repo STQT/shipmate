@@ -318,6 +318,7 @@ class DetailOrderContractView(APIView):
 
         data = {
             'order': order_obj,
+            'order_data': contract_obj.order_data,
             'contract': contract_obj,
             'company': company_obj,
             'pdf': pdf_obj,

@@ -14,7 +14,6 @@ services:
     depends_on:
       - postgres
       - redis
-#      - mailpit
     volumes:
       - .:/app:z
     env_file:

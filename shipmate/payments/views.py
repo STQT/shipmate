@@ -130,13 +130,13 @@ class DetailOrderCustomerContractView(APIView):
     serializer_class = DetailCustomerPaymentSerializer(many=False)
     permission_classes = [AllowAny]
 
-    def get(self, request, order):
+    def get(self, request, order, payment_id):
         try:
             order_obj = Order.objects.get(guid=order)
         except Order.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         company_obj = CompanyInfo.objects.first()
-        credit_card: OrderPayment = order_obj.payments.filter(payment_type="credit_card").first()
+        credit_card: OrderPayment = OrderPayment.objects.filter(pk=payment_id).first()
 
         data = {
             'order': order_obj,

@@ -145,7 +145,7 @@ class Attachments(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     marked = models.BooleanField(default=False)
     link = models.BigIntegerField(help_text="Link to base attachment ID")
-    file = models.CharField(500, blank=True, null=True)
+    file = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         abstract = True

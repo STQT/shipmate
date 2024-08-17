@@ -7,10 +7,10 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from shipmate.insights.views import GoalGroupViewSet
 
-if settings.DEBUG:
-    router = DefaultRouter()
-else:
-    router = SimpleRouter()
+# if settings.DEBUG:
+#     router = DefaultRouter()
+# else:
+router = SimpleRouter()
 
 app_name = "api"
 

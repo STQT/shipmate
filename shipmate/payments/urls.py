@@ -12,7 +12,7 @@ urlpatterns = [
          name='order-contract-create'),
     path('send-cca/<int:payment>/', SendCCAToPaymentView.as_view(),
          name='order-cca-send'),
-    path('customer/<uuid:order>/<int:payment_id>/', DetailOrderCustomerContractView.as_view(),
+    path('customer/<uuid:order>/', DetailOrderCustomerContractView.as_view(),
          name='order-payment-detail'),
     path('attachments/', CreateOrderPaymentAttachmentView.as_view(),
          name='order-contract-attachments-create'),

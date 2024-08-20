@@ -78,6 +78,7 @@ class ListOrderPaymentCreditCardView(ListAPIView):
 class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
     queryset = OrderPaymentCreditCard.objects.all()
     serializer_class = CreateOrderPaymentClientCreditCardSerializer
+    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         files = {
@@ -130,13 +131,13 @@ class DetailOrderCustomerContractView(APIView):
     serializer_class = DetailCustomerPaymentSerializer(many=False)
     permission_classes = [AllowAny]
 
-    def get(self, request, order, payment_id):
+    def get(self, request, order):
         try:
             order_obj = Order.objects.get(guid=order)
         except Order.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         company_obj = CompanyInfo.objects.first()
-        credit_card: OrderPayment = OrderPayment.objects.filter(pk=payment_id).first()
+        credit_card: OrderPayment = OrderPayment.objects.first()
 
         data = {
             'order': order_obj,

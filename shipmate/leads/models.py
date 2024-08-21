@@ -59,6 +59,7 @@ class Leads(LeadsAbstract):
 
 class LeadsAttachment(Attachments):
     lead = models.ForeignKey(Leads, on_delete=models.CASCADE)
+    
 
     class Meta:
         default_related_name = "lead_attachments"

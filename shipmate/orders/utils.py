@@ -48,11 +48,11 @@ Best regards,
                to_emails=recipient_list, host="smtp.gmail.com", user=from_email, password=password_email)
 
 
-def send_cc_agreement(order: Order, payment: OrderPayment):
+def send_cc_agreement(order: Order, payment: OrderPayment, payment_id: int):
     company_name, contact_email, contact_mainline = get_company_data()
     url = f"{settings.FRONTEND_URL}/contract/pay/{order.guid}"
     if payment.payment_type == TypeChoices.credit_card:
-        url = f"{settings.FRONTEND_URL}/contract/cc-auth/{order.guid}"
+        url = f"{settings.FRONTEND_URL}/contract/cc-auth/{order.guid}/{payment_id}"
     subject = "Action Required: Credit Card Authorization Form"
     message = f"""Dear {order.customer.name} {order.customer.last_name},
 

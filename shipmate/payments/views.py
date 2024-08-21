@@ -36,7 +36,7 @@ class SendCCAToPaymentView(CreateAPIView):
         payment = get_object_or_404(OrderPayment, id=payment_id)
         contract = payment.order.contracts.all().first()
         if contract:
-            send_cc_agreement(payment.order, payment)
+            send_cc_agreement(payment.order, payment, payment_id)
             return Response(status=status.HTTP_201_CREATED)
         return Response(data={"error": "No contracts"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -138,6 +138,36 @@ class DetailOrderCustomerContractView(APIView):
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         company_obj = CompanyInfo.objects.first()
         credit_card: OrderPayment = OrderPayment.objects.first()
+
+        data = {
+            'order': order_obj,
+            'company': company_obj,
+            'cc': True if credit_card else False,
+            'payment': None
+        }
+        if credit_card:
+            data['payment'] = {
+                "amount": credit_card.amount,
+                "surcharge_fee_rate": credit_card.surcharge_fee_rate,
+                "discount": credit_card.discount
+            }
+
+        serializer = DetailCustomerPaymentSerializer(data, context={"request": request})
+        return Response(serializer.data)
+
+
+
+class DetailOrderCustomerPaymentView(APIView):
+    serializer_class = DetailCustomerPaymentSerializer(many=False)
+    permission_classes = [AllowAny]
+
+    def get(self, request, order, payment_id):
+        try:
+            order_obj = Order.objects.get(guid=order)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        company_obj = CompanyInfo.objects.first()
+        credit_card: OrderPayment = OrderPayment.objects.filter(pk=payment_id).first()
 
         data = {
             'order': order_obj,

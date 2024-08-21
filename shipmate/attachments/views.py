@@ -23,6 +23,10 @@ User = get_user_model()
 class BaseAttachmentAPIView(CreateAPIView):
     attachment_type = Attachments.TypesChoices.TASK
 
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user if self.request.user.is_authenticated else User.objects.first())
+
 
 class CreateTaskAttachmentAPIView(BaseAttachmentAPIView):
     serializer_class = TaskAttachmentSerializer

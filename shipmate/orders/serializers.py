@@ -152,13 +152,20 @@ class OrderDatesSerializer(serializers.ModelSerializer):
 
 
 class OrderPaymentsSerializer(serializers.ModelSerializer):
+    payment_cod_to_carrier = serializers.SerializerMethodField()
+
+
     class Meta:
         model = Order
         fields = [
             "payment_total_tariff", "payment_reservation", "payment_paid_reservation", "payment_carrier_pay",
             "payment_cod_to_carrier", "payment_paid_to_carrier",
         ]
-
+    def get_payment_cod_to_carrier(self, obj):
+        if obj.payment_total_tariff is not None and obj.payment_reservation is not None:
+            result = Decimal(obj.payment_total_tariff) - Decimal(obj.payment_reservation)
+            return f"${result:.2f}"
+        return None
 
 class ListOrderSerializer(ListLeadMixinSerializer):
     order_vehicles = OrderVehicleLeadsSerializer(many=True)

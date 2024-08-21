@@ -8,7 +8,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path('create-note/', CreateNoteAttachmentAPIView.as_view(), name='create-note'),
+    path('create-note/', CreateNoteAttachmentAPIView.as_view(), name='create-note'), 
     path('create-task/', CreateTaskAttachmentAPIView.as_view(), name='create-task'),
     path('create-email/', CreateEmailAttachmentAPIView.as_view(), name='create-email'),
     path('create-phone/', CreatePhoneAttachmentAPIView.as_view(), name='create-phone'),

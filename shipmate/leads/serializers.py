@@ -124,6 +124,7 @@ class UpdateLeadsSerializer(serializers.ModelSerializer):
 
 class LeadsAttachmentSerializer(serializers.ModelSerializer):
     lead_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
+    user_name = serializers.StringRelatedField(source="user.get_full_name")
 
     class Meta:
         model = LeadsAttachment

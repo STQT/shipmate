@@ -131,7 +131,7 @@ class DetailOrderCustomerContractView(APIView):
     serializer_class = DetailCustomerPaymentSerializer(many=False)
     permission_classes = [AllowAny]
 
-    def get(self, request, order, payment_id):
+    def get(self, request, order):
         try:
             order_obj = Order.objects.get(guid=order)
         except Order.DoesNotExist:

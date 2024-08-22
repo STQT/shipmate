@@ -3,6 +3,7 @@ from decimal import Decimal
 from enum import Enum
 from copy import deepcopy
 
+from django.db.models import Sum
 from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
@@ -17,6 +18,7 @@ from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer, ListLeadMixinSerializer
+from ..payments.models import OrderPayment
 
 
 class CDActions(Enum):
@@ -153,7 +155,8 @@ class OrderDatesSerializer(serializers.ModelSerializer):
 
 class OrderPaymentsSerializer(serializers.ModelSerializer):
     payment_cod_to_carrier = serializers.SerializerMethodField()
-
+    payment_paid_to_carrier = serializers.SerializerMethodField()
+    payment_paid_reservation = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
@@ -161,11 +164,44 @@ class OrderPaymentsSerializer(serializers.ModelSerializer):
             "payment_total_tariff", "payment_reservation", "payment_paid_reservation", "payment_carrier_pay",
             "payment_cod_to_carrier", "payment_paid_to_carrier",
         ]
+
     def get_payment_cod_to_carrier(self, obj):
         if obj.payment_total_tariff is not None and obj.payment_reservation is not None:
             result = Decimal(obj.payment_total_tariff) - Decimal(obj.payment_reservation)
-            return f"${result:.2f}"
+            return f"{result:.2f}"
         return None
+
+    def get_payment_paid_to_carrier(self, obj):
+        payment_paid = obj.payments.filter(
+            direction=OrderPayment.DirectionChoices.broker_to_carrier
+        ).aggregate(total_paid=Sum('amount_charged'))['total_paid'] or Decimal('0.00')
+
+        return f"{payment_paid:.2f}"
+
+    def get_payment_paid_reservation(self, obj):
+        # Calculate 'customer to broker'
+        customer_to_broker = obj.payments.filter(
+            direction=OrderPayment.DirectionChoices.customer_to_broker,
+            status=OrderPayment.StatusChoices.PAID
+        ).aggregate(total=Sum('amount_charged'))['total'] or Decimal('0.00')
+
+        # Calculate 'carrier to broker'
+        carrier_to_broker = obj.payments.filter(
+            direction=OrderPayment.DirectionChoices.carrier_to_broker,
+            status=OrderPayment.StatusChoices.PAID
+        ).aggregate(total=Sum('amount_charged'))['total'] or Decimal('0.00')
+
+        # Calculate 'broker to customer'
+        broker_to_customer = obj.payments.filter(
+            direction=OrderPayment.DirectionChoices.broker_to_customer,
+            status=OrderPayment.StatusChoices.PAID
+        ).aggregate(total=Sum('amount_charged'))['total'] or Decimal('0.00')
+
+        # Calculate 'Paid Reservation'
+        paid_reservation = customer_to_broker + carrier_to_broker - broker_to_customer
+
+        return f"{paid_reservation:.2f}"
+
 
 class ListOrderSerializer(ListLeadMixinSerializer):
     order_vehicles = OrderVehicleLeadsSerializer(many=True)

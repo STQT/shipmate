@@ -167,6 +167,7 @@ class DetailOrderCustomerPaymentView(APIView):
         except Order.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         company_obj = CompanyInfo.objects.first()
+
         credit_card: OrderPayment = OrderPayment.objects.filter(pk=payment_id).first()
 
         data = {

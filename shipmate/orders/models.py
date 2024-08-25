@@ -71,7 +71,7 @@ class Order(OrderAbstract):
 
     # origin
     origin = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True, related_name='orders_origin')
-    origin_address = models.CharField(max_length=255)
+    origin_address = models.CharField(max_length=255, null=True, blank=True)
     origin_business_name = models.CharField(max_length=255, null=True, blank=True)
     origin_business_phone = models.CharField(max_length=50, null=True, blank=True)
     origin_contact_person = models.CharField(max_length=255, null=True, blank=True)
@@ -82,7 +82,7 @@ class Order(OrderAbstract):
     # destination
     destination = models.ForeignKey("addresses.City", on_delete=models.SET_NULL, null=True,
                                     related_name='orders_destination')
-    destination_address = models.CharField(max_length=255)
+    destination_address = models.CharField(max_length=255, null=True, blank=True)
     destination_business_name = models.CharField(max_length=255, null=True, blank=True)
     destination_business_phone = models.CharField(max_length=50, null=True, blank=True)
     destination_contact_person = models.CharField(max_length=255, null=True, blank=True)

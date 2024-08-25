@@ -136,8 +136,14 @@ class DetailOrderCustomerContractView(APIView):
             order_obj = Order.objects.get(guid=order)
         except Order.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
         company_obj = CompanyInfo.objects.first()
-        credit_card: OrderPayment = OrderPayment.objects.first()
+
+        # Get the first OrderPayment associated with the given order
+        try:
+            credit_card = OrderPayment.objects.filter(order=order_obj).first()
+        except OrderPayment.DoesNotExist:
+            credit_card = None
 
         data = {
             'order': order_obj,
@@ -145,6 +151,7 @@ class DetailOrderCustomerContractView(APIView):
             'cc': True if credit_card else False,
             'payment': None
         }
+
         if credit_card:
             data['payment'] = {
                 "amount": credit_card.amount,
@@ -154,7 +161,6 @@ class DetailOrderCustomerContractView(APIView):
 
         serializer = DetailCustomerPaymentSerializer(data, context={"request": request})
         return Response(serializer.data)
-
 
 
 class DetailOrderCustomerPaymentView(APIView):

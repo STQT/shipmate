@@ -41,7 +41,7 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskAttachment
-        exclude = ("user",) 
+        exclude = ("user",)
 
     def create(self, validated_data):
         rel = validated_data.pop('rel', None)
@@ -73,7 +73,7 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
                     "title": text,
                     converter_field_name[field_name]: rel,
                     "user_id": self.context['request'].user.id
-                    
+
                 }
                 if _type == Attachments.TypesChoices.FILE:
                     file_url = created_data.file.url if created_data.file else None
@@ -124,7 +124,7 @@ class UpdateBaseAttachmentSerializer(serializers.ModelSerializer):
 class NoteAttachmentSerializer(BaseAttachmentSerializer):  # noqa
     class Meta:
         model = NoteAttachment
-        exclude = ("user",) 
+        exclude = ("user",)
 
 
 class TaskAttachmentSerializer(BaseAttachmentSerializer):
@@ -183,6 +183,7 @@ class CreateAttachmentCommentSerializer(serializers.Serializer):
 
 
 class PhoneAttachmentSerializer(BaseAttachmentSerializer):
+
     class Meta:
         model = PhoneAttachment
         fields = "__all__"

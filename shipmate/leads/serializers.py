@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from shipmate.attachments.models import PhoneAttachment
 from shipmate.attachments.serializers import AttachmentCommentSerializer
+from shipmate.contrib.models import Attachments
 from shipmate.lead_managements.models import Provider
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
@@ -125,10 +127,20 @@ class UpdateLeadsSerializer(serializers.ModelSerializer):
 class LeadsAttachmentSerializer(serializers.ModelSerializer):
     lead_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
     user_name = serializers.StringRelatedField(source="user.get_full_name")
+    from_phone = serializers.SerializerMethodField()
 
     class Meta:
         model = LeadsAttachment
         fields = "__all__"
+
+
+    def get_from_phone(self, obj: LeadsAttachment):
+        if obj.type == Attachments.TypesChoices.PHONE:
+            # Assuming `from_phone` is a field in the related order model
+            phone = PhoneAttachment.objects.filter(id=obj.link).first()
+            return phone.from_phone
+        else:
+            return None
 
 
 class LeadConvertSerializer(serializers.Serializer):

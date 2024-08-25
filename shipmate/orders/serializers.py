@@ -8,12 +8,14 @@ from rest_framework import serializers
 
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
 from ..addresses.serializers import CitySerializer
+from ..attachments.models import PhoneAttachment
 from ..attachments.serializers import AttachmentCommentSerializer
 from ..carriers.models import Carrier
 from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..company_management.models import CompanyInfo
 from ..contract.serializers import BaseContractSerializer
+from ..contrib.models import Attachments
 from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
@@ -405,10 +407,20 @@ class ProviderOrderListSerializer(serializers.ModelSerializer):
 
 class OrderAttachmentSerializer(serializers.ModelSerializer):
     order_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
+    user_name = serializers.StringRelatedField(source="user.get_full_name")
+    from_phone = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderAttachment
         fields = "__all__"
+
+    def get_from_phone(self, obj: OrderAttachment):
+        if obj.type == Attachments.TypesChoices.PHONE:
+            # Assuming `from_phone` is a field in the related order model
+            phone = PhoneAttachment.objects.filter(id=obj.link).first()
+            return phone.from_phone
+        else:
+            return None
 
 
 class CompanyDetailInfoSerializer(serializers.ModelSerializer):

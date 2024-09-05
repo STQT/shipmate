@@ -184,6 +184,7 @@ class CreateAttachmentCommentSerializer(serializers.Serializer):
 
 
 class PhoneAttachmentSerializer(BaseAttachmentSerializer):
+
     class Meta:
         model = PhoneAttachment
         fields = "__all__"

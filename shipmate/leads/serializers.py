@@ -3,15 +3,10 @@ from rest_framework import serializers
 
 from shipmate.attachments.models import PhoneAttachment
 from shipmate.attachments.serializers import AttachmentCommentSerializer
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 from shipmate.insights.models import LeadsInsight
-=======
 from shipmate.contrib.models import Attachments
->>>>>>> parent of 43ddbd0 (Revert "from_number fields and mini bugs")
-=======
-from shipmate.contrib.models import Attachments
->>>>>>> parent of 43ddbd0 (Revert "from_number fields and mini bugs")
+
 from shipmate.lead_managements.models import Provider
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles

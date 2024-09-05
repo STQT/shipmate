@@ -36,6 +36,7 @@ from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
 from ..contrib.pagination import CustomPagination
 from ..contrib.sms import send_sms
 from ..contrib.views import ArchiveView, ReAssignView
+from ..insights.models import LeadsInsight
 from ..lead_managements.models import Provider
 from ..leads.serializers import LogSerializer
 from ..leads.views import ListTeamLeadAPIView
@@ -383,6 +384,12 @@ class ConvertQuoteToOrderAPIView(CreateAPIView):
     def perform_create(self, serializer):
         quote_id = self.kwargs.get('quote')
         quote = get_object_or_404(Quote, id=quote_id)
+        try:
+            lead_insight = LeadsInsight.objects.get(quote_guid=quote.guid)
+            lead_insight.status = OrderStatusChoices.ORDERS
+            lead_insight.save()
+        except Exception as e:
+            print(e)
         serializer.save()
         quote.delete()
 

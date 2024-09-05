@@ -19,6 +19,7 @@ from shipmate.contrib.generics import RetrieveUpdatePUTDestroyAPIView
 from shipmate.contrib.models import LeadsStatusChoices, QuoteStatusChoices
 from shipmate.contrib.pagination import CustomPagination
 from shipmate.contrib.views import ArchiveView, ReAssignView
+from shipmate.insights.models import LeadsInsight
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles, LeadsLog
@@ -162,6 +163,7 @@ class ConvertLeadToQuoteAPIView(APIView):
             #     #     one_attachment
             #     # )
             lead_data: dict = lead.__dict__
+            lead_guid = lead_data['guid']
             lead.delete()
             lead_data.pop('_state', None)
             lead_data.pop('id', None)
@@ -171,8 +173,18 @@ class ConvertLeadToQuoteAPIView(APIView):
             lead_data.pop('_prefetched_objects_cache', None)
             lead_data['status'] = QuoteStatusChoices.QUOTES
 
+
             quote_instance = Quote(price=price, reservation_price=reservation_price, **lead_data)
             quote_instance.save()
+            try:
+                lead_insight = LeadsInsight.objects.get(guid=lead_guid)
+                lead_insight.price = price
+                lead_insight.reservation_price = reservation_price
+                lead_insight.status = QuoteStatusChoices.QUOTES
+                lead_insight.quote_guid = quote_instance.guid
+                lead_insight.save()
+            except LeadsInsight.DoesNotExist:
+                print('not found')
             quote_dates = quote_instance.quote_dates
             quote_dates.received = lead_data['created_at']
             quote_dates.created = timezone.now()

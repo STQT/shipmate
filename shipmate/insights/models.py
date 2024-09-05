@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
+from shipmate.contrib.models import LeadsStatusChoices
+
 User = get_user_model()
 
 
@@ -36,3 +38,25 @@ class Goal(models.Model):
 
     def __str__(self):
         return f"#{self.pk} {self.group.name} | {self.group.get_month_display()}"
+
+
+class LeadsInsight(models.Model):
+    guid = models.CharField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(editable=False)
+    status = models.CharField(max_length=20, default=LeadsStatusChoices.LEADS)
+    source = models.ForeignKey("lead_managements.Provider", on_delete=models.SET_NULL, null=True, blank=True)
+    price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
+    reservation_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
+    customer = models.ForeignKey("customers.Customer", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leadsinsight_user')
+    extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
+                                   related_name='leadsinsight_extra_user')
+    updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
+                                     null=True, blank=True)
+    quote_guid = models.CharField(blank=True, null=True, max_length=50)
+    order_guid = models.CharField(blank=True, null=True, max_length=50)
+
+    class Meta:
+        verbose_name = "Lead Insight"
+        verbose_name_plural = "Lead Insights"

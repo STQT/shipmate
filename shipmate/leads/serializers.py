@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from shipmate.attachments.serializers import AttachmentCommentSerializer
+from shipmate.insights.models import LeadsInsight
 from shipmate.lead_managements.models import Provider
 from shipmate.lead_managements.serializers import ProviderSmallDataSerializer
 from shipmate.leads.models import Leads, LeadsAttachment, LeadVehicles
@@ -61,9 +62,18 @@ class CreateLeadsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         vehicles_data = validated_data.pop('vehicles')
-        lead = Leads.objects.create(**validated_data)
+        lead: Leads = Leads.objects.create(**validated_data)
         for vehicle_data in vehicles_data:
             LeadVehicles.objects.create(lead=lead, **vehicle_data)
+        leadInsight = LeadsInsight(guid=lead.guid,
+                                   status=lead.status,
+                                   source=lead.source,
+                                   customer=lead.customer,
+                                   user=lead.user,
+                                   extra_user=lead.extra_user,
+                                   updated_at=lead.updated_at)
+        leadInsight.save()
+
         return lead
 
 

@@ -163,7 +163,6 @@ class ConvertLeadToQuoteAPIView(APIView):
             #     #     one_attachment
             #     # )
             lead_data: dict = lead.__dict__
-            lead_guid = lead_data['guid']
             lead.delete()
             lead_data.pop('_state', None)
             lead_data.pop('id', None)
@@ -176,15 +175,6 @@ class ConvertLeadToQuoteAPIView(APIView):
 
             quote_instance = Quote(price=price, reservation_price=reservation_price, **lead_data)
             quote_instance.save()
-            try:
-                lead_insight = LeadsInsight.objects.get(guid=lead_guid)
-                lead_insight.price = price
-                lead_insight.reservation_price = reservation_price
-                lead_insight.status = QuoteStatusChoices.QUOTES
-                lead_insight.quote_guid = quote_instance.guid
-                lead_insight.save()
-            except LeadsInsight.DoesNotExist:
-                print('not found')
             quote_dates = quote_instance.quote_dates
             quote_dates.received = lead_data['created_at']
             quote_dates.created = timezone.now()

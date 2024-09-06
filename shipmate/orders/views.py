@@ -384,12 +384,6 @@ class ConvertQuoteToOrderAPIView(CreateAPIView):
     def perform_create(self, serializer):
         quote_id = self.kwargs.get('quote')
         quote = get_object_or_404(Quote, id=quote_id)
-        try:
-            lead_insight = LeadsInsight.objects.get(quote_guid=quote.guid)
-            lead_insight.status = OrderStatusChoices.ORDERS
-            lead_insight.save()
-        except Exception as e:
-            print(e)
         serializer.save()
         quote.delete()
 
@@ -482,5 +476,5 @@ class SendSmsToContract(CreateAPIView):
         contract = get_object_or_404(OrderContract, id=contract_id)
         user = request.user
         text = f"Please sign the contract at the link: {settings.FRONTEND_URL}/{contract.order.guid}/{contract.pk}"
-        send_sms(user.email, [contract.order.customer.phone], text)
+        send_sms(user.phone, [contract.order.customer.phone], text)
         return Response(status=status.HTTP_201_CREATED)

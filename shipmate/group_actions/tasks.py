@@ -30,7 +30,7 @@ def send_sms_task(user_id, ids, endpoint_type, message):
         }
         phones.append(obj.customer.phone)
         attachment_class.objects.create(**data)
-    send_sms(user.email, phones, message)
+    send_sms(user.phone, phones, message)
 
 
 @shared_task

@@ -110,17 +110,6 @@ class UpdateQuoteAPIView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
-            try:
-                lead_insight = LeadsInsight.objects.get(quote_guid=request.data.get('guid'))
-                print(request.data)
-                lead_insight.status = request.data['status']
-                lead_insight.source = Provider.objects.get(id=request.data['source'])
-                lead_insight.price = request.data['price']
-                lead_insight.reservation_price = request.data['reservation_price']
-                lead_insight.customer = Customer.objects.get(id=request.data['customer'])
-                lead_insight.save()
-            except Exception as e:
-                print(e)
             serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
             return Response(RetrieveQuoteSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

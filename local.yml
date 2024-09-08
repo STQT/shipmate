@@ -75,9 +75,9 @@ services:
 #    <<: *django
 #    image: shipmate_local_celerybeat
 #    container_name: shipmate_local_celerybeat
-#    depends_on:
-#      - redis
-#      - postgres
+    depends_on:
+      - redis
+      - postgres
 #    ports: []
 #    command: /start-celerybeat
 

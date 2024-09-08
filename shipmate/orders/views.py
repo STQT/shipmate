@@ -272,7 +272,7 @@ class SignOrderContractView(APIView):
 
             email = EmailMessage(
                 subject='Signed Contract and Terms',
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=settings.SIGN_EMAIL_USERNAME,
                 body=f'Dear Customer, please find the signed contract and terms at the following links:\n\n'
                      f'Agreement: {request.build_absolute_uri(agreement_url)}\n'
                      f'Terms: {request.build_absolute_uri(terms_url)}',
@@ -283,7 +283,7 @@ class SignOrderContractView(APIView):
                 logger.info(f"Email sent successfully to {customer_email}")
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
-                logger.error(f"From email: {settings.DEFAULT_FROM_EMAIL}")
+                logger.error(f"From email: {settings.SIGN_EMAIL_USERNAME}")
                 return Response({'error': 'Failed to send email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(self.serializer_class(contract_obj).data, status=status.HTTP_200_OK)

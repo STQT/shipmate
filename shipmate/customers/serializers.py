@@ -57,6 +57,7 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
     ongoing = serializers.SerializerMethodField()
     uncompleted = serializers.SerializerMethodField()
     source = serializers.SerializerMethodField()
+    stage = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -99,5 +100,14 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
         first_lead = Leads.objects.filter(customer_id=obj.id).first()
         if first_lead:
             return first_lead.source.name
+        else:
+            return 'NaN'
+
+
+    @classmethod
+    def get_stage(self, obj):
+        last_order = Order.objects.filter(customer_id=obj.id).order_by('-id').first()
+        if last_order:
+            return last_order.status
         else:
             return 'NaN'

@@ -3,6 +3,7 @@ from django.db import models
 
 from .models import Customer, ExternalContacts
 from ..contrib.models import OrderStatusChoices
+from ..leads.models import Leads
 from ..orders.models import Order
 
 
@@ -52,9 +53,10 @@ class SmallExternalContactsSerializer(serializers.Serializer):
 
 class DetailCustomerSerializer(serializers.ModelSerializer):
     extra = SmallExternalContactsSerializer(many=True)
-    complete = serializers.SerializerMethodField()
+    completed = serializers.SerializerMethodField()
     ongoing = serializers.SerializerMethodField()
     uncompleted = serializers.SerializerMethodField()
+    source = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -62,7 +64,7 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     @classmethod
-    def get_complete(self, obj):
+    def get_completed(self, obj):
         # Get all related orders and sum the reservation fee (payment_reservation)
         orders = Order.objects.filter(customer_id=obj.id)
         total_reservation_fee = orders.aggregate(total=models.Sum('payment_paid_reservation'))['total']
@@ -92,3 +94,10 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
         total_uncompleted_reservation = orders.aggregate(total=models.Sum('payment_reservation'))['total']
         return total_uncompleted_reservation or 0  # Return 0 if there are no archived (uncompleted) orders
 
+    @classmethod
+    def get_source(self, obj):
+        first_lead = Leads.objects.filter(customer_id=obj.id).first()
+        if first_lead:
+            return first_lead.source.name
+        else:
+            return 'NaN'

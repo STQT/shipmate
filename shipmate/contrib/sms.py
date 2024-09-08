@@ -28,6 +28,7 @@ def send_sms(from_email, to_numbers: list, message):
         'to_numbers': formatted_numbers,
         'text': message
     }
+    print(payload)
 
     response = requests.post(DIALPAD_SMS_ENDPOINT, headers=headers, json=payload)
 

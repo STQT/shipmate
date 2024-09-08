@@ -139,7 +139,7 @@ class Attachments(models.Model):
         FILE = "file", "File"  # API
 
     title = models.TextField()
-    second_title = models.CharField(max_length=150, null=True, blank=True)
+    second_title = models.CharField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=10, choices=TypesChoices.choices)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)

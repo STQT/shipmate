@@ -1,3 +1,5 @@
+import re
+
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -12,6 +14,7 @@ User = get_user_model()
 
 @shared_task
 def send_sms_task(user_id, ids, endpoint_type, message):
+    print('active')
     user = User.objects.get(pk=user_id)  # noqa
     model_class = ATTACHMENT_CLASS_MAP[endpoint_type]
     fk_field = ATTACHMENT_FK_FIELD_MAP[endpoint_type]
@@ -30,6 +33,9 @@ def send_sms_task(user_id, ids, endpoint_type, message):
         }
         phones.append(obj.customer.phone)
         attachment_class.objects.create(**data)
+    CLEANR = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+
+    message = re.sub(CLEANR, '', message)
     send_sms(user.phone, phones, message)
 
 

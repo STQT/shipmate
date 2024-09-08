@@ -61,15 +61,15 @@ services:
     image: docker.io/redis:6
     container_name: shipmate_local_redis
 
-#  celeryworker:
-#    <<: *django
-#    image: shipmate_local_celeryworker
-#    container_name: shipmate_local_celeryworker
-#    depends_on:
-#      - redis
-#      - postgres
-#    ports: []
-#    command: /start-celeryworker
+  celeryworker:
+    <<: *django
+    image: shipmate_local_celeryworker
+    container_name: shipmate_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celeryworker
 #
 #  celerybeat:
 #    <<: *django

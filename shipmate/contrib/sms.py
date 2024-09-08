@@ -22,6 +22,7 @@ def send_sms(from_email, to_numbers: list, message):
         'Content-Type': 'application/json',
     }
     formatted_numbers = [convert_to_e164(number) for number in to_numbers]
+    formatted_numbers = list(set(formatted_numbers))
     payload = {
         'from_number': from_email,
         'to_numbers': formatted_numbers,

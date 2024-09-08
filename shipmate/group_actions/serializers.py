@@ -121,6 +121,8 @@ class GroupSMSSerializer(serializers.Serializer):
         if not objs.exists():
             raise serializers.ValidationError({fk_field: [f"{fk_field.capitalize()} not found"]})
         send_sms_task.delay(user.pk, ids, endpoint_type, message)
+        print('check 1')
+        # send_sms_task.apply_async(args=(user.pk, ids, endpoint_type, message), countdown=5)
         return validated_data
 
 

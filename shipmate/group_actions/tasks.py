@@ -1,4 +1,5 @@
 import re
+import time
 
 from celery import shared_task
 from django.conf import settings
@@ -36,7 +37,9 @@ def send_sms_task(user_id, ids, endpoint_type, message):
     CLEANR = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
 
     message = re.sub(CLEANR, '', message)
-    send_sms(user.phone, phones, message)
+    for phone in phones:
+        send_sms(user.phone, [phone], message)
+        time.sleep(1)
 
 
 @shared_task

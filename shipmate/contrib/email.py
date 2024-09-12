@@ -3,7 +3,7 @@ import email
 import logging
 from email.header import decode_header
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from django.core.mail import EmailMultiAlternatives, get_connection
 import os
@@ -13,6 +13,7 @@ import os
 class EmailMessage:
     subject: str
     sender: str
+    identifier: Optional[str]
     recipient: str
     date: str
     body: str

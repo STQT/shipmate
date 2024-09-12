@@ -118,6 +118,7 @@ class QuoteAttachmentSerializer(serializers.ModelSerializer):
     quote_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
     user_name = serializers.StringRelatedField(source="user.get_full_name")
     from_phone = serializers.SerializerMethodField()
+    filename = serializers.SerializerMethodField()
 
     class Meta:
         model = QuoteAttachment
@@ -128,6 +129,17 @@ class QuoteAttachmentSerializer(serializers.ModelSerializer):
             # Assuming `from_phone` is a field in the related order model
             phone = PhoneAttachment.objects.filter(id=obj.link).first()
             return phone.from_phone
+        else:
+            return None
+
+
+    def get_filename(self, obj: QuoteAttachment):
+        if obj.type == Attachments.TypesChoices.FILE:
+            try:
+                return obj.file.split('/')[-1] # noqa
+            except Exception as e:
+                print(e)
+                return 'some error'
         else:
             return None
 

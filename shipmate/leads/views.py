@@ -16,9 +16,11 @@ from rest_framework.views import APIView
 
 from shipmate.attachments.models import NoteAttachment, TaskAttachment, FileAttachment
 from shipmate.contrib.generics import RetrieveUpdatePUTDestroyAPIView
-from shipmate.contrib.models import LeadsStatusChoices, QuoteStatusChoices
+from shipmate.contrib.models import LeadsStatusChoices, QuoteStatusChoices, Attachments
 from shipmate.contrib.pagination import CustomPagination
+from shipmate.contrib.timetook import timedelta_to_text
 from shipmate.contrib.views import ArchiveView, ReAssignView
+from shipmate.group_actions.utils import AttachmentType
 from shipmate.insights.models import LeadsInsight
 from shipmate.lead_managements.models import Provider
 from shipmate.leads.filters import LeadsFilter, LeadsAttachmentFilter
@@ -35,7 +37,7 @@ from shipmate.leads.serializers import (
     LogSerializer,
     ListLeadTeamSerializer
 )
-from shipmate.quotes.models import Quote, QuoteVehicles
+from shipmate.quotes.models import Quote, QuoteVehicles, QuoteAttachment
 from shipmate.quotes.serializers import CreateQuoteSerializer
 from shipmate.users.models import Team
 
@@ -200,6 +202,16 @@ class ConvertLeadToQuoteAPIView(APIView):
             #         )
             #         for lead_attachment in lead_attachments_data
             #     ]
+            user = User.objects.get(id=request.user.id)
+            time_took = timezone.now() - lead_data['created_at']
+            QuoteAttachment.objects.create(
+                quote=quote_instance,
+                type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
+                title="Converted to quote",
+                link=0,
+                user=user,
+                time_took=timedelta_to_text(time_took)
+            )
             quote_serializer = CreateQuoteSerializer(quote_instance)
             return Response(quote_serializer.data, status=status.HTTP_200_OK)
         else:

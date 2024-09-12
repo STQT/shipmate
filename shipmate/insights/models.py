@@ -49,7 +49,7 @@ class LeadsInsight(models.Model):
     price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
     reservation_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
     customer = models.ForeignKey("customers.Customer", on_delete=models.SET_NULL, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leadsinsight_user')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='leadsinsight_user', null=True, blank=True)
     extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='leadsinsight_extra_user')
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",

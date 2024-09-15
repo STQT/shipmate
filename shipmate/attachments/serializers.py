@@ -218,6 +218,7 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
         from_email = validated_data.get('from_email', "leads@matelogisticss.com")
         subject = validated_data.get('subject')
         text = validated_data.get('text', '')
+        print(to_emails, from_email, '##########################3')
 
         if not to_emails:
             raise ValidationError({"to_email": "At least one recipient email is required."})

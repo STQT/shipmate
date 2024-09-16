@@ -22,5 +22,6 @@ def fetch_emails_task():
                 'body': email.body,
             }
             sender_email = email_lib.utils.parseaddr(email.sender)[1]
+            print(data)
             Mail.objects.create(**data)
             parsing_email(email.body, sender_email, subject=email.subject)

@@ -13,7 +13,6 @@ import os
 class EmailMessage:
     subject: str
     sender: str
-    identifier: Optional[str]
     recipient: str
     date: str
     body: str

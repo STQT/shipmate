@@ -6,6 +6,8 @@ from copy import deepcopy
 from django.db.models import Sum
 from rest_framework import serializers
 
+from scripts.playwright_worker import FieldValuesDestinationOrigin, VehicleInformation, FieldValuesVehicleInformation, \
+    FieldValuesPickupDelivDates, FieldValuesPricingAndPayments, FieldValuesAdditionalInformation, Dispatch
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
 from ..addresses.serializers import CitySerializer
 from ..attachments.models import PhoneAttachment
@@ -15,7 +17,7 @@ from ..carriers.serializers import CreateCarrierSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..company_management.models import CompanyInfo
 from ..contract.serializers import BaseContractSerializer
-from ..contrib.models import Attachments
+from ..contrib.models import Attachments, OrderStatusChoices
 from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
@@ -103,8 +105,79 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         is_dispatch = validated_data.pop('is_dispatch', None)
         if is_dispatch:
-            # TODO: Paste here dispatching request
-            pass
+            try:
+                order_data = instance.__dict__
+                order_data['vehicles'] = []
+                for idx, order_vehicle in enumerate(instance.order_vehicles.all()):  # noqa
+                    order_data['vehicles'].append(VehicleInformation(
+                        ymmRadio=1,
+                        ymmVehicleYear=order_vehicle.vehicle_year,
+                        ymmMake=order_vehicle.vehicle.mark,
+                        ymmModel=order_vehicle.vehicle.name,
+                        ymmVehicleType=order_vehicle.vehicle.vehicle_type,
+                        qty='1'
+                    ))
+                print(order_data)
+                print(validated_data, '#################################')
+                cod_where = ''
+                if validated_data['dispatch_payment_term'] == 'pickup':
+                    cod_where = 'P'
+                elif validated_data['dispatch_payment_term'] == 'delivery':
+                    cod_where = 'D'
+                company_obj = CompanyInfo.objects.first()
+                fieldValuesDestinationOrigin = FieldValuesDestinationOrigin(
+                    orderId=instance.id,
+                    companyName=company_obj.name,
+                    originAddress1=instance.origin_address,
+                    originContact=instance.origin_contact_person,
+                    originPhone1=instance.origin_phone,
+                    originPhone2=instance.origin_second_phone,
+                    originPhone3='',
+                    originCompanyName=instance.origin_business_name,
+                    originBuyerNumber=instance.origin_buyer_number,
+                    destinationContact=instance.destination_contact_person,
+                    destinationPhone1=instance.destination_phone,
+                    destinationPhone2=instance.destination_second_phone,
+                    destinationPhone3='',
+                    destinationCompanyName=instance.destination_business_name,
+                    destinationBuyerNumber=instance.destination_buyer_number
+                )
+                fieldValuesVehicleInformation = FieldValuesVehicleInformation(
+                    notRunningRadio=1,
+                    selTrailerType=instance.trailer_type,
+                    vehicles=order_data['vehicles']
+                )
+                fieldValuesPickupDelivDates = FieldValuesPickupDelivDates(
+                    dateAvailable=instance.date_est_ship.strftime('%m/%d/%Y'),
+                    datePickup=instance.date_est_ship.strftime('%m/%d/%Y'),
+                    dateDelivery=instance.date_est_del.strftime('%m/%d/%Y'),
+                    datePickupType='Estimated',
+                    dateDeliveryType='Estimated'
+                )
+                fieldValuesPricingAndPayments = FieldValuesPricingAndPayments(
+                    minPayPrice=instance.payment_carrier_pay, # Carrier pay
+                    codAmount=instance.payment_cod_to_carrier, # COD to carrier
+                    cod_payment_method=Order.DispatchPaymentTypeChoices(validated_data['dispatch_cod_method']).value, # COD method
+                    cod_where=cod_where # will be paid by
+                )
+                fieldValuesAdditionalInformation = FieldValuesAdditionalInformation(
+                    txtOrderId=instance.id,
+                    additionalInfo='',
+                    dispatchCustomerNotes='',
+                    balancePaymentMethod=instance.dispatch_payment_type,
+                    balanceTime=Order.DispatchPaymentTermChoices(validated_data['dispatch_payment_term']).value,
+                    balanceWhere=Order.DispatchTermsChoices(validated_data['dispatch_term_begins']).value
+                )
+                dispatch = Dispatch(
+                    fieldValuesDestinationOrigin,
+                    fieldValuesVehicleInformation,
+                    fieldValuesPickupDelivDates,
+                    fieldValuesPricingAndPayments,
+                    fieldValuesAdditionalInformation
+                )
+                dispatch.request()
+            except Exception as e:
+                print(e)
         instance.save()
         return instance
 
@@ -136,8 +209,8 @@ class DirectDispatchOrderSerializer(serializers.ModelSerializer):
         carrier = Carrier.objects.create(**carrier_data)
         instance.carrier = carrier
         if is_dispatch:
-            # TODO: Paste here dispatching request
-            pass
+            instance.status = OrderStatusChoices.DISPATCHED
+
         instance.save()
         return instance
 

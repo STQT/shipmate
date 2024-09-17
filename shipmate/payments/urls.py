@@ -25,5 +25,5 @@ urlpatterns = [
     path('credit-cards/', ListOrderPaymentCreditCardView.as_view(), name='cc-list'),
     path('credit-cards/customer/create/', CreateOrderCustomerPaymentCreditCardAPIView.as_view(),
          name='cc-customer-create'),
-    path('credit-cards/create/', CreateOrderPaymentCreditCardAPIView.as_view(), name='cc-create'),
+    path('credit-cards/create/', CreateOrderPaymentCreditCardAPIView.as_view(), name='cc-create')
 ]

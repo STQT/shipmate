@@ -105,7 +105,7 @@ class Dispatch:
 
     def request(self):
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.firefox.connect('ws://localhost:53333/playwright')
             context = browser.new_context(viewport={"width": 1280, "height": 1280})
             self.page = context.new_page()
             self.page.goto('https://site.centraldispatch.com')

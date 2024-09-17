@@ -111,7 +111,7 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
                 for idx, order_vehicle in enumerate(instance.order_vehicles.all()):  # noqa
                     order_data['vehicles'].append(VehicleInformation(
                         ymmRadio=1,
-                        ymmVehicleYear=order_vehicle.vehicle_year,
+                        ymmVehicleYear=int(order_vehicle.vehicle_year),
                         ymmMake=order_vehicle.vehicle.mark,
                         ymmModel=order_vehicle.vehicle.name,
                         ymmVehicleType=order_vehicle.vehicle.vehicle_type,
@@ -126,48 +126,54 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
                     cod_where = 'D'
                 company_obj = CompanyInfo.objects.first()
                 fieldValuesDestinationOrigin = FieldValuesDestinationOrigin(
-                    orderId=instance.id,
-                    companyName=company_obj.name,
-                    originAddress1=instance.origin_address,
-                    originContact=instance.origin_contact_person,
-                    originPhone1=instance.origin_phone,
-                    originPhone2=instance.origin_second_phone,
+                    orderId=str(instance.id),
+                    companyName=str(company_obj.name),
+                    originAddress1=str(instance.origin_address),
+                    originContact=str(instance.origin_contact_person),
+                    originPhone1=str(instance.origin_phone),
+                    originPhone2=str(instance.origin_second_phone),
                     originPhone3='',
-                    originCompanyName=instance.origin_business_name,
-                    originBuyerNumber=instance.origin_buyer_number,
-                    destinationContact=instance.destination_contact_person,
-                    destinationPhone1=instance.destination_phone,
-                    destinationPhone2=instance.destination_second_phone,
+                    originCompanyName=str(instance.origin_business_name),
+                    originBuyerNumber=str(instance.origin_buyer_number),
+                    destinationContact=str(instance.destination_contact_person),
+                    destinationPhone1=str(instance.destination_phone),
+                    destinationPhone2=str(instance.destination_second_phone),
                     destinationPhone3='',
-                    destinationCompanyName=instance.destination_business_name,
-                    destinationBuyerNumber=instance.destination_buyer_number
+                    destinationCompanyName=str(instance.destination_business_name),
+                    destinationBuyerNumber=str(instance.destination_buyer_number)
                 )
+
                 fieldValuesVehicleInformation = FieldValuesVehicleInformation(
                     notRunningRadio=1,
-                    selTrailerType=instance.trailer_type,
-                    vehicles=order_data['vehicles']
+                    selTrailerType=str(instance.trailer_type),
+                    vehicles=str(order_data['vehicles'])
                 )
+
                 fieldValuesPickupDelivDates = FieldValuesPickupDelivDates(
-                    dateAvailable=instance.date_est_ship.strftime('%m/%d/%Y'),
-                    datePickup=instance.date_est_ship.strftime('%m/%d/%Y'),
-                    dateDelivery=instance.date_est_del.strftime('%m/%d/%Y'),
+                    dateAvailable=instance.date_est_ship.strftime('%m/%d/%Y') if instance.date_est_ship else '',
+                    datePickup=instance.date_est_ship.strftime('%m/%d/%Y') if instance.date_est_ship else '',
+                    dateDelivery=instance.date_est_del.strftime('%m/%d/%Y') if instance.date_est_del else '',
                     datePickupType='Estimated',
                     dateDeliveryType='Estimated'
                 )
+
                 fieldValuesPricingAndPayments = FieldValuesPricingAndPayments(
-                    minPayPrice=instance.payment_carrier_pay, # Carrier pay
-                    codAmount=instance.payment_cod_to_carrier, # COD to carrier
-                    cod_payment_method=Order.DispatchPaymentTypeChoices(validated_data['dispatch_cod_method']).value, # COD method
-                    cod_where=cod_where # will be paid by
+                    minPayPrice=str(instance.payment_carrier_pay),  # Carrier pay
+                    codAmount=str(instance.payment_cod_to_carrier),  # COD to carrier
+                    cod_payment_method=str(
+                        Order.DispatchPaymentTypeChoices(validated_data['dispatch_cod_method']).value),  # COD method
+                    cod_where=str(cod_where)  # will be paid by
                 )
+
                 fieldValuesAdditionalInformation = FieldValuesAdditionalInformation(
-                    txtOrderId=instance.id,
+                    txtOrderId=str(instance.id),
                     additionalInfo='',
                     dispatchCustomerNotes='',
-                    balancePaymentMethod=instance.dispatch_payment_type,
-                    balanceTime=Order.DispatchPaymentTermChoices(validated_data['dispatch_payment_term']).value,
-                    balanceWhere=Order.DispatchTermsChoices(validated_data['dispatch_term_begins']).value
+                    balancePaymentMethod=str(instance.dispatch_payment_type),
+                    balanceTime=str(Order.DispatchPaymentTermChoices(validated_data['dispatch_payment_term']).value),
+                    balanceWhere=str(Order.DispatchTermsChoices(validated_data['dispatch_term_begins']).value)
                 )
+
                 dispatch = Dispatch(
                     fieldValuesDestinationOrigin,
                     fieldValuesVehicleInformation,

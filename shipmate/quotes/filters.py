@@ -60,10 +60,10 @@ class QuoteFilter(django_filters.FilterSet):
 
     # New filter method for 'availableDate'
     def available_date_filter(self, queryset, name, value):
-        if value.lower() == "first avail date":
+        if value.lower() == "first_avail_date":
             # Filtering based on the 'date_est_ship' (first available date)
             return queryset.order_by('date_est_ship')
-        elif value.lower() == "last edited":
+        elif value.lower() == "last_edited":
             # Filtering based on the 'updated_at' (last edited date)
             return queryset.order_by('-updated_at')
         return queryset

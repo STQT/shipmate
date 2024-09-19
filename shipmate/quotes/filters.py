@@ -93,11 +93,11 @@ class QuoteFilter(django_filters.FilterSet):
 
     # New filter method for 'origin_state' based on the State name of the origin city
     def origin_state_filter(self, queryset, name, value):
-        return queryset.filter(origin__state__name__icontains=value)
+        return queryset.filter(origin__state__code__icontains=value)
 
     # New filter method for 'destination_state' based on the State name of the destination city
     def destination_state_filter(self, queryset, name, value):
-        return queryset.filter(destination__state__name__icontains=value)
+        return queryset.filter(destination__state__code__icontains=value)
 
 class QuoteAttachmentFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(field_name='type')

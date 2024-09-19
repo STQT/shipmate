@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from .models import Quote, QuoteAttachment
+from ..cars.models import CarsModel
 from ..contrib.models import QuoteStatusChoices, TrailerTypeChoices, ConditionChoices
 from ..lead_managements.models import Provider
 from django.utils.timezone import now, timedelta
@@ -30,9 +31,15 @@ class QuoteFilter(django_filters.FilterSet):
     origin_state = django_filters.CharFilter(method='origin_state_filter')
     destination_state = django_filters.CharFilter(method='destination_state_filter')
 
+    vehicle = django_filters.ModelChoiceFilter(
+        field_name="quote_vehicles__vehicle",
+        queryset=CarsModel.objects.all(),
+        label="Vehicle"
+    )
+
     class Meta:
         model = Quote
-        fields = ['status', 'source', 'user', 'extraUser', 'q', 'trailer_type', 'condition', 'origin_state', 'destination_state', 'availableDate', 'day', 'period_date_from', 'period_date_to']
+        fields = ['status', 'source', 'user', 'extraUser', 'q', 'trailer_type', 'condition', 'origin_state', 'destination_state', 'availableDate', 'day', 'period_date_from', 'period_date_to', 'vehicle']
 
     # Custom filter method for 'q'
     def custom_filter(self, queryset, name, value):

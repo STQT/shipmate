@@ -52,6 +52,7 @@ class TaskAttachment(BaseModel):
     busy = models.CharField(max_length=10, choices=BusyChoices.choices)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    date = models.DateField(blank=True, null=True)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
 
     class Meta:

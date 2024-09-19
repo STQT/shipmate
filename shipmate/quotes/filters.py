@@ -1,9 +1,12 @@
+from datetime import datetime
+
 import django_filters
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from rest_framework.exceptions import ValidationError
 
 from .models import Quote, QuoteAttachment
-from ..cars.models import CarsModel
+from ..cars.models import CarMarks
 from ..contrib.models import QuoteStatusChoices, TrailerTypeChoices, ConditionChoices
 from ..lead_managements.models import Provider
 from django.utils.timezone import now, timedelta
@@ -20,8 +23,8 @@ class QuoteFilter(django_filters.FilterSet):
     q = django_filters.CharFilter(method='custom_filter')
     availableDate = django_filters.CharFilter(method='available_date_filter')  # New filter
     day = django_filters.CharFilter(method='day_filter')  # New day filter
-    period_date_from = django_filters.DateFilter(field_name='date_est_ship', lookup_expr='gte', method='period_filter_from')
-    period_date_to = django_filters.DateFilter(field_name='date_est_ship', lookup_expr='lte', method='period_filter_to')
+    period_date_from = django_filters.DateFilter(method='period_date_filter', label='Period From')
+    period_date_to = django_filters.DateFilter(method='period_date_filter', label='Period To')
 
     # Trailer type and condition filters (as ChoiceFilters)
     trailer_type = django_filters.ChoiceFilter(choices=TrailerTypeChoices.choices)
@@ -31,15 +34,15 @@ class QuoteFilter(django_filters.FilterSet):
     origin_state = django_filters.CharFilter(method='origin_state_filter')
     destination_state = django_filters.CharFilter(method='destination_state_filter')
 
-    vehicle = django_filters.ModelChoiceFilter(
-        field_name="quote_vehicles__vehicle",
-        queryset=CarsModel.objects.all(),
+    vehicle_id = django_filters.ModelChoiceFilter(
+        field_name="quote_vehicles__vehicle__mark",
+        queryset=CarMarks.objects.all(),
         label="Vehicle"
     )
 
     class Meta:
         model = Quote
-        fields = ['status', 'source', 'user', 'extraUser', 'q', 'trailer_type', 'condition', 'origin_state', 'destination_state', 'availableDate', 'day', 'period_date_from', 'period_date_to', 'vehicle']
+        fields = ['status', 'source', 'user', 'extraUser', 'q', 'trailer_type', 'condition', 'origin_state', 'destination_state', 'availableDate', 'day', 'period_date_from', 'period_date_to', 'vehicle_id']
 
     # Custom filter method for 'q'
     def custom_filter(self, queryset, name, value):
@@ -60,42 +63,134 @@ class QuoteFilter(django_filters.FilterSet):
 
     # New filter method for 'availableDate'
     def available_date_filter(self, queryset, name, value):
-        if value.lower() == "first_avail_date":
-            # Filtering based on the 'date_est_ship' (first available date)
-            return queryset.order_by('date_est_ship')
-        elif value.lower() == "last_edited":
-            # Filtering based on the 'updated_at' (last edited date)
-            return queryset.order_by('-updated_at')
-        return queryset
+
+        pass
+        # if value.lower() == "first_avail_date":
+        #     # Filtering based on the 'date_est_ship' (first available date)
+        #     return queryset.order_by('date_est_ship')
+        # elif value.lower() == "last_edited":
+        #     # Filtering based on the 'updated_at' (last edited date)
+        #     return queryset.order_by('-updated_at')
+        # elif value.lower() == "quoted":
+        #     # Filtering based on the 'updated_at' (last edited date)
+        #     return queryset.order_by('-quoted')
+        # return queryset
 
     # Updated filter method for 'day' based on 'created_at' field
     def day_filter(self, queryset, name, value):
         today = now().date()
-        if 'today' in value:
-            queryset = queryset.filter(created_at__date=today)
-        if 'tomorrow' in value:
-            tomorrow = today + timedelta(days=1)
-            queryset = queryset.filter(created_at__date=tomorrow)
-        if 'this_week' in value:
-            start_of_week = today - timedelta(days=today.weekday())
-            end_of_week = start_of_week + timedelta(days=6)
-            queryset = queryset.filter(created_at__date__range=(start_of_week, end_of_week))
-        if 'last_week' in value:
-            start_of_last_week = today - timedelta(days=today.weekday() + 7)
-            end_of_last_week = start_of_last_week + timedelta(days=6)
-            queryset = queryset.filter(created_at__date__range=(start_of_last_week, end_of_last_week))
+        available_date_filter_value = self.data['available_date']
+
+        if available_date_filter_value:
+            if available_date_filter_value.lower() == "first_available_date":
+
+                if 'today' in value.lower():
+                    queryset = queryset.filter(date_est_ship=today)
+                if 'tomorrow' in value.lower():
+                    tomorrow = today + timedelta(days=1)
+                    queryset = queryset.filter(date_est_ship=tomorrow)
+                if 'this_week' in value.lower():
+                    start_of_week = today - timedelta(days=today.weekday())
+                    end_of_week = start_of_week + timedelta(days=6)
+                    queryset = queryset.filter(date_est_ship__range=(start_of_week, end_of_week))
+                if 'last_week' in value.lower():
+                    start_of_last_week = today - timedelta(days=today.weekday() + 7)
+                    end_of_last_week = start_of_last_week + timedelta(days=6)
+                    queryset = queryset.filter(date_est_ship__range=(start_of_last_week, end_of_last_week))
+            elif available_date_filter_value.lower() == "last_edited":
+                # Filtering based on the 'updated_at' (last edited date)
+                if 'today' in value.lower():
+                    queryset = queryset.filter(updated_at__date=today)
+                if 'tomorrow' in value.lower():
+                    tomorrow = today + timedelta(days=1)
+                    queryset = queryset.filter(updated_at__date=tomorrow)
+                if 'this_week' in value.lower():
+                    start_of_week = today - timedelta(days=today.weekday())
+                    end_of_week = start_of_week + timedelta(days=6)
+                    queryset = queryset.filter(updated_at__date__range=(start_of_week, end_of_week))
+                if 'last_week' in value.lower():
+                    start_of_last_week = today - timedelta(days=today.weekday() + 7)
+                    end_of_last_week = start_of_last_week + timedelta(days=6)
+                    queryset = queryset.filter(updated_at__date__range=(start_of_last_week, end_of_last_week))
+            elif available_date_filter_value.lower() == "quoted":
+                # Filtering based on the 'updated_at' (last edited date)
+                if 'today' in value.lower():
+                    queryset = queryset.filter(quote_dates__quoted__date=today)
+                if 'tomorrow' in value.lower():
+                    tomorrow = today + timedelta(days=1)
+                    queryset = queryset.filter(quote_dates__quoted__date=tomorrow)
+                if 'this_week' in value.lower():
+                    start_of_week = today - timedelta(days=today.weekday())
+                    end_of_week = start_of_week + timedelta(days=6)
+                    queryset = queryset.filter(quote_dates__quoted__date__range=(start_of_week, end_of_week))
+                if 'last_week' in value.lower():
+                    start_of_last_week = today - timedelta(days=today.weekday() + 7)
+                    end_of_last_week = start_of_last_week + timedelta(days=6)
+                    queryset = queryset.filter(quote_dates__quoted__date__range=(start_of_last_week, end_of_last_week))
+            elif available_date_filter_value.lower() == "tasks":
+                # Filtering by task deadline (using `TaskAttachment.date`)
+                if 'today' in value.lower():
+                    queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=today)
+                elif 'tomorrow' in value.lower():
+                    tomorrow = today + timedelta(days=1)
+                    queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=tomorrow)
+                elif 'this_week' in value.lower():
+                    start_of_week = today - timedelta(days=today.weekday())
+                    end_of_week = start_of_week + timedelta(days=6)
+                    queryset = queryset.filter(
+                        quote_attachments__type='task',
+                        quote_attachments__date__range=(start_of_week, end_of_week)
+                    )
+                elif 'last_week' in value.lower():
+                    start_of_last_week = today - timedelta(days=today.weekday() + 7)
+                    end_of_last_week = start_of_last_week + timedelta(days=6)
+                    queryset = queryset.filter(
+                        quote_attachments__type='task',
+                        quote_attachments__date__range=(start_of_last_week, end_of_last_week)
+                    )
+            return queryset
         return queryset
+            # if 'today' in value:
+            #     queryset = queryset.filter(created_at__date=today)
+            # if 'tomorrow' in value:
+            #     tomorrow = today + timedelta(days=1)
+            #     queryset = queryset.filter(created_at__date=tomorrow)
+            # if 'this_week' in value:
+            #     start_of_week = today - timedelta(days=today.weekday())
+            #     end_of_week = start_of_week + timedelta(days=6)
+            #     queryset = queryset.filter(created_at__date__range=(start_of_week, end_of_week))
+            # if 'last_week' in value:
+            #     start_of_last_week = today - timedelta(days=today.weekday() + 7)
+            #     end_of_last_week = start_of_last_week + timedelta(days=6)
+            #     queryset = queryset.filter(created_at__date__range=(start_of_last_week, end_of_last_week))
+            # return queryset
 
     # New filter method for 'period_date_from'
-    def period_filter_from(self, queryset, name, value):
-        # Filters quotes from the given start date on either 'date_est_ship' or 'updated_at'
-        queryset = queryset.filter(Q(date_est_ship__gte=value) | Q(updated_at__date__gte=value))
-        return queryset
+    def period_date_filter(self, queryset, name, value):
+        period_date_from = self.data.get('period_date_from', None)
+        period_date_to = self.data.get('period_date_to', None)
+        available_date_filter_value = self.data.get('available_date', None)
 
-    # New filter method for 'period_date_to'
-    def period_filter_to(self, queryset, name, value):
-        # Filters quotes up to the given end date on either 'date_est_ship' or 'updated_at'
-        queryset = queryset.filter(Q(date_est_ship__lte=value) | Q(updated_at__date__lte=value))
+        if period_date_from and period_date_to and available_date_filter_value:
+            # Convert strings to date objects
+            try:
+                period_date_from = datetime.strptime(period_date_from, '%Y-%m-%d').date()
+                period_date_to = datetime.strptime(period_date_to, '%Y-%m-%d').date()
+            except ValueError:
+                raise ValidationError("Enter a valid date format, expected YYYY-MM-DD.")
+
+            if available_date_filter_value.lower() == "first_available_date":
+                # Filter by 'date_est_ship'
+                queryset = queryset.filter(date_est_ship__range=(period_date_from, period_date_to))
+
+            elif available_date_filter_value.lower() == "last_edited":
+                # Filter by 'updated_at' field
+                queryset = queryset.filter(updated_at__date__range=(period_date_from, period_date_to))
+
+            elif available_date_filter_value.lower() == "quoted":
+                # Filter by 'quote_dates__quoted'
+                queryset = queryset.filter(quote_dates__quoted__range=(period_date_from, period_date_to))
+
         return queryset
 
     # New filter method for 'origin_state' based on the State name of the origin city

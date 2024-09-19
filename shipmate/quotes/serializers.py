@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from .models import Quote, QuoteVehicles, QuoteAttachment, QuoteDates
 from ..addresses.serializers import CitySerializer
-from ..attachments.models import PhoneAttachment
+from ..attachments.models import PhoneAttachment, EmailAttachment
 from ..attachments.serializers import AttachmentCommentSerializer
 from ..cars.serializers import CarsModelSerializer
 from ..contrib.models import Attachments
@@ -119,6 +119,8 @@ class QuoteAttachmentSerializer(serializers.ModelSerializer):
     user_name = serializers.StringRelatedField(source="user.get_full_name")
     from_phone = serializers.SerializerMethodField()
     filename = serializers.SerializerMethodField()
+    subject = serializers.SerializerMethodField()
+
 
     class Meta:
         model = QuoteAttachment
@@ -140,6 +142,15 @@ class QuoteAttachmentSerializer(serializers.ModelSerializer):
             except Exception as e:
                 print(e)
                 return 'some error'
+        else:
+            return None
+
+    def get_subject(self, obj: QuoteAttachment):
+        if obj.type == Attachments.TypesChoices.EMAIL:
+            # Assuming `from_phone` is a field in the related order model
+            email = EmailAttachment.objects.filter(id=obj.link).first()
+
+            return email.subject if email else None
         else:
             return None
 

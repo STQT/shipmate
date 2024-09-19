@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from shipmate.attachments.models import PhoneAttachment
+from shipmate.attachments.models import PhoneAttachment, EmailAttachment
 from shipmate.attachments.serializers import AttachmentCommentSerializer
 
 from shipmate.insights.models import LeadsInsight
@@ -132,6 +132,7 @@ class LeadsAttachmentSerializer(serializers.ModelSerializer):
     lead_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
     user_name = serializers.StringRelatedField(source="user.get_full_name")
     from_phone = serializers.SerializerMethodField()
+    subject = serializers.SerializerMethodField()
 
     class Meta:
         model = LeadsAttachment
@@ -144,6 +145,16 @@ class LeadsAttachmentSerializer(serializers.ModelSerializer):
             phone = PhoneAttachment.objects.filter(id=obj.link).first()
 
             return phone.from_phone if phone else None
+        else:
+            return None
+
+
+    def get_subject(self, obj: LeadsAttachment):
+        if obj.type == Attachments.TypesChoices.EMAIL:
+            # Assuming `from_phone` is a field in the related order model
+            email = EmailAttachment.objects.filter(id=obj.link).first()
+
+            return email.subject if email else None
         else:
             return None
 
@@ -180,7 +191,7 @@ class ListLeadUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "picture", "first_name", "last_name", "count"]
+        fields = ["id", "picture", "first_name", "last_name", "count", "is_active"]
 
     def get_count(self, obj) -> int:
         status = self.context.get('type')

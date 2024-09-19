@@ -279,9 +279,12 @@ class ListTeamLeadAPIView(ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        return Team.objects.filter(status=Team.TeamStatusChoices.ACTIVE).prefetch_related(
-            Prefetch('users', queryset=User.objects.filter(is_active=True))
+        return Team.objects.all().prefetch_related(
+            Prefetch('users', queryset=User.objects.all())
         )
+        # return Team.objects.filter(status=Team.TeamStatusChoices.ACTIVE).prefetch_related(
+        #     Prefetch('users', queryset=User.objects.filter(is_active=True))
+        # )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

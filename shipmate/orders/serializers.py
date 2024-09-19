@@ -10,7 +10,7 @@ from scripts.playwright_worker import FieldValuesDestinationOrigin, VehicleInfor
     FieldValuesPickupDelivDates, FieldValuesPricingAndPayments, FieldValuesAdditionalInformation, Dispatch
 from .models import Order, OrderVehicles, OrderAttachment, OrderContract
 from ..addresses.serializers import CitySerializer
-from ..attachments.models import PhoneAttachment
+from ..attachments.models import PhoneAttachment, EmailAttachment
 from ..attachments.serializers import AttachmentCommentSerializer
 from ..carriers.models import Carrier
 from ..carriers.serializers import CreateCarrierSerializer
@@ -488,6 +488,7 @@ class OrderAttachmentSerializer(serializers.ModelSerializer):
     order_attachment_comments = AttachmentCommentSerializer(many=True, read_only=True)
     user_name = serializers.StringRelatedField(source="user.get_full_name")
     from_phone = serializers.SerializerMethodField()
+    subject = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderAttachment
@@ -498,6 +499,15 @@ class OrderAttachmentSerializer(serializers.ModelSerializer):
             # Assuming `from_phone` is a field in the related order model
             phone = PhoneAttachment.objects.filter(id=obj.link).first()
             return phone.from_phone
+        else:
+            return None
+
+    def get_subject(self, obj: OrderAttachment):
+        if obj.type == Attachments.TypesChoices.EMAIL:
+            # Assuming `from_phone` is a field in the related order model
+            email = EmailAttachment.objects.filter(id=obj.link).first()
+
+            return email.subject if email else None
         else:
             return None
 

@@ -127,27 +127,27 @@ class QuoteFilter(django_filters.FilterSet):
                     start_of_last_week = today - timedelta(days=today.weekday() + 7)
                     end_of_last_week = start_of_last_week + timedelta(days=6)
                     queryset = queryset.filter(quote_dates__quoted__date__range=(start_of_last_week, end_of_last_week))
-            elif available_date_filter_value.lower() == "tasks":
-                # Filtering by task deadline (using `TaskAttachment.date`)
-                if 'today' in value.lower():
-                    queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=today)
-                elif 'tomorrow' in value.lower():
-                    tomorrow = today + timedelta(days=1)
-                    queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=tomorrow)
-                elif 'this_week' in value.lower():
-                    start_of_week = today - timedelta(days=today.weekday())
-                    end_of_week = start_of_week + timedelta(days=6)
-                    queryset = queryset.filter(
-                        quote_attachments__type='task',
-                        quote_attachments__date__range=(start_of_week, end_of_week)
-                    )
-                elif 'last_week' in value.lower():
-                    start_of_last_week = today - timedelta(days=today.weekday() + 7)
-                    end_of_last_week = start_of_last_week + timedelta(days=6)
-                    queryset = queryset.filter(
-                        quote_attachments__type='task',
-                        quote_attachments__date__range=(start_of_last_week, end_of_last_week)
-                    )
+            # elif available_date_filter_value.lower() == "tasks":
+            #     # Filtering by task deadline (using `TaskAttachment.date`)
+            #     if 'today' in value.lower():
+            #         queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=today)
+            #     elif 'tomorrow' in value.lower():
+            #         tomorrow = today + timedelta(days=1)
+            #         queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=tomorrow)
+            #     elif 'this_week' in value.lower():
+            #         start_of_week = today - timedelta(days=today.weekday())
+            #         end_of_week = start_of_week + timedelta(days=6)
+            #         queryset = queryset.filter(
+            #             quote_attachments__type='task',
+            #             quote_attachments__date__range=(start_of_week, end_of_week)
+            #         )
+            #     elif 'last_week' in value.lower():
+            #         start_of_last_week = today - timedelta(days=today.weekday() + 7)
+            #         end_of_last_week = start_of_last_week + timedelta(days=6)
+            #         queryset = queryset.filter(
+            #             quote_attachments__type='task',
+            #             quote_attachments__date__range=(start_of_last_week, end_of_last_week)
+            #         )
             return queryset
         return queryset
             # if 'today' in value:

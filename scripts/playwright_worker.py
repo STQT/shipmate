@@ -16,6 +16,8 @@ logger_handler = logging.StreamHandler()
 logger.addHandler(logger_handler)
 
 
+PLAYWRIGHT_WS_URL = "ws://147.182.162.87:53333/playwright"
+
 @dataclass
 class FieldValuesDestinationOrigin:
     orderId: str = ""
@@ -105,7 +107,7 @@ class Dispatch:
 
     def request(self):
         with sync_playwright() as p:
-            browser = p.firefox.connect('ws://localhost:53333/playwright')
+            browser = p.chromium.connect(PLAYWRIGHT_WS_URL)
             context = browser.new_context(viewport={"width": 1280, "height": 1280})
             self.page = context.new_page()
             self.page.goto('https://site.centraldispatch.com')

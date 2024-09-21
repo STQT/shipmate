@@ -363,7 +363,14 @@ class DispatchingOrderCreateAPIView(UpdatePUTAPIView):
     lookup_field = "guid"
 
     def perform_update(self, serializer):
-        serializer.save(status=OrderStatusChoices.DISPATCHED)
+        serializer.save()
+        OrderAttachment.objects.create(
+            order=serializer.instance,
+            type=Attachments.TypesChoices.ACTIVITY,
+            title=f"Moved to Dispatched through Dispatch button",
+            link=0,
+            user=serializer.instance.user
+        )
 
 
 class DirectDispatchOrderCreateAPIView(UpdatePUTAPIView):
@@ -375,6 +382,13 @@ class DirectDispatchOrderCreateAPIView(UpdatePUTAPIView):
         serializer.save(
             status=OrderStatusChoices.DISPATCHED,
             updated_from=self.request.user if self.request.user.is_authenticated else None
+        )
+        OrderAttachment.objects.create(
+            order=serializer.instance,
+            type=Attachments.TypesChoices.ACTIVITY,
+            title=f"Moved to Dispatched through Direct Dispatch",
+            link=0,
+            user=serializer.instance.user
         )
 
 
@@ -478,6 +492,13 @@ class PostToCDAPIView(CreateAPIView):
             order_id = self.kwargs.get('guid')
             order = get_object_or_404(Order, guid=order_id)
             order.status = OrderStatusChoices.POSTED
+            OrderAttachment.objects.create(
+                order=order,
+                type=Attachments.TypesChoices.ACTIVITY,
+                title=f"Moved to posted",
+                link=0,
+                user=order.user
+            )
             action = serializer.data['action']
             response_data = serializer.data
             response_data['status'] = OrderStatusChoices.POSTED
@@ -488,6 +509,13 @@ class PostToCDAPIView(CreateAPIView):
             else:
                 delete_cd(order)
                 order.status = OrderStatusChoices.BOOKED
+                OrderAttachment.objects.create(
+                    order=order,
+                    type=Attachments.TypesChoices.ACTIVITY,
+                    title=f"Moved to Booked",
+                    link=0,
+                    user=order.user
+                )
                 response_data['status'] = OrderStatusChoices.BOOKED
             order.save()
             return Response(response_data, status=status.HTTP_200_OK)

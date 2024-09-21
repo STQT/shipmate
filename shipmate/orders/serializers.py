@@ -514,7 +514,7 @@ class OrderAttachmentSerializer(serializers.ModelSerializer):
         if obj.type == Attachments.TypesChoices.PHONE:
             # Assuming `from_phone` is a field in the related order model
             phone = PhoneAttachment.objects.filter(id=obj.link).first()
-            return phone.from_phone
+            return phone.from_phone if phone else None
         else:
             return None
 

@@ -41,9 +41,20 @@ class QuoteFilter(django_filters.FilterSet):
         label="Vehicle"
     )
 
+    time_zones = django_filters.CharFilter(method='time_zone_filter')  # New time_zone filter
+
     class Meta:
         model = Quote
         fields = ['status', 'source', 'user', 'extraUser', 'q', 'trailer_type', 'condition', 'origin_state', 'destination_state', 'availableDate', 'day', 'period_date_from', 'period_date_to', 'vehicle_id']
+
+    TIMEZONE_AREA_CODES = {
+        'EST': ['201', '212', '305', '718', '929', '617', '202', '646'],
+        'CT': ['312', '469', '713', '214', '281', '773'],
+        'MT': ['303', '406', '505', '575', '720'],
+        'PST': ['213', '310', '415', '702', '619', '818']
+    }
+
+
 
     # Custom filter method for 'q'
     def custom_filter(self, queryset, name, value):
@@ -60,6 +71,25 @@ class QuoteFilter(django_filters.FilterSet):
             if value.isdigit():
                 q_objects |= Q(id=value)
             queryset = queryset.filter(q_objects)
+        return queryset
+
+    def time_zone_filter(self, queryset, name, value):
+        """
+        Custom filter method to filter quotes based on the time zone of the phone number.
+        :param queryset: The original queryset
+        :param name: The name of the filter field (time_zone)
+        :param value: The value of the filter (EST, CT, MT, PST)
+        :return: Filtered queryset
+        """
+        # Get area codes for the given time zone
+        area_codes = self.TIMEZONE_AREA_CODES.get(value.upper(), [])
+
+        if area_codes:
+            # Remove any characters like '(', ')', spaces, or dashes for proper matching
+            query_regex = r'^(\({0}\))|^({0})'.format('|'.join(area_codes))
+
+            # Filter quotes based on the customer phone number's area code
+            return queryset.filter(customer__phone__regex=query_regex)
         return queryset
 
     # New filter method for 'availableDate'

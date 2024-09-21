@@ -178,6 +178,7 @@ class Order(OrderAbstract):
 
 class OrderAttachment(Attachments):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    time_took = models.CharField(null=True, blank=True, max_length=255)
 
     class Meta:
         default_related_name = "orders"

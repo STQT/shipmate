@@ -18,11 +18,19 @@ from ..cars.serializers import CarsModelSerializer
 from ..company_management.models import CompanyInfo
 from ..contract.serializers import BaseContractSerializer
 from ..contrib.models import Attachments, OrderStatusChoices
+from ..contrib.timetook import timedelta_to_text
 from ..customers.serializers import RetrieveCustomerSerializer
 from ..lead_managements.models import Provider
 from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer, ListLeadMixinSerializer
 from ..payments.models import OrderPayment
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+
+
+
+User = get_user_model()  # noqa
 
 
 class CDActions(Enum):
@@ -46,6 +54,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         vehicles_data = validated_data.pop('vehicles')
+        # created_at = validated_data.pop('created_at')
         order = Order.objects.create(**validated_data)
         for vehicle_data in vehicles_data:
             OrderVehicles.objects.create(order=order, **vehicle_data)
@@ -370,6 +379,13 @@ class CreateOrderContractSerializer(serializers.ModelSerializer):
         order = validated_data['order']
         order_data = deepcopy(order.__dict__)
         order_data.pop('_state', None)  # Удаляем внутреннее поле Django
+        OrderAttachment.objects.create(
+            order=order,
+            type=Attachments.TypesChoices.ACTIVITY,
+            title="Contract is sent",
+            link=0,
+            user=order.user
+        )
 
         # Удаляем поля, которые не нужны в контракте
         excluded_fields = {'id', 'guid', 'created_at', 'updated_at', 'updated_from'}

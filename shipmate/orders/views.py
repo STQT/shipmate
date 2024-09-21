@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import OrderFilter, OrderAttachmentFilter
-from shipmate.contrib.models import OrderStatusChoices
+from shipmate.contrib.models import OrderStatusChoices, Attachments
 from shipmate.contrib.generics import UpdatePUTAPIView, RetrieveUpdatePUTDestroyAPIView
 from .models import Order, OrderAttachment, OrderLog, OrderVehicles, OrderContract
 from .serializers import CreateOrderSerializer, UpdateOrderSerializer, RetrieveOrderSerializer, ListOrderSerializer, \
@@ -35,12 +35,13 @@ from ..contract.models import Hawaii, Ground, International
 from ..contrib.centraldispatch import post_cd, repost_cd, delete_cd
 from ..contrib.pagination import CustomPagination
 from ..contrib.sms import send_sms
+from ..contrib.timetook import timedelta_to_text
 from ..contrib.views import ArchiveView, ReAssignView
 from ..insights.models import LeadsInsight
 from ..lead_managements.models import Provider
 from ..leads.serializers import LogSerializer
 from ..leads.views import ListTeamLeadAPIView
-from ..quotes.models import Quote
+from ..quotes.models import Quote, QuoteAttachment
 from ..quotes.serializers import CreateQuoteSerializer
 
 VEHICLE_TAG = "orders/vehicle/"
@@ -251,6 +252,15 @@ class SignOrderContractView(APIView):
             contract_obj.sign_ip_address = ip
             contract_obj.signed_time = timezone.now()
             contract_obj.save()
+            # Creating activity history
+            OrderAttachment.objects.create(
+                order=order_obj,
+                type=Attachments.TypesChoices.ACTIVITY,
+                title="Contract is signed",
+                link=0,
+                user=order_obj.user
+            )
+
 
             if order_obj.status == OrderStatusChoices.ORDERS:
                 order_obj.status = OrderStatusChoices.BOOKED
@@ -385,6 +395,36 @@ class ConvertQuoteToOrderAPIView(CreateAPIView):
         quote_id = self.kwargs.get('quote')
         quote = get_object_or_404(Quote, id=quote_id)
         serializer.save()
+        quote_id = self.kwargs.get('quote')
+        quote = get_object_or_404(Quote, id=quote_id)
+
+        # Save the Order without needing to pass quote to serializer
+        order = serializer.save()
+
+        user = quote.user
+        time_took = timezone.now() - quote.created_at
+
+        # Create OrderAttachment after order is saved
+        OrderAttachment.objects.create(
+            order=order,
+            type=Attachments.TypesChoices.ACTIVITY,
+            title=f"Converted to orders",
+            link=0,
+            user=user,
+            time_took=timedelta_to_text(time_took)
+        )
+        # user = User.objects.get(id=quote.user.id)
+        # print(quote.created_at)
+        # print(serializer)
+        # time_took = timezone.now() - quote.created_at
+        # OrderAttachment.objects.create(
+        #     order=serializer,
+        #     type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
+        #     title=f"Converted to orders",
+        #     link=0,
+        #     user=user,
+        #     time_took=timedelta_to_text(time_took)
+        # )
         quote.delete()
 
 
@@ -416,7 +456,13 @@ class BackToQuoteOrderAPIView(CreateAPIView):
         quote_serializer = serializer_class(data=order_data)
         quote_serializer.is_valid(raise_exception=True)
         quote_serializer.save()
-
+        QuoteAttachment.objects.create(
+            quote=quote_serializer.instance,
+            type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
+            title="Re-converted to quote",
+            link=0,
+            user=order.user
+        )
         order.delete()
 
         return Response(quote_serializer.data, status=status.HTTP_201_CREATED)

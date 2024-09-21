@@ -13,7 +13,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from .filters import QuoteFilter, QuoteAttachmentFilter
-from shipmate.contrib.models import QuoteStatusChoices
+from shipmate.contrib.models import QuoteStatusChoices, Attachments
 from shipmate.contrib.generics import RetrieveUpdatePUTDestroyAPIView
 from .models import QuoteAttachment, QuoteLog, Quote, QuoteVehicles
 from .serializers import (
@@ -108,9 +108,27 @@ class UpdateQuoteAPIView(UpdateAPIView):
     lookup_field = 'guid'
 
     def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        original_status = instance.status  # Get the original status
+
+
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
             serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+
+            # Check if the status has changed
+            new_status = serializer.instance.status
+            if original_status != new_status:
+                user = User.objects.get(id=request.user.id)
+                print(f"Moved to {new_status}")  # Log the status change
+                QuoteAttachment.objects.create(
+                    quote=serializer.instance,
+                    type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
+                    title=f"Converted to {QuoteStatusChoices(new_status).label}",
+                    link=0,
+                    user=user
+                )
+
             return Response(RetrieveQuoteSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

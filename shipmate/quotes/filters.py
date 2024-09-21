@@ -6,6 +6,7 @@ from django.db.models import Q
 from rest_framework.exceptions import ValidationError
 
 from .models import Quote, QuoteAttachment
+from ..attachments.models import TaskAttachment
 from ..cars.models import CarMarks
 from ..contrib.models import QuoteStatusChoices, TrailerTypeChoices, ConditionChoices
 from ..lead_managements.models import Provider
@@ -127,27 +128,33 @@ class QuoteFilter(django_filters.FilterSet):
                     start_of_last_week = today - timedelta(days=today.weekday() + 7)
                     end_of_last_week = start_of_last_week + timedelta(days=6)
                     queryset = queryset.filter(quote_dates__quoted__date__range=(start_of_last_week, end_of_last_week))
-            # elif available_date_filter_value.lower() == "tasks":
-            #     # Filtering by task deadline (using `TaskAttachment.date`)
-            #     if 'today' in value.lower():
-            #         queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=today)
-            #     elif 'tomorrow' in value.lower():
-            #         tomorrow = today + timedelta(days=1)
-            #         queryset = queryset.filter(quote_attachments__type='task', quote_attachments__date=tomorrow)
-            #     elif 'this_week' in value.lower():
-            #         start_of_week = today - timedelta(days=today.weekday())
-            #         end_of_week = start_of_week + timedelta(days=6)
-            #         queryset = queryset.filter(
-            #             quote_attachments__type='task',
-            #             quote_attachments__date__range=(start_of_week, end_of_week)
-            #         )
-            #     elif 'last_week' in value.lower():
-            #         start_of_last_week = today - timedelta(days=today.weekday() + 7)
-            #         end_of_last_week = start_of_last_week + timedelta(days=6)
-            #         queryset = queryset.filter(
-            #             quote_attachments__type='task',
-            #             quote_attachments__date__range=(start_of_last_week, end_of_last_week)
-            #         )
+            elif available_date_filter_value.lower() == "task":
+                # Filtering by task deadline (using `TaskAttachment.date`)
+                # Get task deadlines based on the date filters
+
+                if 'today' in value.lower():
+                    task_attachments = TaskAttachment.objects.filter(date=today)
+                elif 'tomorrow' in value.lower():
+                    tomorrow = today + timedelta(days=1)
+                    task_attachments = TaskAttachment.objects.filter(date=tomorrow)
+                elif 'this_week' in value.lower():
+                    start_of_week = today - timedelta(days=today.weekday())
+                    end_of_week = start_of_week + timedelta(days=6)
+                    task_attachments = TaskAttachment.objects.filter(date__range=(start_of_week, end_of_week))
+                elif 'last_week' in value.lower():
+                    start_of_last_week = today - timedelta(days=today.weekday() + 7)
+                    end_of_last_week = start_of_last_week + timedelta(days=6)
+                    task_attachments = TaskAttachment.objects.filter(date__range=(start_of_last_week, end_of_last_week))
+                else:
+                    task_attachments = TaskAttachment.objects.none()  # No valid filter case
+
+                    # Now filter quotes based on the obtained task attachments
+                if task_attachments.exists():
+                    # Assuming 'link' in QuoteAttachment corresponds to some ID in Quote
+                    queryset = queryset.filter(
+                        id__in=QuoteAttachment.objects.filter(
+                            link__in=task_attachments.values_list('id', flat=True)).values_list('quote_id', flat=True)
+                    )
             return queryset
         return queryset
             # if 'today' in value:

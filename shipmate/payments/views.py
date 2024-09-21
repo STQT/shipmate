@@ -37,6 +37,13 @@ class SendCCAToPaymentView(CreateAPIView):
         contract = payment.order.contracts.all().first()
         if contract:
             send_cc_agreement(payment.order, payment, payment_id)
+            OrderAttachment.objects.create(
+                order=payment.order,
+                type=Attachments.TypesChoices.ACTIVITY,
+                title="CC authorization is sent",
+                link=0,
+                user=payment.order.user
+            )
             return Response(status=status.HTTP_201_CREATED)
         return Response(data={"error": "No contracts"}, status=status.HTTP_400_BAD_REQUEST)
 

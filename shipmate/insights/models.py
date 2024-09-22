@@ -46,8 +46,8 @@ class LeadsInsight(models.Model):
     updated_at = models.DateTimeField(editable=False)
     status = models.CharField(max_length=20, default=LeadsStatusChoices.LEADS)
     source = models.ForeignKey("lead_managements.Provider", on_delete=models.SET_NULL, null=True, blank=True)
-    price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
-    reservation_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive])
+    price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive], null=True, blank=True)
+    reservation_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, validators=[validate_positive], null=True, blank=True)
     customer = models.ForeignKey("customers.Customer", on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='leadsinsight_user', null=True, blank=True)
     extra_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True,

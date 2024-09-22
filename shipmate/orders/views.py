@@ -125,8 +125,20 @@ class UpdateOrderAPIView(UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
+
         if serializer.is_valid():
             serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
+            try:
+                lead_insight = LeadsInsight.objects.get(order_guid=serializer.instance.guid)
+                lead_insight.status = serializer.instance.status
+                lead_insight.source = serializer.instance.source
+                lead_insight.price = serializer.instance.price
+                lead_insight.reservation_price = serializer.instance.reservation_price
+                lead_insight.customer = serializer.instance.customer
+                lead_insight.save()
+            except Exception as e:
+                print(e)
+
             return Response(RetrieveOrderSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -414,6 +426,14 @@ class ConvertQuoteToOrderAPIView(CreateAPIView):
 
         # Save the Order without needing to pass quote to serializer
         order = serializer.save()
+
+        try:
+            lead_insight = LeadsInsight.objects.get(quote_guid=quote.guid)
+            lead_insight.status = OrderStatusChoices.ORDERS
+            lead_insight.order_guid = order.guid
+            lead_insight.save()
+        except Exception as e:
+            print(e)
 
         user = quote.user
         time_took = timezone.now() - quote.created_at

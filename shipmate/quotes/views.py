@@ -128,6 +128,16 @@ class UpdateQuoteAPIView(UpdateAPIView):
                     link=0,
                     user=user
                 )
+            try:
+                lead_insight = LeadsInsight.objects.get(quote_guid=serializer.instance.guid)
+                lead_insight.status = serializer.instance.status
+                lead_insight.source = serializer.instance.source
+                lead_insight.price = serializer.instance.price
+                lead_insight.reservation_price = serializer.instance.reservation_price
+                lead_insight.customer = serializer.instance.customer
+                lead_insight.save()
+            except Exception as e:
+                print(e)
 
             return Response(RetrieveQuoteSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

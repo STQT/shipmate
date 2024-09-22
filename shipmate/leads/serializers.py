@@ -67,6 +67,14 @@ class CreateLeadsSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         vehicles_data = validated_data.pop('vehicles')
         lead: Leads = Leads.objects.create(**validated_data)
+        leadInsight = LeadsInsight(guid=lead.guid,
+                                   status=lead.status,
+                                   source=lead.source,
+                                   customer=lead.customer,
+                                   user=lead.user,
+                                   extra_user=lead.extra_user,
+                                   updated_at=lead.updated_at)
+        leadInsight.save()
         for vehicle_data in vehicles_data:
             LeadVehicles.objects.create(lead=lead, **vehicle_data)
 

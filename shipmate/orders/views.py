@@ -363,7 +363,7 @@ class DispatchingOrderCreateAPIView(UpdatePUTAPIView):
     lookup_field = "guid"
 
     def perform_update(self, serializer):
-        serializer.save()
+        serializer.save(status=OrderStatusChoices.DISPATCHED)
         OrderAttachment.objects.create(
             order=serializer.instance,
             type=Attachments.TypesChoices.ACTIVITY,

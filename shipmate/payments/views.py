@@ -98,6 +98,13 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
             validated_data.pop(file_field, None)
 
         instance = OrderPaymentCreditCard.objects.create(**validated_data)
+        OrderAttachment.objects.create(
+            quote=instance.order,
+            type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
+            title="CC authorization is filled",
+            link=0,
+            user=instance.order.user
+        )
         self.send_email_with_attachments(instance, files)
 
     def send_email_with_attachments(self, instance, files):
@@ -120,6 +127,15 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
         email = EmailMessage(subject, body, to=[customer])
         email.attach(file.name, file.read(), file.content_type)
         email.send()
+        # receipt_attachment = FileAttachment.objects.create(file=file, text="Receipt")
+        #
+        # OrderAttachment.objects.create(
+        #     order=instance.order,  # Access the order from the instance of OrderPaymentCreditCard
+        #     type=Attachments.TypesChoices.FILE,
+        #     title="Receipt",
+        #     link=receipt_attachment.pk,  # Use the FileAttachment primary key as the link
+        #     user=instance.order.user  # Access the user via the related Order model
+        # )
 
     def send_cc(self, email, file):
         subject = 'CC'

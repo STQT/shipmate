@@ -60,17 +60,18 @@ class QuoteVehicleLeadsSerializer(serializers.ModelSerializer):
         return f"{obj.vehicle_year} {vehicle_mark} {vehicle_name}"
 
 
-class ListQuoteSerializer(ListLeadMixinSerializer):
-    quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
-
-    class Meta:
-        model = Quote
-        fields = "__all__"
-
-
 class QuoteDatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuoteDates
+        fields = "__all__"
+
+
+class ListQuoteSerializer(ListLeadMixinSerializer):
+    quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
+    quote_dates = QuoteDatesSerializer(many=False)
+
+    class Meta:
+        model = Quote
         fields = "__all__"
 
 

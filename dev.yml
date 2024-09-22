@@ -18,7 +18,7 @@ services:
     depends_on:
       - postgres
       - redis
-      - playwright  # Add playwright dependency
+      - playwright_ocean  # Add playwright dependency
     ports:
       - "6000:5000"
     env_file:
@@ -52,18 +52,16 @@ services:
     command: /start-celerybeat
     ports: []
 
-  flower:
-    <<: *django
-    image: shipmate_dev_flower
-    command: /start-flower
-    ports:
-      - "5555:5555"
+#  flower:
+#    <<: *django
+#    image: shipmate_dev_flower
+#    command: /start-flower
+#    ports:
+#      - "5555:5555"
 
   # Add playwright service
-  playwright:
+  playwright_ocean:
     image: jacoblincool/playwright:chromium-server
-    ports:
-      - "53333:53333"  # Expose port 53333
     environment:
       - PLAYWRIGHT_CHROMIUM_DEBUG_PORT=53333  # Ensure Playwright runs on the correct port
     volumes:

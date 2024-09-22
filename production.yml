@@ -12,14 +12,14 @@ services:
 
     image: shipmate_production_django
     volumes:
-      - /var/www/api.shipmate.com/media:/app/shipmate/media
-      - /var/www/api.shipmate.com/static:/app/staticfiles
+      - /var/www/api.ocean.connectacrm.com/media:/app/shipmate/media
+      - /var/www/api.ocean.connectacrm.com/static:/app/staticfiles
 
     depends_on:
       - postgres
       - redis
     ports:
-      - "7000:5000"
+      - "7500:5000"
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres

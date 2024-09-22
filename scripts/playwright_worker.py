@@ -16,7 +16,7 @@ logger_handler = logging.StreamHandler()
 logger.addHandler(logger_handler)
 
 
-PLAYWRIGHT_WS_URL = "ws://147.182.162.87:53333/playwright"
+PLAYWRIGHT_WS_URL = "ws://playwright_ocean:53333/playwright"
 
 @dataclass
 class FieldValuesDestinationOrigin:

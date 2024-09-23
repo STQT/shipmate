@@ -6,7 +6,10 @@ from rest_framework.views import APIView
 
 from shipmate.contrib.models import LeadsStatusChoices, Attachments
 from shipmate.contrib.serializers import ArchiveSerializer, ReassignSerializer
+from shipmate.insights.models import LeadsInsight
 from shipmate.leads.models import Leads, LeadsAttachment
+from shipmate.orders.models import Order
+from shipmate.quotes.models import Quote
 
 User = get_user_model()
 
@@ -28,6 +31,24 @@ class ArchiveView(APIView):
                 return Response({'error': ['Quote not found']}, status=status.HTTP_404_NOT_FOUND)
             reason = serializer.validated_data['reason']  # noqa
             obj.status = LeadsStatusChoices.ARCHIVED
+            try:
+                if self.base_class is Leads:
+                    lead_insight = LeadsInsight.objects.get(guid=guid)
+                elif self.base_class is Quote:
+                    lead_insight = LeadsInsight.objects.get(quote_guid=guid)
+                elif self.base_class is Order:
+                    lead_insight = LeadsInsight.objects.get(order_guid=guid)
+
+
+                lead_insight.status = obj.status
+                lead_insight.source = obj.source
+                lead_insight.price = obj.price
+                lead_insight.reservation_price = obj.reservation_price
+                lead_insight.customer = obj.customer
+                lead_insight.save()
+                print('done saving LeadInsight object')
+            except Exception as e:
+                print(e)
             obj.save()
             data = {
                 self.base_fk_field: obj,

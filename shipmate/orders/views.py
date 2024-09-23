@@ -519,6 +519,16 @@ class PostToCDAPIView(CreateAPIView):
                 link=0,
                 user=order.user
             )
+            try:
+                lead_insight = LeadsInsight.objects.get(order_guid=order.guid)
+                lead_insight.status = order.status
+                lead_insight.source = order.source
+                lead_insight.price = order.price
+                lead_insight.reservation_price = order.reservation_price
+                lead_insight.customer = order.customer
+                lead_insight.save()
+            except Exception as e:
+                print(e)
             action = serializer.data['action']
             response_data = serializer.data
             response_data['status'] = OrderStatusChoices.POSTED
@@ -536,6 +546,16 @@ class PostToCDAPIView(CreateAPIView):
                     link=0,
                     user=order.user
                 )
+                try:
+                    lead_insight = LeadsInsight.objects.get(order_guid=order.guid)
+                    lead_insight.status = order.status
+                    lead_insight.source = order.source
+                    lead_insight.price = order.price
+                    lead_insight.reservation_price = order.reservation_price
+                    lead_insight.customer = order.customer
+                    lead_insight.save()
+                except Exception as e:
+                    print(e)
                 response_data['status'] = OrderStatusChoices.BOOKED
             order.save()
             return Response(response_data, status=status.HTTP_200_OK)

@@ -142,7 +142,7 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
             })
 
         # Add total amount sum to the list
-        order_list.append({'total_amount': total_amount_sum})
+        order_list.append({'total_amount_sum': total_amount_sum})
 
         return order_list if order_list else 'No ongoing orders'
 

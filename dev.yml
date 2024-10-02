@@ -12,15 +12,15 @@ services:
 
     image: shipmate_dev_django
     volumes:
-      - /var/www/api.ocean.connectacrm.com/media:/app/shipmate/media
-      - /var/www/api.ocean.connectacrm.com/static:/app/staticfiles
+      - /var/www/api.shipmate.com/media:/app/shipmate/media
+      - /var/www/api.shipmate.com/static:/app/staticfiles
 
     depends_on:
       - postgres
       - redis
-      - playwright_ocean  # Add playwright dependency
+#      - playwright_ocean  # Add playwright dependency
     ports:
-      - "6000:5000"
+      - "7500:5000"
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
@@ -60,10 +60,10 @@ services:
 #      - "5555:5555"
 
   # Add playwright service
-  playwright_ocean:
-    image: jacoblincool/playwright:chromium-server
-    environment:
-      - PLAYWRIGHT_CHROMIUM_DEBUG_PORT=53333  # Ensure Playwright runs on the correct port
-    volumes:
-      - /var/www/api.ocean.connectacrm.com/playwright:/playwright  # Example volume (optional, adjust as needed)
-    restart: unless-stopped
+#  playwright_ocean:
+#    image: jacoblincool/playwright:chromium-server
+#    environment:
+#      - PLAYWRIGHT_CHROMIUM_DEBUG_PORT=53333  # Ensure Playwright runs on the correct port
+#    volumes:
+#      - /var/www/api.ocean.connectacrm.com/playwright:/playwright  # Example volume (optional, adjust as needed)
+#    restart: unless-stopped

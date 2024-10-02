@@ -99,7 +99,7 @@ class CreateOrderCustomerPaymentCreditCardAPIView(CreateAPIView):  # noqa
 
         instance = OrderPaymentCreditCard.objects.create(**validated_data)
         OrderAttachment.objects.create(
-            quote=instance.order,
+            order=instance.order,
             type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
             title="CC authorization is filled",
             link=0,

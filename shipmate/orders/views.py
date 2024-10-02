@@ -291,13 +291,21 @@ class SignOrderContractView(APIView):
 
             # Send email with ZIP attachment
             customer_email = order_obj.customer.email
+            mate_url = ''
+            mate_term_url = ''
+            if 'mate' in request.build_absolute_uri(agreement_url):
+                mate_url = 'https://api.matelogisticss.com'+agreement_url
+                mate_term_url = 'https://api.matelogisticss.com'+terms_url
+            else:
+                mate_url = request.build_absolute_uri(agreement_url)
+                mate_term_url = request.build_absolute_uri(terms_url)
 
             email = EmailMessage(
                 subject='Signed Contract and Terms',
                 from_email=settings.SIGN_EMAIL_USERNAME,
                 body=f'Dear Customer, please find the signed contract and terms at the following links:\n\n'
-                     f'Agreement: {request.build_absolute_uri(agreement_url)}\n'
-                     f'Terms: {request.build_absolute_uri(terms_url)}',
+                     f'Agreement: {mate_url}\n'
+                     f'Terms: {mate_term_url}',
                 to=[customer_email],
             )
             try:

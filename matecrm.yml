@@ -12,8 +12,8 @@ services:
 
     image: shipmate_matecrm_django
     volumes:
-      - /var/www/matelog.connectacrm.com/media:/app/shipmate/media
-      - /var/www/matelog.connectacrm.com/static:/app/staticfiles
+      - /var/www/api.matelogistics.com/media:/app/shipmate/media
+      - /var/www/api.matelogistics.com/static:/app/staticfiles
 
     depends_on:
       - postgres

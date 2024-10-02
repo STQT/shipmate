@@ -25,8 +25,7 @@ from ..lead_managements.serializers import ProviderSmallDataSerializer
 from ..leads.serializers import ListLeadUserSerializer, ListLeadTeamSerializer, ListLeadMixinSerializer
 from ..payments.models import OrderPayment
 from django.contrib.auth import get_user_model
-from django.utils import timezone
-
+from django.db.models import Q
 
 
 
@@ -263,7 +262,8 @@ class OrderPaymentsSerializer(serializers.ModelSerializer):
 
     def get_payment_paid_to_carrier(self, obj):
         payment_paid = obj.payments.filter(
-            direction=OrderPayment.DirectionChoices.broker_to_carrier
+            Q(direction=OrderPayment.DirectionChoices.broker_to_carrier) |
+            Q(direction=OrderPayment.DirectionChoices.customer_to_broker)
         ).aggregate(total_paid=Sum('amount_charged'))['total_paid'] or Decimal('0.00')
 
         return f"{payment_paid:.2f}"

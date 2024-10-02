@@ -2,7 +2,8 @@ import random
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from shipmate.insights.models import Goal, GoalGroup
+from shipmate.insights.models import Goal, GoalGroup, LeadsInsight
+from shipmate.users.serializers import ListUserSerializer
 
 User = get_user_model()
 
@@ -74,4 +75,14 @@ class CreateGoalSerializer(serializers.ModelSerializer):
 class UpdateGoalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goal
+        fields = "__all__"
+
+
+# Lead Insight
+
+class ListLeadsInsightUserSerializer(serializers.ModelSerializer):
+    user = ListUserSerializer()
+
+    class Meta:
+        model = LeadsInsight
         fields = "__all__"

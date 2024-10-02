@@ -4,7 +4,7 @@ from .views import (
     GoalDetailAPIView,
     GoalListAPIView,
     GoalUpdateAPIView,
-    GoalDestroyAPIView,
+    GoalDestroyAPIView, LeadsInsightUsersAPIView,
 
 )
 
@@ -14,4 +14,6 @@ urlpatterns = [
     path('goal/update/<int:pk>/', GoalUpdateAPIView.as_view(), name='goal-update'),
     path('goal/detail/<int:pk>/', GoalDetailAPIView.as_view(), name='goal-detail'),
     path('goal/delete/<int:pk>/', GoalDestroyAPIView.as_view(), name='goal-delete'),
+    path('lead-insight/users/', LeadsInsightUsersAPIView.as_view(), name='lead-insight-users'),
+
 ]

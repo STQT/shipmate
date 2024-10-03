@@ -141,6 +141,7 @@ def blur_card_number(card_number):
 
 class ListOrderPaymentCreditCardSerializer(serializers.ModelSerializer):
     card_number = serializers.SerializerMethodField()
+    cvv = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderPaymentCreditCard
@@ -150,6 +151,12 @@ class ListOrderPaymentCreditCardSerializer(serializers.ModelSerializer):
         card_number = obj.card_number
         blurred_card_number = blur_card_number(card_number)
         return blurred_card_number
+
+    def get_cvv(self, obj):
+        cvv = obj.cvv
+        blurred_card_number = blur_card_number(cvv)
+        return blurred_card_number
+
 
 
 class CreateOrderPaymentCreditCardSerializer(serializers.ModelSerializer):

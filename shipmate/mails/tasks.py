@@ -13,6 +13,7 @@ def fetch_emails_task():
         username = settings.IMAP_EMAIL_USER
         password = settings.IMAP_EMAIL_PASSWORD
         emails = fetch_emails(username, password, imap_server="imap.gmail.com")
+        print(emails, username, password, '#####################################')
         for email in emails:
             data = {
                 'subject': email.subject,

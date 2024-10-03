@@ -15,11 +15,11 @@ from enum import Enum
 from django.utils.html import strip_tags
 
 from shipmate.contrib.email import send_email
-from shipmate.contrib.models import Attachments
+from shipmate.contrib.models import Attachments, QuoteStatusChoices
 from shipmate.contrib.sms import send_sms
 from shipmate.leads.models import LeadsAttachment, LeadAttachmentComment
 from shipmate.orders.models import OrderAttachment, OrderAttachmentComment
-from shipmate.quotes.models import QuoteAttachment, QuoteAttachmentComment
+from shipmate.quotes.models import QuoteAttachment, QuoteAttachmentComment, Quote
 
 
 class AttachmentType(Enum):
@@ -76,6 +76,13 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
                     "user_id": self.context['request'].user.id
 
                 }
+                try:
+                    if field_name == 'quote' and _type == Attachments.TypesChoices.TASK:
+                        quote = Quote.objects.get(pk=rel)
+                        quote.status = QuoteStatusChoices.UPCOMING
+                        quote.save()
+                except Exception as e:
+                    print(e)
                 if _type == Attachments.TypesChoices.FILE:
                     file_url = created_data.file.url if created_data.file else None
                     if file_url:

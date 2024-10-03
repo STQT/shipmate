@@ -20,4 +20,8 @@ app.conf.beat_schedule = {
         'task': 'shipmate.mails.tasks.fetch_emails_task',
         'schedule': 30,  # Fetch emails every 30 seconds
     },
+    'follow_up_quotes_task': {
+        'task': 'shipmate.quotes.tasks.follow_up_quotes',
+        'schedule': 60,  # Run every minute
+    },
 }

@@ -4,7 +4,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from shipmate.contrib.authorize import charge_payment, refund_payment
+from shipmate.contrib.models import Attachments
 from shipmate.contrib.serializers import Base64ImageField
+from shipmate.orders.models import OrderAttachment
 from shipmate.orders.serializers import CompanyDetailInfoSerializer, RetrieveOrderSerializer
 from shipmate.payments.models import OrderPayment, OrderPaymentAttachment, OrderPaymentCreditCard, TypeChoices
 
@@ -84,6 +86,14 @@ class OrderPaymentAttachmentSerializer(serializers.ModelSerializer):
         order_payment_attachments_all_amount = OrderPaymentAttachment.objects.filter(order_payment=order_payment)
         total_amount = order_payment_attachments_all_amount.aggregate(Sum('amount'))['amount__sum'] or 0
         order_payment.amount_charged = total_amount + amount
+        OrderAttachment.objects.create(
+            order=order,
+            second_title=OrderPayment.DirectionChoices(order_payment.direction).label,
+            type=Attachments.TypesChoices.ACTIVITY,
+            title=f"${order_payment.amount_charged} is made by {'Credit Card' if credit_card else TypeChoices(order_payment.payment_type).label}",
+            link=0,
+            user=order.user
+        )
         if order_payment.amount <= order_payment.amount_charged:
             order_payment.status = OrderPayment.StatusChoices.PAID
         order_payment.save()

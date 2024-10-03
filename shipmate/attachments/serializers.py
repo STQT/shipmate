@@ -81,6 +81,8 @@ class BaseAttachmentSerializer(serializers.ModelSerializer):
                     if file_url:
                         request = self.context['request']
                         url = request.build_absolute_uri('/')[:-1]
+                        if 'mate' in url:
+                            url = 'https://api.matelogisticss.com'
                         attachment_class_data["file"] = f"{url}{file_url}"
                 related_model = Class._meta.get_field(converter_field_name[field_name]).related_model
                 if not related_model.objects.filter(pk=rel).exists():

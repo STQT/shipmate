@@ -118,15 +118,22 @@ class UpdateQuoteAPIView(UpdateAPIView):
 
             # Check if the status has changed
             new_status = serializer.instance.status
-            if original_status != new_status:
-                user = User.objects.get(id=request.user.id)
+            if original_status != new_status and original_status != 'archived':
                 print(f"Moved to {new_status}")  # Log the status change
                 QuoteAttachment.objects.create(
                     quote=serializer.instance,
                     type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
                     title=f"Converted to {QuoteStatusChoices(new_status).label}",
                     link=0,
-                    user=user
+                    user=serializer.instance.user
+                )
+            elif original_status == 'archived':
+                QuoteAttachment.objects.create(
+                    quote=serializer.instance,
+                    type=Attachments.TypesChoices.ACTIVITY,  # Assuming you have types for attachments
+                    title=f"Backed to {QuoteStatusChoices(new_status).label}",
+                    link=0,
+                    user=serializer.instance.user
                 )
             try:
                 lead_insight = LeadsInsight.objects.get(quote_guid=serializer.instance.guid)

@@ -89,6 +89,14 @@ class UpdateLeadsAPIView(UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
         if serializer.is_valid():
+            if serializer.instance.status == 'archived':
+                LeadsAttachment.objects.create(
+                    lead=serializer.instance,
+                    type=Attachments.TypesChoices.ACTIVITY,
+                    title="Backed to Leads",
+                    link=0,
+                    user=serializer.instance.user
+                )
             serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
             return Response(RetrieveLeadsSerializer(serializer.instance).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

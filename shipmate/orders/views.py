@@ -127,6 +127,15 @@ class UpdateOrderAPIView(UpdateAPIView):
         serializer = self.get_serializer(instance=self.get_object(), data=request.data)
 
         if serializer.is_valid():
+            print(serializer.instance.status)
+            if serializer.instance.status == 'archived':
+                OrderAttachment.objects.create(
+                    order=serializer.instance,
+                    type=Attachments.TypesChoices.ACTIVITY,
+                    title="Backed to Orders",
+                    link=0,
+                    user=serializer.instance.user
+                )
             serializer.save(updated_from=self.request.user if self.request.user.is_authenticated else None)
             try:
                 lead_insight = LeadsInsight.objects.get(order_guid=serializer.instance.guid)

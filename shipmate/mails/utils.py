@@ -252,10 +252,10 @@ def parsing_email(text, email, subject=""):
         condition=condition,
         trailer_type=trailer_type,
         **data)
-    email_attach = EmailAttachment.objects.create(from_email=email, to_email=[settings.IMAP_EMAIL_USER],
-                                                  subject=subject)
+    # email_attach = EmailAttachment.objects.create(from_email=email, to_email=[settings.IMAP_EMAIL_USER],
+    #                                               subject=subject, text='text')
     LeadsAttachment.objects.create(lead=lead, title="Subject: " + subject,
-                                   type=LeadsAttachment.TypesChoices.EMAIL, link=email_attach.pk)
+                                   type=LeadsAttachment.TypesChoices.EMAIL, link=0)
     car_model = get_car_model(vehicle1['model'],
                               vehicle1.get('vehicle_type', CarsModel.VehicleTYPES.CAR),
                               vehicle1['make'])

@@ -8,10 +8,10 @@ class CarMarksSerializer(serializers.ModelSerializer):
         model = CarMarks
         fields = "__all__"
 
-    def create(self, validated_data):
-        # Set is_active to False before saving
-        validated_data['is_active'] = False
-        return super().create(validated_data)
+    # def create(self, validated_data):
+    #     # Set is_active to False before saving
+    #     validated_data['is_active'] = False
+    #     return super().create(validated_data)
 
 
 class CarsModelSerializer(serializers.ModelSerializer):

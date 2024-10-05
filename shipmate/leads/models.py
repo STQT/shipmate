@@ -3,7 +3,9 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from shipmate.contrib.models import LeadsAbstract, Attachments, VehicleAbstract
+from shipmate.more_settings.models import Automation
 from shipmate.utils.models import BaseLog
+from shipmate.more_settings.tasks import send_automation_message
 
 User = get_user_model()
 
@@ -17,6 +19,25 @@ class Leads(LeadsAbstract):
                                    related_name='leads_extra_user')
     updated_from = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+",
                                      null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None  # Check if this is a new instance
+
+        super().save(*args, **kwargs)  # Save the object first
+
+        if is_new:
+            # Retrieve active automations for the given step
+            active_automations = Automation.objects.filter(
+                steps=Automation.StepsChoices.AFTER_RECEIVED,  # Adjust step according to the flow
+                status=Automation.StatusChoices.ACTIVE,
+                included_users=self.user
+            )
+            for automation in active_automations:
+                # Schedule the task after the specified delay
+                send_automation_message.apply_async(
+                    args=[self.customer.email, self.user.phone, self.customer.phone, automation.id],  # Pass lead_id and automation_id
+                    countdown=automation.delays_minutes * 60  # Delay in seconds
+                )
 
     def clean(self):
         super().clean()
@@ -59,7 +80,7 @@ class Leads(LeadsAbstract):
 
 class LeadsAttachment(Attachments):
     lead = models.ForeignKey(Leads, on_delete=models.CASCADE)
-    
+
 
     class Meta:
         default_related_name = "lead_attachments"

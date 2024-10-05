@@ -110,6 +110,7 @@ class TemplateTypeChoices(models.TextChoices):
 
 class Template(models.Model):
     name = models.CharField(max_length=100)
+    subject = models.CharField(max_length=500, null=True, blank=True)
     body = models.TextField()
     status = models.CharField(max_length=8, choices=TemplateStatusChoices.choices)
     template_type = models.CharField(max_length=5, choices=TemplateTypeChoices.choices)

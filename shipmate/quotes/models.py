@@ -3,7 +3,10 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from shipmate.contrib.models import QuoteAbstract, Attachments, VehicleAbstract, QuoteStatusChoices
+from shipmate.more_settings.models import Automation
 from shipmate.utils.models import BaseLog
+from shipmate.more_settings.tasks import send_automation_message
+
 
 User = get_user_model()
 
@@ -23,6 +26,8 @@ class Quote(QuoteAbstract):
         verbose_name_plural = "Quotes"
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None  # Check if this is a new instance
+
         status_mapper = {
             QuoteStatusChoices.QUOTES: 'quoted',
             QuoteStatusChoices.FOLLOWUP: 'follow_up',
@@ -37,6 +42,7 @@ class Quote(QuoteAbstract):
         if not self.pk:
             self.created_at = timezone.now()
             self.updated_at = self.created_at
+
         else:
             old_instance = self.__class__.objects.get(pk=self.pk)
             if self.extra_user != old_instance.extra_user:
@@ -53,6 +59,19 @@ class Quote(QuoteAbstract):
                     quote_dates.last_time_edited = self.updated_at
                     quote_dates.save()
         super().save(*args, **kwargs)
+        if is_new:
+            # Retrieve active automations for the given step
+            active_automations = Automation.objects.filter(
+                steps=Automation.StepsChoices.AFTER_QUOTED,  # Adjust step according to the flow
+                status=Automation.StatusChoices.ACTIVE,
+                included_users=self.user
+            )
+            for automation in active_automations:
+                # Schedule the task after the specified delay
+                send_automation_message.apply_async(
+                    args=[self.customer.email, self.user.phone, self.customer.phone, automation.id],  # Pass lead_id and automation_id
+                    countdown=automation.delays_minutes * 60  # Delay in seconds
+                )
 
     @property
     def origin_name(self):
@@ -129,3 +148,5 @@ class QuoteDates(models.Model):
 
     def __str__(self):
         return f"QuoteDates for {self.quote}"
+
+

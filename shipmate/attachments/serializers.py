@@ -17,9 +17,11 @@ from django.utils.html import strip_tags
 from shipmate.contrib.email import send_email
 from shipmate.contrib.models import Attachments, QuoteStatusChoices
 from shipmate.contrib.sms import send_sms
+from shipmate.customers.serializers import CustomerSerializer
 from shipmate.leads.models import LeadsAttachment, LeadAttachmentComment
 from shipmate.orders.models import OrderAttachment, OrderAttachmentComment
 from shipmate.quotes.models import QuoteAttachment, QuoteAttachmentComment, Quote
+from shipmate.users.serializers import UserSerializer
 
 
 class AttachmentType(Enum):
@@ -149,6 +151,8 @@ class AttachmentCommentSerializer(serializers.Serializer):
 
 class ListTaskAttachmentSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
+    customer = CustomerSerializer()
+    user = UserSerializer()
 
     class Meta:
         model = TaskAttachment
@@ -167,6 +171,7 @@ class ListTaskAttachmentSerializer(serializers.ModelSerializer):
                     return AttachmentCommentSerializer([], many=True).data
         comments_filter = getattr(attachment, rel_name).all()
         return AttachmentCommentSerializer(comments_filter, many=True).data
+
 
 
 class CreateAttachmentCommentSerializer(serializers.Serializer):

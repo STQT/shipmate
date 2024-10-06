@@ -38,6 +38,11 @@ class TaskAttachment(BaseModel):
         DEADLINE = "deadline", "Deadline"
         PAYMENT = "payment", "Payment"
 
+    class StatusChoice(models.TextChoices):
+        SUPPORT = "support", "Support"
+        COMPLETED = "completed", "Completed"
+        ARCHIVED = "archived", "Archived"
+
     class PriorityChoices(models.TextChoices):
         HIGH = "high", "High"
         MEDIUM = "medium", "Medium"
@@ -50,6 +55,7 @@ class TaskAttachment(BaseModel):
     type = models.CharField(max_length=10, choices=TypeChoices.choices)
     priority = models.CharField(max_length=10, choices=PriorityChoices.choices)
     busy = models.CharField(max_length=10, choices=BusyChoices.choices)
+    status = models.CharField(max_length=15, choices=StatusChoice.choices, default=StatusChoice.SUPPORT)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     date = models.DateField(null=True, blank=True)

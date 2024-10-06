@@ -153,12 +153,16 @@ class ListTaskAttachmentSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     customer = CustomerSerializer()
     user = UserSerializer()
+    parent = serializers.SerializerMethodField()
+
 
     class Meta:
         model = TaskAttachment
         fields = "__all__"
 
     def get_comments(self, obj):
+        from shipmate.attachments.serializers import AttachmentCommentSerializer
+
         attachment = LeadsAttachment.objects.filter(link=obj.pk).first()
         rel_name = "lead_attachment_comments"
         if attachment is None:
@@ -171,6 +175,34 @@ class ListTaskAttachmentSerializer(serializers.ModelSerializer):
                     return AttachmentCommentSerializer([], many=True).data
         comments_filter = getattr(attachment, rel_name).all()
         return AttachmentCommentSerializer(comments_filter, many=True).data
+
+    def get_parent(self, obj):
+        # Try to find the corresponding LeadsAttachment, QuoteAttachment, or OrderAttachment
+        attachment = LeadsAttachment.objects.filter(link=obj.pk).first()
+        if attachment:
+            return {
+                'type': 'lead',
+                'guid': attachment.lead.guid,
+                'id': attachment.lead.id
+            }  # Assuming Lead has a guid field
+
+        attachment = QuoteAttachment.objects.filter(link=obj.pk).first()
+        if attachment:
+            return {
+                'type': 'quote',
+                'guid': attachment.quote.guid,
+                'id': attachment.quote.id
+            }  # Assuming Lead has a guid field
+
+        attachment = OrderAttachment.objects.filter(link=obj.pk).first()
+        if attachment:
+            return {
+                'type': 'order',
+                'guid': attachment.order.guid,
+                'id': attachment.order.id
+            }  # Assuming Lead has a guid field
+
+        return None  # Return None if no attachment found
 
 
 

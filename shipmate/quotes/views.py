@@ -7,8 +7,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListAPIView, RetrieveAPIView,
     DestroyAPIView, CreateAPIView,
-    get_object_or_404, UpdateAPIView
+    get_object_or_404, UpdateAPIView, GenericAPIView
 )
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
@@ -169,7 +170,7 @@ class DetailQuoteAPIView(RetrieveAPIView):
 
 
 @extend_schema(tags=[ATTACHMENTS_TAG])
-class QuoteAttachmentListView(ListAPIView):
+class QuoteAttachmentListView(UpdateModelMixin, GenericAPIView):
     serializer_class = QuoteAttachmentSerializer
     filterset_class = QuoteAttachmentFilter
 
@@ -177,6 +178,27 @@ class QuoteAttachmentListView(ListAPIView):
         quote_id = self.kwargs.get('quoteId')  # Retrieve the lead_id from URL kwargs
         return QuoteAttachment.objects.prefetch_related(
             "quote_attachment_comments").filter(quote_id=quote_id).order_by("-id")
+
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    # PATCH method to update specific fields of an OrderAttachment
+    def patch(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)  # Ensure it's a partial update
+        queryset = self.get_queryset()  # Get the queryset filtered by order_id
+        attachment = queryset.filter(pk=kwargs.get('pk')).first()  # Get the object by primary key
+
+        if not attachment:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(attachment, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        print(request.data, serializer.instance.marked)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 @extend_schema(tags=[ATTACHMENTS_TAG])

@@ -11,6 +11,7 @@ User = get_user_model()
 
 class TaskAttachmentFilter(django_filters.FilterSet):
     type = django_filters.ChoiceFilter(choices=TaskAttachment.TypeChoices.choices)
+    status = django_filters.ChoiceFilter(choices=TaskAttachment.StatusChoice.choices)
 
     user = django_filters.ModelMultipleChoiceFilter(field_name='user', queryset=User.objects.all())
     q = django_filters.CharFilter(method='custom_filter')
@@ -25,7 +26,7 @@ class TaskAttachmentFilter(django_filters.FilterSet):
     class Meta:
         model = TaskAttachment
         fields = [
-            'type', 'user', 'q',
+            'type', 'status', 'user', 'q',
             'due', 'to_do', 'today', 'tomorrow', 'this_week', 'next_week'
         ]
 

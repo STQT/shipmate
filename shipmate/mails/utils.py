@@ -12,6 +12,7 @@ from shipmate.cars.models import CarsModel, CarMarks
 from shipmate.company_management.models import LeadParsingValue
 from shipmate.contrib.models import ConditionChoices, TrailerTypeChoices
 from shipmate.customers.models import Customer
+from shipmate.insights.models import LeadsInsight
 from shipmate.lead_managements.models import Provider, Distribution
 from shipmate.leads.models import LeadVehicles, Leads, LeadsAttachment
 
@@ -252,6 +253,18 @@ def parsing_email(text, email, subject=""):
         condition=condition,
         trailer_type=trailer_type,
         **data)
+    try:
+        leadInsight = LeadsInsight(guid=lead.guid,
+                                   status=lead.status,
+                                   source=lead.source,
+                                   customer=lead.customer,
+                                   user=lead.user,
+                                   extra_user=lead.extra_user,
+                                   updated_at=lead.updated_at)
+        leadInsight.save()
+        print('saved')
+    except Exception as e:
+        print(e)
     # email_attach = EmailAttachment.objects.create(from_email=email, to_email=[settings.IMAP_EMAIL_USER],
     #                                               subject=subject, text='text')
     LeadsAttachment.objects.create(lead=lead, title="Subject: " + subject,

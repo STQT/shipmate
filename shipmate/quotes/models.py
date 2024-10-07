@@ -68,10 +68,14 @@ class Quote(QuoteAbstract):
             )
             for automation in active_automations:
                 # Schedule the task after the specified delay
-                send_automation_message.apply_async(
-                    args=[self.customer.email, self.user.phone, self.customer.phone, automation.id],  # Pass lead_id and automation_id
-                    countdown=automation.delays_minutes * 60  # Delay in seconds
-                )
+                try:
+                    send_automation_message.apply_async(
+                        args=[self.customer.email, self.user.phone, self.customer.phone, automation.id],  # Pass lead_id and automation_id
+                        countdown=automation.delays_minutes * 60  # Delay in seconds
+                    )
+                except Exception as e:
+                    print(e)
+                    continue
 
     @property
     def origin_name(self):

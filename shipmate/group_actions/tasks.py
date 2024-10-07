@@ -60,7 +60,11 @@ def send_email_task(user_id, ids, endpoint_type, message, subject="", cc_list=No
             "type": Attachments.TypesChoices.EMAIL,
             "link": 0
         }
-        attachment_class.objects.create(**data)
-        email_list.append(obj.customer.email)
+        try:
+            attachment_class.objects.create(**data)
+            email_list.append(obj.customer.email)
+        except Exception as e:
+            print(e)
+            continue
     send_email(subject=subject, text_content=message, from_email=settings.DEFAULT_FROM_EMAIL,
                to_emails=email_list, bcc_emails=bcc_emails, cc_emails=cc_list)

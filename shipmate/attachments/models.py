@@ -39,6 +39,7 @@ class TaskAttachment(BaseModel):
         PAYMENT = "payment", "Payment"
 
     class StatusChoice(models.TextChoices):
+        ALL = "all", "All"
         SUPPORT = "support", "Support"
         COMPLETED = "completed", "Completed"
         ARCHIVED = "archived", "Archived"

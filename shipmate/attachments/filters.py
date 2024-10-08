@@ -38,6 +38,12 @@ class TaskAttachmentFilter(django_filters.FilterSet):
 
         return queryset
 
+    def filter_status(self, queryset, name, value):
+        # Check if 'all' is passed for status, return all records if true
+        if value == 'all':
+            return queryset
+        return queryset.filter(status=value)
+
     def filter_due(self, queryset, name, value):
         if value:
             now = datetime.now()

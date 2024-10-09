@@ -278,9 +278,6 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
             html_content=text,
             cc_emails=validated_data.get('cc_email', None),
             bcc_emails=validated_data.get('bcc_email', None),
-            host='smtp.sendgrid.net',
-            user='apikey',
-            password=settings.SENDGRID_API_KEY
         )
 
         return email_attachment

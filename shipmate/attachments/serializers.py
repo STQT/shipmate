@@ -280,7 +280,7 @@ class EmailAttachmentSerializer(BaseAttachmentSerializer):
             bcc_emails=validated_data.get('bcc_email', None),
             host='smtp.sendgrid.net',
             user='apikey',
-            password='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'
+            password=settings.SENDGRID_API_KEY
         )
 
         return email_attachment

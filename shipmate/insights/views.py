@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 
 from shipmate.contrib.generics import UpdatePUTAPIView
 from shipmate.insights.models import GoalGroup, LeadsInsight
-from shipmate.insights.serializers import GoalGroupSerializer, ListLeadsInsightUserSerializer
+from shipmate.insights.serializers import GoalGroupSerializer, ListLeadsInsightUserSerializer, \
+    ListLeadsInsightSerializer
 from shipmate.insights.filters import GoalFilter, LeadsInsightFilter
 from shipmate.insights.models import Goal
 from shipmate.insights.serializers import (
@@ -138,3 +139,11 @@ class LeadsInsightDaysAPIView(generics.GenericAPIView):
             'labels': labels,
             'datasets': datasets,
         })
+
+
+class LeadsInsightAPIView(generics.ListAPIView):
+    queryset = LeadsInsight.objects.all()
+    serializer_class = ListLeadsInsightSerializer
+    pagination_class = None
+
+

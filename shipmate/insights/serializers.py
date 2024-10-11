@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from shipmate.insights.models import Goal, GoalGroup, LeadsInsight
-from shipmate.users.serializers import ListUserSerializer
+from shipmate.lead_managements.serializers import ProviderSerializer
+from shipmate.users.serializers import ListUserSerializer, UserSerializer
 
 User = get_user_model()
 
@@ -82,6 +83,38 @@ class UpdateGoalSerializer(serializers.ModelSerializer):
 
 class ListLeadsInsightUserSerializer(serializers.ModelSerializer):
     user = ListUserSerializer()
+
+    class Meta:
+        model = LeadsInsight
+        fields = "__all__"
+
+
+
+class ListLeadsInsightSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+    source = serializers.SerializerMethodField()
+    user = UserSerializer()
+
+
+    @classmethod
+    def get_user_name(cls, obj) -> str:
+        user = obj.user
+        if not obj.user:
+            return "NaN"
+        name = user.first_name
+        last_name = user.last_name if user.last_name else ""
+        return name + " " + last_name
+
+
+
+    @classmethod
+    def get_source(cls, obj) -> str:
+        source = obj.source
+        if not obj.source:
+            return "NaN"
+        name = source.name
+        return name
+
 
     class Meta:
         model = LeadsInsight

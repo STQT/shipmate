@@ -116,4 +116,4 @@ def send_email(from_email, subject, to_emails, text_content=None, html_content=N
 #
 # send_email(from_email=to_email,
 #            subject=subject, to_emails=['murodovazizmurod@gmail.com'],
-#            text_content=text_content, html_content=html_content, host='smtp.sendgrid.net', user='apikey', password='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')
+#            text_content=text_content, html_content=html_content, host='smtp.sendgrid.net', user='apikey', password='')

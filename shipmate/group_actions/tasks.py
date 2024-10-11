@@ -66,5 +66,7 @@ def send_email_task(user_id, ids, endpoint_type, message, subject="", cc_list=No
         except Exception as e:
             print(e)
             continue
-    send_email(subject=subject, text_content=message, from_email=settings.DEFAULT_FROM_EMAIL,
-               to_emails=email_list, bcc_emails=bcc_emails, cc_emails=cc_list)
+    send_email(subject=subject, text_content=message, from_email=user.email,
+               to_emails=email_list, bcc_emails=bcc_emails, cc_emails=cc_list, host='smtp.sendgrid.net',
+            user='apikey',
+            password=settings.SENDGRID_API_KEY)

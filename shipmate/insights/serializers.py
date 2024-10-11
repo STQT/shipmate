@@ -101,8 +101,8 @@ class ListLeadsInsightSerializer(serializers.ModelSerializer):
         user = obj.user
         if not obj.user:
             return "NaN"
-        name = user.first_name
-        last_name = user.last_name if user.last_name else ""
+        name = user.first_name if user.last_name else " "
+        last_name = user.last_name if user.last_name else " "
         return name + " " + last_name
 
 

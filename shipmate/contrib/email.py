@@ -78,7 +78,8 @@ def send_email(from_email, subject, to_emails, text_content=None, html_content=N
         port=587,
         username=user,
         password=password,
-        use_tls=True
+        use_tls=True,
+
     ) if host and user and password else None
 
     # Create the email message
@@ -108,11 +109,11 @@ def send_email(from_email, subject, to_emails, text_content=None, html_content=N
 
 # Example usage:
 # subject = "Subject of the email"
-# to_email = "leads@example.com"
+# to_email = "users@matelogisticss.com"
 # text_content = "Plain text content of the email"
 # html_content = "<p>HTML content of the email</p>"
-# attachment_path = "/path/to/your/attachment/file.pdf"
-
-# send_email("gayratbek.sultonov@gmail.com",
-#            subject, to_email,
-#            text_content=text_content, html_content=html_content, attachment=attachment_path)
+# # attachment_path = "/path/to/your/attachment/file.pdf"
+#
+# send_email(from_email=to_email,
+#            subject=subject, to_emails=['murodovazizmurod@gmail.com'],
+#            text_content=text_content, html_content=html_content, host='smtp.sendgrid.net', user='apikey', password='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')

@@ -61,7 +61,7 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
     uncompleted = serializers.SerializerMethodField()
     source = serializers.SerializerMethodField()
     stage = serializers.SerializerMethodField()
-    # address = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
     # attached_payment_methods = serializers.SerializerMethodField()
     # payments_made = serializers.SerializerMethodField()
     # charged = serializers.SerializerMethodField()
@@ -161,25 +161,25 @@ class DetailCustomerSerializer(serializers.ModelSerializer):
         else:
             return 'NaN'
 
-    # @classmethod
-    # def get_address(self, obj):
-    #     # Get the latest order of the customer that has related credit card data
-    #     latest_order = Order.objects.filter(customer_id=obj.id, credit_cards__isnull=False).order_by(
-    #         '-created_at').first()
-    #
-    #     if latest_order:
-    #         # Get the latest credit card information related to this order
-    #         latest_credit_card = latest_order.credit_cards.last()  # Get the most recent credit card
-    #         if latest_credit_card:
-    #             # Build the full address from the credit card's billing details
-    #             full_address = {
-    #                 'billing_address': latest_credit_card.billing_address,
-    #                 'billing_city': latest_credit_card.billing_city,
-    #                 'billing_state': latest_credit_card.billing_state,
-    #                 'billing_zip': latest_credit_card.billing_zip
-    #             }
-    #             return full_address
-    #     return 'NaN'
+    @classmethod
+    def get_address(self, obj):
+        # Get the latest order of the customer that has related credit card data
+        latest_order = Order.objects.filter(customer_id=obj.id, credit_cards__isnull=False).order_by(
+            '-created_at').first()
+
+        if latest_order:
+            # Get the latest credit card information related to this order
+            latest_credit_card = latest_order.credit_cards.last()  # Get the most recent credit card
+            if latest_credit_card:
+                # Build the full address from the credit card's billing details
+                full_address = {
+                    'billing_address': latest_credit_card.billing_address,
+                    'billing_city': latest_credit_card.billing_city,
+                    'billing_state': latest_credit_card.billing_state,
+                    'billing_zip': latest_credit_card.billing_zip
+                }
+                return full_address
+        return 'NaN'
 
     # @classmethod
     # def get_attached_payment_methods(self, obj):

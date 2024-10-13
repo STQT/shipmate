@@ -62,11 +62,11 @@ def send_email_task(user_id, ids, endpoint_type, message, subject="", cc_list=No
         }
         try:
             attachment_class.objects.create(**data)
-            email_list.append(obj.customer.email)
+            send_email(subject=subject, text_content=message, from_email=user.email,
+                       to_emails=[obj.customer.email], bcc_emails=bcc_emails, cc_emails=cc_list, host='smtp.sendgrid.net',
+                       user='apikey',
+                       password=settings.SENDGRID_API_KEY)
+            # email_list.append(obj.customer.email)
         except Exception as e:
             print(e)
             continue
-    send_email(subject=subject, text_content=message, from_email=user.email,
-               to_emails=email_list, bcc_emails=bcc_emails, cc_emails=cc_list, host='smtp.sendgrid.net',
-            user='apikey',
-            password=settings.SENDGRID_API_KEY)

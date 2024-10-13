@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from django.db import transaction
 from django.conf import settings
 from rest_framework import serializers
@@ -140,9 +141,35 @@ class NoteAttachmentSerializer(BaseAttachmentSerializer):  # noqa
 
 
 class TaskAttachmentSerializer(BaseAttachmentSerializer):
+    deadline_string = serializers.SerializerMethodField()  # Add deadline_string field
+
+
     class Meta:
         model = TaskAttachment
-        fields = "__all__"
+        fields = ['type', 'priority', 'busy', 'status', 'start_time', 'end_time', 'date', 'deadline_string', 'customer']
+
+
+    def get_deadline_string(self, obj):
+        if not obj.date:
+            return None  # If no date is provided, return None
+
+        # Get today's date
+        today = date.today()
+
+        # Calculate the difference between the task date and today
+        delta = obj.date - today
+
+        # Determine the string based on the delta value
+        if delta.days > 1:
+            return f"{delta.days} days due"
+        elif delta.days == 1:
+            return "tomorrow"
+        elif delta.days == 0:
+            return "today"
+        elif delta.days == -1:
+            return "1 day past"
+        else:
+            return f"{abs(delta.days)} days past"
 
 
 class AttachmentCommentSerializer(serializers.Serializer):

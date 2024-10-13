@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from shipmate.attachments.models import PhoneAttachment, EmailAttachment
-from shipmate.attachments.serializers import AttachmentCommentSerializer, NoteAttachmentSerializer
+from shipmate.attachments.models import PhoneAttachment, EmailAttachment, TaskAttachment
+from shipmate.attachments.serializers import AttachmentCommentSerializer, NoteAttachmentSerializer, \
+    TaskAttachmentSerializer
 
 from shipmate.insights.models import LeadsInsight
 from shipmate.contrib.models import Attachments
@@ -113,6 +114,7 @@ class ListLeadMixinSerializer(serializers.ModelSerializer):
 class ListLeadsSerializer(ListLeadMixinSerializer):
     lead_vehicles = ListVehicleLeadsSerializer(many=True)
     notes = serializers.SerializerMethodField()  # Add notes field
+    tasks = serializers.SerializerMethodField()  # Add tasks field
 
     class Meta:
         model = Leads
@@ -122,6 +124,12 @@ class ListLeadsSerializer(ListLeadMixinSerializer):
         # Filter attachments where type is 'NOTE' and they belong to the lead (obj)
         note_attachments = LeadsAttachment.objects.filter(lead=obj, type=Attachments.TypesChoices.NOTE)
         return LeadsAttachmentSerializer(note_attachments, many=True).data
+
+    def get_tasks(self, obj):
+        # Filter tasks related to this lead (obj)
+        task_attachments = LeadsAttachment.objects.filter(lead=obj, type=Attachments.TypesChoices.TASK)
+        # Serialize the tasks and include deadline_string
+        return LeadsAttachmentSerializer(task_attachments, many=True, context=self.context).data
 
 
 class RetrieveLeadsSerializer(ListLeadsSerializer):

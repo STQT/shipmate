@@ -296,6 +296,8 @@ class OrderPaymentsSerializer(serializers.ModelSerializer):
 class ListOrderSerializer(ListLeadMixinSerializer):
     order_vehicles = OrderVehicleLeadsSerializer(many=True)
     price = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()  # Add notes field
+
 
     class Meta:
         model = Order
@@ -354,6 +356,11 @@ class ListOrderSerializer(ListLeadMixinSerializer):
             city_zip = obj.destination.zip
 
         return f"{city_name}, {state_code} {city_zip}"
+
+    def get_notes(self, obj):
+        # Filter attachments where type is 'NOTE' and they belong to the lead (obj)
+        note_attachments = OrderAttachment.objects.filter(order=obj, type=Attachments.TypesChoices.NOTE)
+        return OrderAttachmentSerializer(note_attachments, many=True).data
 
 
 class OrderContractSerializer(serializers.ModelSerializer):

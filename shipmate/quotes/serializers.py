@@ -69,10 +69,17 @@ class QuoteDatesSerializer(serializers.ModelSerializer):
 class ListQuoteSerializer(ListLeadMixinSerializer):
     quote_vehicles = QuoteVehicleLeadsSerializer(many=True)
     quote_dates = QuoteDatesSerializer(many=False)
+    notes = serializers.SerializerMethodField()  # Add notes field
+
 
     class Meta:
         model = Quote
         fields = "__all__"
+
+    def get_notes(self, obj):
+        # Filter attachments where type is 'NOTE' and they belong to the lead (obj)
+        note_attachments = QuoteAttachment.objects.filter(quote=obj, type=Attachments.TypesChoices.NOTE)
+        return QuoteAttachmentSerializer(note_attachments, many=True).data
 
 
 class RetrieveQuoteSerializer(ListQuoteSerializer):

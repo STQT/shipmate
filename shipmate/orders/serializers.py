@@ -192,6 +192,7 @@ class DispatchingOrderSerializer(serializers.ModelSerializer):
                 dispatch.request()
             except Exception as e:
                 print(e)
+        instance.status = OrderStatusChoices.DISPATCHED
         instance.save()
         return instance
 

@@ -192,18 +192,23 @@ class OrderAttachmentListView(UpdateModelMixin, GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    # PATCH method to update specific fields of an OrderAttachment
     def patch(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)  # Ensure it's a partial update
-        queryset = self.get_queryset()  # Get the queryset filtered by order_id
-        attachment = queryset.filter(pk=kwargs.get('pk')).first()  # Get the object by primary key
+
+        # Extract attachment_id from query parameters
+        attachment_id = request.query_params.get('attachment_id')
+
+        if not attachment_id:
+            return Response({"detail": "attachment_id parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        queryset = self.get_queryset()  # Get the queryset filtered by lead_id
+        attachment = queryset.filter(pk=attachment_id).first()  # Filter using attachment_id
 
         if not attachment:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = self.get_serializer(attachment, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        print(request.data, serializer.instance.marked)
         self.perform_update(serializer)
         return Response(serializer.data)
 

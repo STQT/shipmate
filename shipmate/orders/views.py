@@ -213,6 +213,7 @@ class OrderAttachmentListView(UpdateModelMixin, GenericAPIView):
         return Response(serializer.data)
 
 
+
 @extend_schema(tags=[ATTACHMENTS_TAG])
 class OrderAttachmentDeleteAPIView(DestroyAPIView):
     serializer_class = OrderAttachmentSerializer  # noqa

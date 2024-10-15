@@ -253,6 +253,7 @@ def parsing_email(text, email, subject=""):
         condition=condition,
         trailer_type=trailer_type,
         **data)
+    print(lead)
     try:
         leadInsight = LeadsInsight(guid=lead.guid,
                                    status=lead.status,

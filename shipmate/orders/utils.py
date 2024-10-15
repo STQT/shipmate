@@ -76,9 +76,9 @@ Best regards,
 {contact_email}
 {contact_mainline}
 """
-    from_email = settings.SIGN_EMAIL_USERNAME  # Your email address
+    from_email = 'e-sign@connectacrm.com'  # Your email address
     password_email = settings.SIGN_EMAIL_PASSWORD
     recipient_list = [order.customer.email]  # List of recipients
     cc_list = [settings.CC_EMAIL]
     send_email(subject=subject, text_content=message, from_email=from_email, to_emails=recipient_list,
-               cc_emails=cc_list, host="smtp.gmail.com", user=from_email, password=password_email)
+               cc_emails=cc_list, host='smtp.sendgrid.net', user='apikey', password=settings.CONNECTA_API)

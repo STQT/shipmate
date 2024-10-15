@@ -9,7 +9,7 @@ from shipmate.mails.utils import parsing_email
 
 @shared_task
 def fetch_emails_task():
-    if settings.DEBUG is True:
+    if settings.DEBUG is False:
         username = settings.IMAP_EMAIL_USER
         password = settings.IMAP_EMAIL_PASSWORD
         emails = fetch_emails(username, password, imap_server="imap.gmail.com")

@@ -20,7 +20,7 @@ services:
       - redis
 #      - playwright_ocean  # Add playwright dependency
     ports:
-      - "7500:5000"
+      - "7501:5000"
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
